@@ -17,20 +17,29 @@
 					<div class="col-md-6 login-right">
 
 			  			<h3>CHANGE PASSWORD</h3>
-						 <form action="<?= base_url('changePassword');?>"  method="POST">                                                    
+						 <form action="<?= base_url('changePassword');?>"  method="POST">
 
+							 <div class="validation_errors">
+								 <?php echo validation_errors(); ?>
+
+								 <?php  if(isset($error)) {
+									 print $error;
+								 }
+
+								 ?>
+							 </div>
 							<div>
 
 								<span>New Password<label>*</label></span>
 
-								<input type="password" name="password" autocomplete="off"> 
+								<input type="password" name="password" autocomplete="off" required>
 
 							</div>
 							<div>
 
 								<span>Password confirm<label>*</label></span>
 
-								<input type="password" name="password" autocomplete="off"> 
+								<input type="password" name="password_confirm" autocomplete="off" required>
 
 							</div>
 

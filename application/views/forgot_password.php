@@ -15,7 +15,7 @@
 			   <div class="account_grid">
 					<div class="col-md-6 login-right">
 
-			  			<h3>RETRIEVE PASSWORD</h3>
+			  			<h3>CHANGE PASSWORD</h3>
 						 <form action="<?= base_url('sendPasswordChangeEmail');?>"  method="POST">
                                                      
 							<div>

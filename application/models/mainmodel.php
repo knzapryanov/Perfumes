@@ -53,6 +53,22 @@ class MainModel extends CI_Model {
       
       return false;
    }
+
+   public function changeUserPassword($userId) {
+       $data = array(
+           'password' => $_POST['password']
+       );
+
+       $this->db->where('id', $userId);
+       $this->db->update('users', $data);
+       unset($_SESSION['token']);
+       unset($_SESSION['userId']);
+   }
+
+   public function getUserIdByEmail($userEmail) {
+       $query = $this->db->get_where('users', array('email' => $userEmail));
+       return $query->row()->id;
+   }
 }
     
     

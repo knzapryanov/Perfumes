@@ -6,7 +6,7 @@ class Main extends MyController {
     }
          
     function generateEncryptStr(){
-    $str = md5(md5(123123123123123));
+    $str = md5(md5(time()));
     
     return $str;
     
@@ -78,7 +78,7 @@ class Main extends MyController {
         }
         else {
             if($this->mainModel->insertUserSuccess()) {
-                 $data['successMessage'] = '<div id="successRegister">Successfully registered!</div>';
+                 $data['successMessage'] = '<div class="success">Successfully registered!</div>';
                  $this->currentPage('login', $data);
             }
             $data['error'] = 'Database error occurred, resend!';
@@ -86,73 +86,80 @@ class Main extends MyController {
            
         }
     }
-    public $token = '';
     
     public function forgotPassword(){
         $this->currentPage('forgot_password');
     }
 
     public function sendPasswordChangeEmail() {
-      
-        
+
         if(!$this->mainModel->checkEmailExist()) {
             $data['message'] = 'This email do not exist in our database!!!';
-            $this->currentPage('forgot_password', $data) ;  
-            
-            return false;
+            $this->currentPage('forgot_password', $data) ;
         }
-        
-         $configLocalhost = Array(
-            'protocol' => 'smtp',
-            'smtp_host' => 'ssl://smtp.googlemail.com',
-            'smtp_port' => 465,
-            'smtp_user' => 'peturhristozovps@gmail.com', // change it to yours
-            'smtp_pass' => 'lanselotps3', // change it to yours
-            'mailtype' => 'html',
-            'charset' => 'iso-8859-1',
-            'wordwrap' => TRUE
-          );
-        
-        $this->load->library('email', $configLocalhost);
-                          
+
+        $this->load->library('email');
         $this->email->from('peturhristozovps@gmail.com', 'Perfumes.com');
         $this->email->to($this->input->post('email'));
-        
-        $this->token = $this->generateEncryptStr();
-        // generate token 
+
+        // generate token
+        $_SESSION['token'] = $this->generateEncryptStr();
+        $userEmail = $this->input->post('email');
+        $userId = $this->mainModel->getUserIdByEmail($userEmail);
         
         $link = "Follow the link to change your password in Perfumes.com<br />";
-        $link =+ '<a href="http://localhost/Perfumes/passwordChangeAccess?token='.$this->token.'">Password change.</a>';
+        $link .= "http://localhost/Perfumes/changePasswordAccess?id=".$userId;
+        $link .= "&token=".$_SESSION['token'];
         
         $this->email->message($link);
         $this->email->subject('Perfumes.com password change');
-//
-//        echo '<pre>';
-//        print_r($this->email->get());
-//        echo '</pre>';
         $send = $this->email->send();
         
         if($send) {
-            $data['message'] = 'Plase check your email address and follow the instructions';
+            $data['message'] = 'Please check your email address and follow the instructions';
             
-         }
-         else {
-            $data['message'] = 'Error, Plase try again! ';
-         }
-         print_r($this->email->print_debugger());
-         $this->currentPage('forgot_password', $data) ;  
+        }
+        else {
+            $data['message'] = 'Error, Please try again! ';
+        }
+        $this->currentPage('forgot_password', $data) ;
     }
-    
-    public function passwordChangeAccess() {
-        if(!isset($_GET['token']) || $_GET['token'] !== $this->token) {
+
+    public function changePasswordAccess() {
+        if(isset($_GET['token']) && $_GET['token'] === $_SESSION['token']){
+            $_SESSION['userId'] = $_GET['id'];
+            $this->currentPage('change_password');
+        }
+        elseif(isset($_SESSION['userId'])){
+            // continue without redirect. Allow authenticated(with token) user to visit changePassword page multiple times
+            $this->currentPage('change_password');
+        }
+        else{
             redirect('');
         }
-        
-        $this->currentPage('change_password');
-        $this->email->print_debugger();
     }
-    
+
     public function changePassword() {
-        
+
+        $this->load->helper(array('form', 'url'));
+
+        $this->load->library('form_validation');
+
+        $this->form_validation->set_rules('password', 'Password', 'trim|required|matches[password_confirm]',
+            array('required' => 'You must provide a %s.')
+        );
+        $this->form_validation->set_rules('password_confirm', 'Password Confirmation', 'trim|required');
+
+        if ($this->form_validation->run() == FALSE) {
+            $this->changePasswordAccess();
+        }
+        else {
+            if($this->mainModel->changeUserPassword($_SESSION['userId'])) {
+                $data['successMessage'] = '<div class="success">Password changed successfully!</div>';
+                $this->currentPage('login', $data);
+            }
+            $data['error'] = 'Database error occurred, resend!';
+            $this->currentPage('login', $data);
+        }
     }
 }
