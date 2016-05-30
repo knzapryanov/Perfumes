@@ -18,7 +18,12 @@ class AdminController extends MyController {
     }
 
     public function index() {
-        $this->adminPage('admin/index');
+        if(isset($_SESSION['role']) && $_SESSION['role'] == ADMIN) {
+            $this->productPage();
+        }
+        else {
+            $this->adminPage('admin/index');
+        }
     }
     
     public function checkRole() {
@@ -26,7 +31,9 @@ class AdminController extends MyController {
     }
     
     public function productPage() {
-        $this->adminPage('admin/admin_page');
+        $data['allBrandsResult'] = $this->mainModel->getAllBrands();
+        $data['allCategoriesResult'] = $this->mainModel->getAllCategories();
+        $this->adminPage('admin/admin_page', $data);
     }
     
     //* $field_name => Input file field name.

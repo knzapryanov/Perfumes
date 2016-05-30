@@ -179,4 +179,14 @@ $(document).ready(function() {
     }
 }
 
+    $('#sale_price_div').hide();
+    $('#is_sale').click(function() {
+        $('#sale_price_div')[this.checked ? "show" : "hide"]();
+    });
+
+    $('#off_price_div').hide();
+    $('#is_off').click(function() {
+        $('#off_price_div')[this.checked ? "show" : "hide"]();
+    });
+
 });   

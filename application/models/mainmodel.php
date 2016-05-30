@@ -70,6 +70,16 @@ class MainModel extends CI_Model {
        $query = $this->db->get_where('users', array('email' => $userEmail));
        return $query->row()->id;
    }
+
+   public function getAllBrands() {
+       $query = $this->db->get('brands');
+       return $query->result();
+   }
+
+   public function getAllCategories(){
+       $query = $this->db->get('categories');
+       return $query->result();
+   }
 }
     
     
