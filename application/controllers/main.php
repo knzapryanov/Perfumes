@@ -1,6 +1,7 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
 class Main extends MyController {
+    
     public function index(){
         $this->currentPage('index');
     }
@@ -12,35 +13,6 @@ class Main extends MyController {
     
     }
     
-    function permission() {
-        $is_empty = $this->mainModel->validationUser();
-
-        if($is_empty !== false){
-            $sessionData = array(
-                    'id' => $is_empty[0]->id,
-                    'first_name' => $is_empty[0]->first_name,
-                    'last_name' => $is_empty[0]->last_name,
-                    'fullName' => $is_empty[0]->first_name.' '.$is_empty[0]->last_name,
-                    'email' => $is_empty[0]->email,
-                    'role' => $is_empty[0]->role,
-                    'password' => $is_empty[0]->password,
-                );            
-                
-                // user found
-                $this->session->set_userdata($sessionData);
-
-                if((int)$is_empty[0]->role === ADMIN){
-                    redirect('admin');
-                }
-                if((int)$is_empty[0]->role === USER){
-                    redirect('index');
-                }
-        }   
-        else{
-            $this->session->set_flashdata('error','Email or Password not match!');
-            redirect('login');
-        }
-    }
     
     public function logout(){
              $this->session->sess_destroy();

@@ -4,13 +4,13 @@ class MainModel extends CI_Model {
     public function validationUser(){
        $data = array(
          'email' => $this->input->post('email'),
-         'password' => $this->input->post('password')
+         'password' => $this->input->post('password'),
        );
   
        $query = $this
                ->db
                ->where($data)
-               ->get('users')->result();
+               ->get('users')->result(); 
        
        $count = count($query);
        if($count > 0){
@@ -21,6 +21,7 @@ class MainModel extends CI_Model {
        {
            return false;
        }
+       
    }
    
    public function insertUserSuccess() {
