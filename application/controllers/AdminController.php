@@ -138,8 +138,8 @@ class AdminController extends MyController {
     }
     
     public function createProduct() {
-        sleep(4);
-        echo false;
+        //sleep(4);
+        echo $this->mainModel->insertProductInDB();
     }
 
     

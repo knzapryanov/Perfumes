@@ -80,6 +80,17 @@ class MainModel extends CI_Model {
        $query = $this->db->get('categories');
        return $query->result();
    }
+
+   public function  insertProductInDB() {
+       $this->db->set('created_time',time());
+       $isSuccess = $this->db->insert('products', $_POST);
+
+       if($isSuccess) {
+           return true;
+       }
+
+       return false;
+   }
 }
     
     

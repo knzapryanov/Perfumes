@@ -20,13 +20,11 @@
 
                                            <span>Brand<label>*</label></span>
 
-                                            <select>
+                                            <select id="brand_id">
                                                 <?php
                                                     foreach($allBrandsResult as $brandObj){
                                                         ?>
-                                                        <option value="
-                                                        <?php echo $brandObj->id; ?>
-                                                        ">
+                                                        <option value="<?php echo $brandObj->id; ?>">
                                                         <?php echo ucfirst($brandObj->brand_name); ?>
                                                         </option>
                                                         <?php
@@ -40,13 +38,11 @@
 
                                        <span>Category<label>*</label></span>
 
-                                       <select>
+                                       <select id="cat_id">
                                            <?php
                                            foreach($allCategoriesResult as $categoryObj){
                                                ?>
-                                               <option value="
-                                                        <?php echo $categoryObj->id; ?>
-                                                        ">
+                                               <option value="<?php echo $categoryObj->id; ?>">
                                                    <?php echo ucfirst($categoryObj->category_name); ?>
                                                </option>
                                                <?php
@@ -68,7 +64,7 @@
 
                                             <span>Quantity<label>*</label></span>
 
-                                            <input type="text" name="quntity" id="quntity" autocomplete="off">
+                                            <input type="text" name="quantity" id="quantity" autocomplete="off">
 
                                     </div>
 
@@ -76,7 +72,7 @@
 
                                        <span>Rate<label>*</label></span>
 
-                                       <input type="text" name="rate" autocomplete="off">
+                                       <input type="text" name="rate" id="rate" autocomplete="off">
 
                                     </div>
 
@@ -84,7 +80,7 @@
 
                                        <span>Milliliters<label>*</label></span>
 
-                                       <input type="text" name="ml" autocomplete="off">
+                                       <input type="text" name="ml" id="ml" autocomplete="off">
 
                                     </div>
 
@@ -95,7 +91,7 @@
 
                                         <div id="sale_price_div">
                                             <span>Sale price<label>*</label></span>
-                                            <input type="text" name="sale_price" autocomplete="off">
+                                            <input type="text" name="sale_price" id="sale_price" autocomplete="off">
                                         </div>
 
                                     </div>
@@ -107,7 +103,7 @@
 
                                        <div id="off_price_div">
                                            <span>Off price<label>*</label></span>
-                                           <input type="text" name="off_price" autocomplete="off">
+                                           <input type="text" name="off_price" id="off_price" autocomplete="off">
                                        </div>
 
                                     </div>

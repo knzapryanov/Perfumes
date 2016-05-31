@@ -85,15 +85,39 @@ $(document).ready(function() {
     
     $('body').on('click', '#createProduct', function() {
        var productName = $('#product_name').val();
+       var productBrandId = $('#brand_id').val();
+       var productCatId = $('#cat_id').val();
        var productPrice = $('#price').val();
-       var quantity = $('#quantity').val();
-       var images = [];
+       var productQuantity = $('#quantity').val();
+       var productRate = $('#rate').val();
+       var productMl = $('#ml').val();
+       var productIsSale;
+       var productSalePrice;
+       if ($('#is_sale').is(":checked")) {
+           productIsSale = 1;
+           productSalePrice = $('#sale_price').val();
+       }
+       else {
+           productIsSale = 0;
+           productSalePrice = 0;
+       }
+       var productIsOff;
+       var productOffPrice;
+       if($('#is_off').is(":checked")){
+           productIsOff = 1;
+           productOffPrice = $('#off_price').val();
+       }
+       else{
+           productIsOff = 0;
+           productOffPrice = 0;
+       }
+/*       var images = [];
        
        for(var i = 0; i < $('.contImage').length; i++) {
           var src = $('.contImage').eq(i).attr('image-src');
           
           images.push(src);
-       }
+       }*/
        
        showWaitMessage('Product is being uploaded...');
        $.ajax({
@@ -101,9 +125,17 @@ $(document).ready(function() {
           type: 'POST',
           data: {
              product_name: productName,
+             brand_id: productBrandId,
+             cat_id: productCatId,
              price: productPrice,
-             quantity: quantity,
-             images: images
+             quantity: productQuantity,
+             rate: productRate,
+             ml: productMl,
+             is_sale: productIsSale,
+             sale_price: productSalePrice,
+             is_off: productIsOff,
+             off_price: productOffPrice
+             //images: images
           },
           success: function(response) {
               if(response) {
