@@ -33,6 +33,7 @@ class AdminController extends MyController {
     public function productPage() {
         $data['allBrandsResult'] = $this->mainModel->getAllBrands();
         $data['allCategoriesResult'] = $this->mainModel->getAllCategories();
+        $data['manualProducts'] = $this->mainModel->getManualProducts();
         $this->adminPage('admin/admin_page', $data);
     }
     
@@ -138,8 +139,10 @@ class AdminController extends MyController {
     }
     
     public function createProduct() {
-        //sleep(4);
-        echo $this->mainModel->insertProductInDB();
+        if($this->input->is_ajax_request()) {
+           echo $this->mainModel->insertProductInDB();
+        }
+        
     }
 
     

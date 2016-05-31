@@ -12,7 +12,7 @@
 
                                             <span>Name<label>*</label></span>
 
-                                            <input type="text" name="product_name" id="product_name" autocomplete="off">
+                                            <input type="text" name="product_name" required id="product_name" autocomplete="off">
 
                                     </div>
 
@@ -51,63 +51,45 @@
                                        </select>
 
                                     </div>
-
+                                    <div>
+                                                
+                                       <span>ML<label>*</label></span>
+                                       <div id="holdMl"> 
+                                           
+                                        <input type="text" name="ml" id="ml" autocomplete="off">
+                                        <a href="javascript:void(0)" id="addMl">Add</a>
+                                       </div> 
+                                    </div>
+                                   
+                                    <div id="containerHolderPrices"></div>
+                                  
                                     <div>
 
-                                            <span>Price<label>*</label></span>
-
-                                            <input type="text" name="price" id="price" autocomplete="off">
-
                                     </div>
-
+                                    
                                     <div>
-
-                                            <span>Quantity<label>*</label></span>
-
-                                            <input type="text" name="quantity" id="quantity" autocomplete="off">
-
+                                        <input type="checkbox" id="addToNewest" />
+                                        <label>Add to Newest Products</label>
                                     </div>
-
-                                    <div>
-
-                                       <span>Rate<label>*</label></span>
-
-                                       <input type="text" name="rate" id="rate" autocomplete="off">
-
+                                    
+                                    <div id="overLayerManual">
+                                        
+                                        
+                                        
+                                        <span id="newLeft">NEWEST PRODUCTS</span><span id="newRight"><?= count($manualProducts) ?> from 48</span>
+                                        <ol>
+                                            <?php if(!empty($manualProducts)) : ?>
+                                                <?php foreach($manualProducts as $product) :  ?>
+                                                <li>
+                                                    <input type="checkbox" checked="checked" value="<?= $product['id'] ?>" />
+                                                    <label><?= $product['product_name']; ?></label>
+                                                </li>
+                                                <?php endforeach; ?>
+                                            <?php else : ?>
+                                                <li>No added products!</li>
+                                            <?php endif; ?>
+                                        </ol>
                                     </div>
-
-                                    <div>
-
-                                       <span>Milliliters<label>*</label></span>
-
-                                       <input type="text" name="ml" id="ml" autocomplete="off">
-
-                                    </div>
-
-                                    <div>
-
-                                        <input type="hidden" name="is_sale" value="0" />
-                                        <input type="checkbox" name="is_sale" id="is_sale" value="1">Product on sale.<br>
-
-                                        <div id="sale_price_div">
-                                            <span>Sale price<label>*</label></span>
-                                            <input type="text" name="sale_price" id="sale_price" autocomplete="off">
-                                        </div>
-
-                                    </div>
-
-                                    <div>
-
-                                       <input type="hidden" name="is_off" value="0" />
-                                       <input type="checkbox" name="is_off" id="is_off" value="1">Product with off price.<br>
-
-                                       <div id="off_price_div">
-                                           <span>Off price<label>*</label></span>
-                                           <input type="text" name="off_price" id="off_price" autocomplete="off">
-                                       </div>
-
-                                    </div>
-
                                     <div id="startPoint">
 
                                             <span>Upload Images<label></label></span>
@@ -123,7 +105,8 @@
                                              <input type="submit" id="uploadImage" value="Upload" class="acount-btn">
                                              </form>
                                     </div>
-
+                                    
+                                   
 
                                     <input type="submit" id="createProduct" value="Create" class="acount-btn">
 

@@ -82,14 +82,113 @@ class MainModel extends CI_Model {
    }
 
    public function  insertProductInDB() {
-       $this->db->set('created_time',time());
-       $isSuccess = $this->db->insert('products', $_POST);
-
+       $post = $this->input->post();
+     
+       
+       $productTable = array(
+          'product_name' => $post['product_name'], 
+          'brand_id' => $post['brand_id'], 
+          'cat_id' => $post['cat_id'],
+          'created_time' => time()
+       );
+       
+       $isSuccess = $this->db->insert('products', $productTable);
+       $lastId = $this->db->insert_id();
+       
+       $this->productOptions($lastId, $post['mlArray']);
+       
+       $this->saveImages($lastId, $post['images']);
+       
+       $manuals = isset($post['manualNewest']) ? $post['manualNewest'] : array();
+       
+       $this->manualProducts($lastId, $manuals, $post['addToNewest']);
+       
+       
+       
        if($isSuccess) {
            return true;
        }
 
        return false;
+   }
+   
+   public function productOptions($lastId, $mlArray) {
+//       foreach($mlArray as $index => $ml) {
+//           $options = array(
+//               'product_id' => $lastId,
+//               'ml' => $ml[$index][0], // ml
+//               'price' => $ml[$index][1], //price
+//               'sale_price' => $ml[$index][2],//sale_price
+//               'off_percentage' => $ml[$index][3], // off_percentage
+//               'quantity' => $ml[$index][4] // 'quantity'
+//           );
+//           
+           for($i = 0; $i < count($mlArray); $i++) {
+               $options = array(
+               'product_id' => $lastId,
+               'ml' => $mlArray[$i][0], // ml
+               'price' => $mlArray[$i][1], //price
+               'sale_price' => $mlArray[$i][2],//sale_price
+               'off_percentage' => $mlArray[$i][3], // off_percentage
+               'quantity' => $mlArray[$i][4] // 'quantity'
+               );
+             $this->db->insert('product_options', $options);
+
+           }
+           
+//       }
+   }
+   
+   public function manualProducts($lastId, $manuals, $added) {
+       $this->db->empty_table('manual_newest');
+       
+       
+       if($added) {
+           $manuals[] = $lastId;
+       }
+   
+       foreach($manuals as $product) {
+          $this->db->insert('manual_newest', array('product_id' => $product));
+       }
+       
+   }
+   
+   public function saveImages($lastId, $images) {
+       $index = 0;
+       foreach($images as $image) {
+           $isCover = 0;
+           if($index === 0) {
+               $isCover = 1;
+           } 
+           
+           $dataImage = array(
+               'product_id' => $lastId,
+               'source' => $image,
+               'is_cover' => $isCover,
+           );
+           
+           $index++;
+           
+           $this->db->insert('pictures', $dataImage);
+       }
+   }
+   
+   
+   public function getManualProducts() {
+            $this->db->select('*');
+            $this->db->order_by('product_name ASC');
+            $this->db->from('manual_newest m'); 
+            $this->db->join('products p', 'm.product_id = p.id', 'left');
+            $query = $this->db->get(); 
+            
+            if($query->num_rows() !== 0)
+            {
+                return $query->result_array();
+            }
+            else
+            {
+                return false;
+            }
    }
 }
     

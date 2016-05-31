@@ -72,9 +72,9 @@ $(document).ready(function() {
                 $('.imageInput').val('');    
                 $('.under').text('No file chosen');
                 
-                var childImage = '<div class="contImage" image-src="'+ image +'">'+
-                                 +'<img src="'+ uploadsPath + '/' + image +'" />';
-                                 +'<a class="removeImage">X</a>';
+                var childImage = '<div class="contImage" image-src="'+ image +'">'
+                                     +'<img src="'+ uploadsPath + '/thumbs/' + image +'" />'
+                                     +'<a href="javascript:void(0)" class="removeImage"></a>'
                                  +'</div>';
                 // append image
                 $('#startPoint').append(childImage);
@@ -83,42 +83,32 @@ $(document).ready(function() {
         });
     });
     
+
+    
+
+ 
+
     $('body').on('click', '#createProduct', function() {
        var productName = $('#product_name').val();
        var productBrandId = $('#brand_id').val();
        var productCatId = $('#cat_id').val();
-       var productPrice = $('#price').val();
-       var productQuantity = $('#quantity').val();
-       var productRate = $('#rate').val();
-       var productMl = $('#ml').val();
-       var productIsSale;
-       var productSalePrice;
-       if ($('#is_sale').is(":checked")) {
-           productIsSale = 1;
-           productSalePrice = $('#sale_price').val();
-       }
-       else {
-           productIsSale = 0;
-           productSalePrice = 0;
-       }
-       var productIsOff;
-       var productOffPrice;
-       if($('#is_off').is(":checked")){
-           productIsOff = 1;
-           productOffPrice = $('#off_price').val();
-       }
-       else{
-           productIsOff = 0;
-           productOffPrice = 0;
-       }
-/*       var images = [];
        
-       for(var i = 0; i < $('.contImage').length; i++) {
-          var src = $('.contImage').eq(i).attr('image-src');
-          
-          images.push(src);
-       }*/
+//       var productPrice = $('#price').val();
+//       var productQuantity = $('#quantity').val();
+       if($('.holderPrices').length === 0 ) {
+           alert('Please add atleast one ML for the product!');
+           return false;
+       } 
        
+       var mlArray = getAllMl();
+       var images = getImages();     
+       
+       var addToNewest = $('#addToNewest').is(':checked');
+       var manualNewest = getManualProducts();
+       
+//        console.info(productName, productBrandId, productCatId);
+//        console.info(mlArray, images, addToNewest, manualNewest);
+//       return false;
        showWaitMessage('Product is being uploaded...');
        $.ajax({
           url: adminPath+"/createProduct",
@@ -127,15 +117,10 @@ $(document).ready(function() {
              product_name: productName,
              brand_id: productBrandId,
              cat_id: productCatId,
-             price: productPrice,
-             quantity: productQuantity,
-             rate: productRate,
-             ml: productMl,
-             is_sale: productIsSale,
-             sale_price: productSalePrice,
-             is_off: productIsOff,
-             off_price: productOffPrice
-             //images: images
+             mlArray: mlArray,
+             images: images,
+             addToNewest: addToNewest,
+             manualNewest: manualNewest
           },
           success: function(response) {
               if(response) {
@@ -154,6 +139,53 @@ $(document).ready(function() {
           }
        });
     });
+    
+    function getManualProducts() {
+        var manualProducts = [];
+        
+        for(var i = 0; i < $('#overLayerManual ol li').length; i++) {
+            var currentInput = $('#overLayerManual ol li').eq(i).find('input');
+            
+            if(currentInput.is(':checked')) {
+                manualProducts.push(currentInput.val());
+            }
+        }
+        
+        return manualProducts;
+    }
+    
+    function getAllMl() {
+        var mlArrayHolder = [];
+        
+        for(var i = 0; i < $('.holderPrices').length; i++ ) {
+           var currentArray = [];
+           var holder = $('.holderPrices').eq(i);
+           
+           var mlVal =  holder.find('.editMl').val();
+           var priceVal =  holder.find('.price').val();
+           var salePrice =  holder.find('.sale_price').val();
+           var offPercentage =  holder.find('.off_percentage').val();
+           var quantity = holder.find('.quantity').val();
+           
+           currentArray.push(mlVal, priceVal, salePrice, offPercentage, quantity);
+           
+           mlArrayHolder.push(currentArray);
+        }
+        
+        return mlArrayHolder;
+    }
+    
+    function getImages() {
+       var images = [];
+       
+       for(var i = 0; i < $('.contImage').length; i++) {
+          var src = $('.contImage').eq(i).attr('image-src');
+          images.push(src);
+       }
+       
+       return images;
+    }
+    
     
     $('body').on('click', '.removeImage', function() {
        $(this).parent().remove(); 
@@ -211,14 +243,90 @@ $(document).ready(function() {
     }
 }
 
-    $('#sale_price_div').hide();
-    $('#is_sale').click(function() {
-        $('#sale_price_div')[this.checked ? "show" : "hide"]();
+    $('.sale_price_div').hide();
+    
+    $('body').on('click', '.is_sale', function() {
+        $(this).parent().find('.sale_price_div')[this.checked ? "show" : "hide"]();
     });
 
-    $('#off_price_div').hide();
-    $('#is_off').click(function() {
-        $('#off_price_div')[this.checked ? "show" : "hide"]();
+    $('body').on('click', '.calculateButton', function() {
+       var holder = $(this).parents('.holderPrices');
+       
+       var priceVal = holder.find('.price').val();
+       var salePriceVal = holder.find('.sale_price').val();
+       var offPercentageVal = holder.find('.off_percentage').val();
+       var salePrice = holder.find('.sale_price');
+       var offPercentage = holder.find('.off_percentage');
+       
+       if(priceVal !== '') {
+            if(salePriceVal !== '') {
+             calculatePrecentage(salePriceVal, priceVal, offPercentage);
+            }
+            else if (offPercentageVal !== '') {
+              calculateSalePrice(offPercentageVal, priceVal, salePrice);  
+            }
+       }
+       else {
+           alert('Please fill regular PRICE first!');
+       }
     });
 
-});   
+    function calculatePrecentage(salePrice, priceVal, offPercentage) {
+        var result = 100 - (salePrice/priceVal * 100);
+
+        offPercentage.val(Math.ceil(result));
+    }
+    
+    function calculateSalePrice(offPercentage, priceVal, salePrice) {
+       var result = priceVal - (priceVal * (offPercentage/100));
+               
+
+        salePrice.val(Math.floor(result));  
+    }
+    
+    $('body').on('click', '#addMl', function() {
+        if($('#ml').val() === '') {
+            return false;
+        }
+        
+        createHolderPrices($('#ml').val());
+    });
+    
+    $('body').on('click', '.removeOption', function() {
+        $(this).parents('.holderPrices').remove();
+    });
+    
+    
+
+    function createHolderPrices(ml) {
+        var child = '<div class="holderPrices">'
+                     +'<div class="headerMl">'
+                         +'<span>ML&nbsp</span><input type="text" value="'+ ml +'" name="price" class="editMl" autocomplete="off">'
+                         +'<a class="removeOption" href="javascript:void(0)">X</a>'
+                     +'</div>'
+                     +'<div>'
+                             +'<span>Price<label>*</label></span>'
+                             +'<input type="text" name="price" class="price" autocomplete="off">'
+                     +'</div>'
+                     +'<div>'
+                         +'<input type="hidden" name="is_sale" value="0">'
+                         +'<input type="checkbox" name="is_sale" class="is_sale" id="" value="1"><label class="fixLabel" for="">Product on sale</label><br>'
+                         +'<div class="sale_price_div" style="display: none;">'
+                             +'<span>Sale price<label>*</label></span>'
+                             +'<input type="text" name="sale_price" class="sale_price" autocomplete="off">'
+                              +'<a class="calculateButton" href="javascript:void(0)">calculate</a>'
+                             +'<span>OFF Percentage<label>*</label></span>'
+                             +'<input type="text" name="off_percentage" class="off_percentage" autocomplete="off">'                                                          
+                         +'</div>'
+                         +'<span class="qnty">Quantity<label>*</label></span>'
+                         +'<input type="text" name="quantity" class="quantity" autocomplete="off">'
+                     +'</div>'
+                +'</div>';
+        
+        
+        $('#containerHolderPrices').append(child);
+        $('#ml').val('');
+    
+    }
+}); 
+// ready end
