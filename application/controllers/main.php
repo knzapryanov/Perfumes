@@ -3,7 +3,23 @@
 class Main extends MyController {
     
     public function index(){
-        $this->currentPage('index');
+        $data['manualNewestProductsArr'] = $this->mainModel->getManualProducts();
+
+        foreach ($data['manualNewestProductsArr'] as $index => $newestProduct) {
+            //$newestProductId = $newestProduct['id'];
+            /*$data['newestProductOptions'][$index] = $this->mainModel->getProductOptionsByProducId($newestProductId);
+            $data['newestProductPictures'][$index] = $this->mainModel->getProductPicturesByProducId($newestProductId);*/
+            $data['offPercentages'][$index] = $this->mainModel->getBiggestOffPercentByProductId($newestProduct['id']);
+        }
+
+        $productBiggestOffPercent = [];
+        /*foreach ($data['newestProductOptions'] as $currentProductOptions => $valArr) {
+            foreach ($currentProductOptions as $currentOption) {
+
+            }
+        }*/
+        //$dataToView[]
+        $this->currentPage('index', $data);
     }
          
     function generateEncryptStr(){

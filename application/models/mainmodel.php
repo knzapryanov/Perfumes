@@ -179,6 +179,8 @@ class MainModel extends CI_Model {
             $this->db->order_by('product_name ASC');
             $this->db->from('manual_newest m'); 
             $this->db->join('products p', 'm.product_id = p.id', 'left');
+            //$this->db->join('product_options po', 'm.product_id = po.product_id', 'left');
+            //$this->db->join('pictures pi', 'm.product_id = pi.product_id', 'left');
             $query = $this->db->get(); 
             
             if($query->num_rows() !== 0)
@@ -190,6 +192,22 @@ class MainModel extends CI_Model {
                 return false;
             }
    }
+
+    public function getProductOptionsByProducId($productId){
+        $query = $this->db->get_where('product_options', array('product_id' => $productId));
+        return $query->result_array();
+    }
+
+    public function getProductPicturesByProducId($productId){
+        $query = $this->db->get_where('pictures', array('product_id' => $productId));
+        return $query->result_array();
+    }
+
+    public function getBiggestOffPercentByProductId($productId){
+        $query = $this->db->get_where('product_options', array('product_id' => $productId));
+        //$resultArr =
+        return $query->row()->off_percentage;
+    }
 }
     
     
