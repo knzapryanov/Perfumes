@@ -83,12 +83,13 @@ class MainModel extends CI_Model {
 
    public function  insertProductInDB() {
        $post = $this->input->post();
-     
-       
+   
        $productTable = array(
           'product_name' => $post['product_name'], 
+          'description' => $post['description'], 
           'brand_id' => $post['brand_id'], 
           'cat_id' => $post['cat_id'],
+          'is_newest' => $post['addToNewest'],
           'created_time' => time()
        );
        
@@ -99,61 +100,83 @@ class MainModel extends CI_Model {
        
        $this->saveImages($lastId, $post['images']);
        
-       $manuals = isset($post['manualNewest']) ? $post['manualNewest'] : array();
-       
-       $this->manualProducts($lastId, $manuals, $post['addToNewest']);
-       
-       
-       
        if($isSuccess) {
-           return true;
+           $manuals = $this->getManualProducts();
+           
+           return $manuals;
        }
 
        return false;
    }
    
-   public function productOptions($lastId, $mlArray) {
-//       foreach($mlArray as $index => $ml) {
-//           $options = array(
-//               'product_id' => $lastId,
-//               'ml' => $ml[$index][0], // ml
-//               'price' => $ml[$index][1], //price
-//               'sale_price' => $ml[$index][2],//sale_price
-//               'off_percentage' => $ml[$index][3], // off_percentage
-//               'quantity' => $ml[$index][4] // 'quantity'
-//           );
-//           
-           for($i = 0; $i < count($mlArray); $i++) {
-               $options = array(
-               'product_id' => $lastId,
-               'ml' => $mlArray[$i][0], // ml
-               'price' => $mlArray[$i][1], //price
-               'sale_price' => $mlArray[$i][2],//sale_price
-               'off_percentage' => $mlArray[$i][3], // off_percentage
-               'quantity' => $mlArray[$i][4] // 'quantity'
-               );
-             $this->db->insert('product_options', $options);
+   public function updateProductInDB() {
+       $post = $this->input->post();
+       $currentId = $post['product_id'];
 
-           }
+       $productTable = array(
+          'product_name' => $post['product_name'], 
+          'description' => $post['description'], 
+          'brand_id' => $post['brand_id'], 
+          'cat_id' => $post['cat_id'],
+          'is_newest' => (int)$post['addToNewest'],
+       );
+       
+       $isSuccess = $this->db->where('id', $currentId)->update('products', $productTable);
+       
+       $this->productOptions($currentId, $post['mlArray'], true);
+       
+       $this->saveImages($currentId, $post['images'], true);
+       
+       if($isSuccess) {
+           $manuals = $this->getManualProducts();
            
-//       }
-   }
-   
-   public function manualProducts($lastId, $manuals, $added) {
-       $this->db->empty_table('manual_newest');
-       
-       
-       if($added) {
-           $manuals[] = $lastId;
+           return $manuals;
        }
-   
-       foreach($manuals as $product) {
-          $this->db->insert('manual_newest', array('product_id' => $product));
-       }
+
+       return false;
+       
        
    }
    
-   public function saveImages($lastId, $images) {
+   
+   public function productOptions($lastId, $mlArray, $isUpdate = false) {
+        
+       if($isUpdate) {
+          $this->db->where('product_id', $lastId)->delete('product_options');
+       }
+       
+        for($i = 0; $i < count($mlArray); $i++) {
+            $options = array(
+            'product_id' => $lastId,
+            'ml' => $mlArray[$i][0], // ml
+            'price' => $mlArray[$i][1], //price
+            'sale_price' => $mlArray[$i][2],//sale_price
+            'off_percentage' => $mlArray[$i][3], // off_percentage
+            'quantity' => $mlArray[$i][4] // 'quantity'
+            );
+            
+            $this->db->insert('product_options', $options);
+        }
+   }
+   
+   public function updateNew() {
+       $success = $this->db
+               ->where('id', $this->input->post('id'))
+               ->update('products', array('is_newest' => $this->input->post('is_newest')));
+       
+       if($success) {
+           return true;
+       }
+       
+       return false;
+       
+   }
+   
+   public function saveImages($lastId, $images, $isUpdate = false) {
+       if($isUpdate) {
+           $this->db->where('product_id', $lastId)->delete('pictures');
+       }
+
        $index = 0;
        foreach($images as $image) {
            $isCover = 0;
@@ -175,12 +198,10 @@ class MainModel extends CI_Model {
    
    
    public function getManualProducts() {
-            $this->db->select('*');
+            $this->db->select('id, product_name');
+            $this->db->from('products');
+            $this->db->where('is_newest', 1);
             $this->db->order_by('product_name ASC');
-            $this->db->from('manual_newest m'); 
-            $this->db->join('products p', 'm.product_id = p.id', 'left');
-            //$this->db->join('product_options po', 'm.product_id = po.product_id', 'left');
-            //$this->db->join('pictures pi', 'm.product_id = pi.product_id', 'left');
             $query = $this->db->get(); 
             
             if($query->num_rows() !== 0)
@@ -208,6 +229,66 @@ class MainModel extends CI_Model {
         //$resultArr =
         return $query->row()->off_percentage;
     }
+    
+    public function deleteBrandById() {
+        return $this->db->where('id', $this->input->post('id'))->delete('brands');
+    }
+    
+    public function deleteProductById() {
+        return $this->db->where('id', $this->input->post('id'))->delete('products');
+    }
+    
+    public function createBrand() {
+        $brand = $this->db->insert('brands', $this->input->post());
+        
+        if($brand) {
+            return array(
+                'id' => $this->db->insert_id()
+            );
+        }
+        
+        return false;
+    }
+    
+    public function getProducts($get = false) {
+        $baseURL = base_url().'admin/all_products/'; 
+
+        $page = 0;
+        
+       if($get !== false) {
+           $page = isset($get['page']) ? $get['page'] * 10 : 0;
+           
+           $this->db->like('product_name', $get['product_name']);
+       } 
+       
+       
+       $count = $this->db->get('products')->num_rows;
+   
+       $result_count = $count;
+
+        $config['base_url'] = $baseURL; 
+        $config['total_rows'] = $result_count;
+        $config['per_page']= 10;
+        $config['num_links'] = 20; 
+        $config['enable_query_strings'] = TRUE;
+    
+        
+        
+        $this->pagination->initialize($config);
+
+    
+        $this->db->select('id, product_name');
+        $this->db->like('product_name', !$get ? '' : $get['product_name']);
+        $this->db->order_by('product_name','asc');
+        
+        $data = array(
+            'products' => $this->db->get('products', $config['per_page'], $page)->result(),
+            'nextPage' => $this->db->get('products',$config['per_page'], $page + 10)->num_rows()
+         );
+        
+        return $data;
+    }
+ 
 }
     
     

@@ -1,13 +1,3 @@
-<style>
-
-
-
-</style>
-
-
-
-
-
 <div class="banner-section" style="margin:0 0 20px 0;">
 
 	<div class="container">
@@ -97,19 +87,6 @@
 	
 
 	<div id="newest" class="tab-pane fade in active">
-
-
-
-		
-
-
-
-
-
-
-
-		
-
 		<div class="gallery">
 
 			<div class="container">
@@ -117,808 +94,79 @@
 				<h3>NEWEST</h3>
 
 				<div class="gallery-grids">
-
-
-<?php //echo '<pre>'; print_r($manualNewestProductsArr); print_r(count($manualNewestProductsArr)); echo '</pre>'; ?>
-					<?php echo '<pre>'; print_r($offPercentages); echo '</pre>'; ?>
-					<?php //echo '<pre>'; print_r($newestProductPictures); echo '</pre>'; ?>
-					<div class="col-md-3 gallery-grid ">
-
-						<a href="products.php">
-
-
-
-							<div class="b-wrapper_percent_off">
-
-								<div>-20%<BR/>OFF</div>
-
-							</div>
-
-							
-
-							<img src="images/g1.png" class="img-responsive" alt="" />
-
-							
-
+                                    
+                                        <?php foreach($manualNewest as $product) : ?>   
+                                      	<div class="col-md-3 gallery-grid ">
+                                            <a href="<?= base_url('product').'/'.$product->id ?>">
+                                                        <?php
+                                                        
+                                                        $salePrice = array();
+                                                        $percentage = array();
+                                                        $price = array();
+                                                        $minSalePrice = array();
+                                                        
+                                                        foreach ($product->options as $option) {
+                                                               $price[] = $option->price;
+                                                               $salePrice[] = $option->sale_price;
+                                                               
+                                                               if((int)$option->sale_price !== 0) {
+                                                                   $minSalePrice[] = $option->sale_price;
+                                                               }
+                                                               
+                                                               $percentage[] = $option->off_percentage;
+                                                        }
+                                                        
+                                                        $maxSale = (int)max($salePrice);
+                                                        $minSale = count($minSalePrice) > 0 ? (int)min($minSalePrice) : '';
+                                                        $maxpercentage = (int)max($percentage);
+                                                        
+                                                        ?>
+                                                        
+                                                        
+                                                        <?php if($maxSale > 0) : ?>
+                                                           <?php if($maxpercentage >= 30) : ?>
+                                                
+                                                                <div class="b-wrapper_sale">
+                                                                        <div>SALE</div>
+                                                                </div>
+                                                               
+                                                           <?php else :?>     
+                                                                 <div class="b-wrapper_percent_off">
+                                                                        <div><?= $maxpercentage ?>%<BR/>OFF</div>
+                                                                </div>
+                                                            <?php endif; ?>    
+                                                        <?php endif; ?>    
+                                                <?php 
+                                                             
+                                                
+                                                ?>
+                                                <img src="<?= base_url('assets/uploads/thumbs').'/'.$product->pictures[0]->source ?>" class="img-responsive" alt="<?= $product->product_name ?>" />
 							<div class="gallery-info">
-
 								<div class="quick">
-
 									<p><span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span> view</p>
-
 								</div>
-
 							</div>
-
 						</a>
-
 						<div class="galy-info">
-
-							<p>Bvlgari Omnia</p>
-
+							<p><?= $product->product_name ?></p>
 							<div class="galry">
-
-								<div class="home_item_price"><del>€100.00</del></div>
-
-								<div class="home_new_price">€95.00</div>						
-
+                                                                <?php if($maxSale > 0) : ?>
+                                                                    <div class="home_item_price"><del>€<?= min($price);  ?>.00</del></div>
+                                                                    <div class="home_new_price">€<?= $minSale;  ?>.00</div>						
+                                                                <?php else : ?>
+                                                                    <div class="home_item_price">€<?= min($price);  ?>.00</div>
+                                                                <?php endif; ?>
 								<div class="clearfix"></div>
-
 							</div>
-
 						</div>
-
-					</div><!-- END of ITEM -->
-
-
-<!--
-					<div class="col-md-3 gallery-grid">
-
-						<a href="products.php">
-
-							
-
-							<div class="b-wrapper_sale">
-
-								<div>SALE</div>
-
-							</div>
-
-
-
-							<img src="images/g2.png" class="img-responsive" alt=""/>
-
-							<div class="gallery-info">
-
-								<div class="quick">
-
-									<p><span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span> view</p>
-
-								</div>
-
-							</div>
-
-						</a>
-
-						<div class="galy-info">
-
-							<p>Bvlgari In Black</p>
-
-							<div class="galry">
-
-								<div class="home_item_price"><del>€100.00</del></div>
-
-								<div class="home_new_price">€95.00</div>						
-
-								<div class="clearfix"></div>
-
-							</div>
-
-						</div>
-
-					</div><!-- END of ITEM
-
-
-
-					<div class="col-md-3 gallery-grid ">
-
-						<a href="products.php">
-
-
-
-							<div class="b-wrapper_percent_off">
-
-								<div>-20%<BR/>OFF</div>
-
-							</div>
-
-							
-
-							<img src="images/g1.png" class="img-responsive" alt="" />
-
-							
-
-							<div class="gallery-info">
-
-								<div class="quick">
-
-									<p><span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span> view</p>
-
-								</div>
-
-							</div>
-
-						</a>
-
-						<div class="galy-info">
-
-							<p>Bvlgari Omnia</p>
-
-							<div class="galry">
-
-								<div class="home_item_price"><del>€100.00</del></div>
-
-								<div class="home_new_price">€95.00</div>						
-
-								<div class="clearfix"></div>
-
-							</div>
-
-						</div>
-
-					</div><!-- END of ITEM
-
-
-
-					<div class="col-md-3 gallery-grid">
-
-						<a href="products.php">
-
-							
-
-							<div class="b-wrapper_sale">
-
-								<div>SALE</div>
-
-							</div>
-
-
-
-							<img src="images/g2.png" class="img-responsive" alt=""/>
-
-							<div class="gallery-info">
-
-								<div class="quick">
-
-									<p><span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span> view</p>
-
-								</div>
-
-							</div>
-
-						</a>
-
-						<div class="galy-info">
-
-							<p>Bvlgari In Black</p>
-
-							<div class="galry">
-
-								<div class="home_item_price"><del>€100.00</del></div>
-
-								<div class="home_new_price">€95.00</div>						
-
-								<div class="clearfix"></div>
-
-							</div>
-
-						</div>
-
-					</div><!-- END of ITEM
-
-
-
-					<div class="col-md-3 gallery-grid ">
-
-						<a href="products.php">
-
-
-
-							<div class="b-wrapper_percent_off">
-
-								<div>-20%<BR/>OFF</div>
-
-							</div>
-
-							
-
-							<img src="images/g1.png" class="img-responsive" alt="" />
-
-							
-
-							<div class="gallery-info">
-
-								<div class="quick">
-
-									<p><span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span> view</p>
-
-								</div>
-
-							</div>
-
-						</a>
-
-						<div class="galy-info">
-
-							<p>Bvlgari Omnia</p>
-
-							<div class="galry">
-
-								<div class="home_item_price"><del>€100.00</del></div>
-
-								<div class="home_new_price">€95.00</div>						
-
-								<div class="clearfix"></div>
-
-							</div>
-
-						</div>
-
-					</div><!-- END of ITEM
-
-
-
-					<div class="col-md-3 gallery-grid">
-
-						<a href="products.php">
-
-							
-
-							<div class="b-wrapper_sale">
-
-								<div>SALE</div>
-
-							</div>
-
-
-
-							<img src="images/g2.png" class="img-responsive" alt=""/>
-
-							<div class="gallery-info">
-
-								<div class="quick">
-
-									<p><span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span> view</p>
-
-								</div>
-
-							</div>
-
-						</a>
-
-						<div class="galy-info">
-
-							<p>Bvlgari In Black</p>
-
-							<div class="galry">
-
-								<div class="home_item_price"><del>€100.00</del></div>
-
-								<div class="home_new_price">€95.00</div>						
-
-								<div class="clearfix"></div>
-
-							</div>
-
-						</div>
-
-					</div><!-- END of ITEM
-
-
-
-					<div class="col-md-3 gallery-grid ">
-
-						<a href="products.php">
-
-
-
-							<div class="b-wrapper_percent_off">
-
-								<div>-20%<BR/>OFF</div>
-
-							</div>
-
-							
-
-							<img src="images/g1.png" class="img-responsive" alt="" />
-
-							
-
-							<div class="gallery-info">
-
-								<div class="quick">
-
-									<p><span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span> view</p>
-
-								</div>
-
-							</div>
-
-						</a>
-
-						<div class="galy-info">
-
-							<p>Bvlgari Omnia</p>
-
-							<div class="galry">
-
-								<div class="home_item_price"><del>€100.00</del></div>
-
-								<div class="home_new_price">€95.00</div>						
-
-								<div class="clearfix"></div>
-
-							</div>
-
-						</div>
-
-					</div><!-- END of ITEM
-
-
-
-					<div class="col-md-3 gallery-grid">
-
-						<a href="products.php">
-
-							
-
-							<div class="b-wrapper_sale">
-
-								<div>SALE</div>
-
-							</div>
-
-
-
-							<img src="images/g2.png" class="img-responsive" alt=""/>
-
-							<div class="gallery-info">
-
-								<div class="quick">
-
-									<p><span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span> view</p>
-
-								</div>
-
-							</div>
-
-						</a>
-
-						<div class="galy-info">
-
-							<p>Bvlgari In Black</p>
-
-							<div class="galry">
-
-								<div class="home_item_price"><del>€100.00</del></div>
-
-								<div class="home_new_price">€95.00</div>						
-
-								<div class="clearfix"></div>
-
-							</div>
-
-						</div>
-
-					</div><!-- END of ITEM
-
-
-
-					<div class="col-md-3 gallery-grid ">
-
-						<a href="products.php">
-
-
-
-							<div class="b-wrapper_percent_off">
-
-								<div>-20%<BR/>OFF</div>
-
-							</div>
-
-							
-
-							<img src="images/g1.png" class="img-responsive" alt="" />
-
-							
-
-							<div class="gallery-info">
-
-								<div class="quick">
-
-									<p><span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span> view</p>
-
-								</div>
-
-							</div>
-
-						</a>
-
-						<div class="galy-info">
-
-							<p>Bvlgari Omnia</p>
-
-							<div class="galry">
-
-								<div class="home_item_price"><del>€100.00</del></div>
-
-								<div class="home_new_price">€95.00</div>						
-
-								<div class="clearfix"></div>
-
-							</div>
-
-						</div>
-
-					</div><!-- END of ITEM
-
-
-
-					<div class="col-md-3 gallery-grid">
-
-						<a href="products.php">
-
-							
-
-							<div class="b-wrapper_sale">
-
-								<div>SALE</div>
-
-							</div>
-
-
-
-							<img src="images/g2.png" class="img-responsive" alt=""/>
-
-							<div class="gallery-info">
-
-								<div class="quick">
-
-									<p><span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span> view</p>
-
-								</div>
-
-							</div>
-
-						</a>
-
-						<div class="galy-info">
-
-							<p>Bvlgari In Black</p>
-
-							<div class="galry">
-
-								<div class="home_item_price"><del>€100.00</del></div>
-
-								<div class="home_new_price">€95.00</div>						
-
-								<div class="clearfix"></div>
-
-							</div>
-
-						</div>
-
-					</div><!-- END of ITEM
-
-
-
-					<div class="col-md-3 gallery-grid ">
-
-						<a href="products.php">
-
-
-
-							<div class="b-wrapper_percent_off">
-
-								<div>-20%<BR/>OFF</div>
-
-							</div>
-
-							
-
-							<img src="images/g1.png" class="img-responsive" alt="" />
-
-							
-
-							<div class="gallery-info">
-
-								<div class="quick">
-
-									<p><span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span> view</p>
-
-								</div>
-
-							</div>
-
-						</a>
-
-						<div class="galy-info">
-
-							<p>Bvlgari Omnia</p>
-
-							<div class="galry">
-
-								<div class="home_item_price"><del>€100.00</del></div>
-
-								<div class="home_new_price">€95.00</div>						
-
-								<div class="clearfix"></div>
-
-							</div>
-
-						</div>
-
-					</div><!-- END of ITEM
-
-
-
-					<div class="col-md-3 gallery-grid">
-
-						<a href="products.php">
-
-							
-
-							<div class="b-wrapper_sale">
-
-								<div>SALE</div>
-
-							</div>
-
-
-
-							<img src="images/g2.png" class="img-responsive" alt=""/>
-
-							<div class="gallery-info">
-
-								<div class="quick">
-
-									<p><span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span> view</p>
-
-								</div>
-
-							</div>
-
-						</a>
-
-						<div class="galy-info">
-
-							<p>Bvlgari In Black</p>
-
-							<div class="galry">
-
-								<div class="prices">
-
-									<h5 class="item_price">€95.00</h5>
-
-								</div>
-
-								<div class="old_price"><span>€95.00</span></div>
-
-								<div class="clearfix"></div>
-
-							</div>
-
-						</div>
-
-					</div><!-- END of ITEM
-
-				
-
-					<div class="clearfix"></div>
-
-					<div id="allproducts1" class="targetDiv">
-
-					
-
-						<div class="col-md-3 gallery-grid ">
-
-							<a href="products.php">
-
-
-
-								<div class="b-wrapper_percent_off">
-
-									<div>-20%<BR/>OFF</div>
-
-								</div>
-
-								
-
-								<img src="images/g1.png" class="img-responsive" alt="" />
-
-								
-
-								<div class="gallery-info">
-
-									<div class="quick">
-
-										<p><span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span> view</p>
-
-									</div>
-
-								</div>
-
-							</a>
-
-							<div class="galy-info">
-
-								<p>Bvlgari Omnia</p>
-
-								<div class="galry">
-
-									<div class="home_item_price"><del>€100.00</del></div>
-
-									<div class="home_new_price">€95.00</div>						
-
-									<div class="clearfix"></div>
-
-								</div>
-
-							</div>
-
-						</div><!-- END of ITEM
-
-
-
-						<div class="col-md-3 gallery-grid">
-
-							<a href="products.php">
-
-								
-
-								<div class="b-wrapper_sale">
-
-									<div>SALE</div>
-
-								</div>
-
-
-
-								<img src="images/g2.png" class="img-responsive" alt=""/>
-
-								<div class="gallery-info">
-
-									<div class="quick">
-
-										<p><span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span> view</p>
-
-									</div>
-
-								</div>
-
-							</a>
-
-							<div class="galy-info">
-
-								<p>Bvlgari In Black</p>
-
-								<div class="galry">
-
-									<div class="home_item_price"><del>€100.00</del></div>
-
-									<div class="home_new_price">€95.00</div>						
-
-									<div class="clearfix"></div>
-
-								</div>
-
-							</div>
-
-						</div><!-- END of ITEM
-
-
-
-						<div class="col-md-3 gallery-grid ">
-
-							<a href="products.php">
-
-
-
-								<div class="b-wrapper_percent_off">
-
-									<div>-20%<BR/>OFF</div>
-
-								</div>
-
-								
-
-								<img src="images/g1.png" class="img-responsive" alt="" />
-
-								
-
-								<div class="gallery-info">
-
-									<div class="quick">
-
-										<p><span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span> view</p>
-
-									</div>
-
-								</div>
-
-							</a>
-
-							<div class="galy-info">
-
-								<p>Bvlgari Omnia</p>
-
-								<div class="galry">
-
-									<div class="home_item_price"><del>€100.00</del></div>
-
-									<div class="home_new_price">€95.00</div>						
-
-									<div class="clearfix"></div>
-
-								</div>
-
-							</div>
-
-						</div><!-- END of ITEM
-
-
-
-						<div class="col-md-3 gallery-grid">
-
-							<a href="products.php">
-
-								
-
-								<div class="b-wrapper_sale">
-
-									<div>SALE</div>
-
-								</div>
-
-
-
-								<img src="images/g2.png" class="img-responsive" alt=""/>
-
-								<div class="gallery-info">
-
-									<div class="quick">
-
-										<p><span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span> view</p>
-
-									</div>
-
-								</div>
-
-							</a>
-
-							<div class="galy-info">
-
-								<p>Bvlgari In Black</p>
-
-								<div class="galry">
-
-									<div class="home_item_price"><del>€100.00</del></div>
-
-									<div class="home_new_price">€95.00</div>						
-
-									<div class="clearfix"></div>
-
-								</div>
-
-							</div>
-
-						</div><!-- END of ITEM
--->
-					
-
-						<div class="clearfix"></div>
-
 					</div>
+			
+                                        <?php endforeach; ?>
+                                        
+					<div class="clearfix"></div>
+                                        
+					</div>
+                                <!-- END GALLERY -->
 
 					<div style="text-align:center;"><a class="showSingle button" target="1">See all newest products</a></div>
 
@@ -941,10 +189,6 @@
 
 
 
-
-
-
-	</div>
 
 
 
@@ -1789,7 +1033,7 @@
 
 
 	</div>
-
+    </div>
 </div>
 
 

@@ -3,7 +3,9 @@
 class AdminController extends MyController {
      public function __construct() {
         parent::__construct();
-        
+
+        $this->load->model('relation_product_model');
+
         $ArrSession = $this->sessionData();
         $allowed = array(
             'index',
@@ -80,6 +82,8 @@ class AdminController extends MyController {
                         list($width,$height) = getimagesize($upload_image);
                         $thumb_height = ($thumb_width/$width) * $height;
                         $thumb_create = imagecreatetruecolor($thumb_width,$thumb_height);
+                        
+                        
                         switch($file_ext){
                                 case 'jpg':
                                         $source = imagecreatefromjpeg($upload_image);
@@ -97,11 +101,20 @@ class AdminController extends MyController {
                                         $source = imagecreatefromjpeg($upload_image);
                         }
                         imagecopyresized($thumb_create,$source,0,0,0,0,$thumb_width,$thumb_height,$width,$height);
-                        switch($file_ext){
+                        switch($file_ext){ 
                                 case 'jpg' || 'jpeg':
                                         imagejpeg($thumb_create,$thumbnail,100);
                                         break;
                                 case 'png':
+                                        $targ_w_thumb = $targ_w_thumb = 200;
+//                                        $dst_r = ImageCreateTrueColor($targ_w_thumb, $targ_h_thumb);
+                                        imagealphablending($thumb_create, false);
+                                        imagesavealpha($thumb_create, true);
+                                        imagefill($thumb_create, 0, 0, imagecolorallocatealpha($thumb_create, 0, 0, 0, 127));
+                                        imagecopyresampled($thumb_create, $this->image, 0, 0, $targ_x, $targ_y, $targ_w_thumb, $targ_h_thumb, $targ_w, $targ_h);
+//                                        imagepng($thumb_create,$thumbnail, 9);    
+                                    
+                                    
                                         imagepng($thumb_create,$thumbnail,100);
                                         break;
                                 case 'gif':
@@ -125,7 +138,10 @@ class AdminController extends MyController {
           
         $pathoToUpload = $_SERVER['DOCUMENT_ROOT'].'/Perfumes/assets/uploads/';
 	
-	$upload_img = $this->processUpload('file', $pathoToUpload, '', TRUE, $pathoToUpload.'thumbs/','200','160');
+        $width = '269';
+        $height = '340';
+        
+	$upload_img = $this->processUpload('file', $pathoToUpload, '', TRUE, $pathoToUpload.'thumbs/', $width, $height);
 	
 	//full path of the thumbnail image
 	$thumb_src = base_url().'assest/uploads/thumbs/'.$upload_img;
@@ -140,10 +156,117 @@ class AdminController extends MyController {
     
     public function createProduct() {
         if($this->input->is_ajax_request()) {
-           echo $this->mainModel->insertProductInDB();
+           $return = $this->mainModel->insertProductInDB();
+           
+           if(is_array($return)) {
+               echo json_encode(array(
+                   'data' => $return
+               ));
+           } 
+           else {
+              echo $return;
+           }
         }
         
     }
-
     
+    
+     public function updateProduct() {
+        if($this->input->is_ajax_request()) {
+           $return = $this->mainModel->updateProductInDB();
+           
+           if(is_array($return)) {
+               echo json_encode(array(
+                   'data' => $return
+               ));
+           } 
+           else {
+              echo $return;
+           }
+        }
+        
+    }
+    
+    
+    public function editProduct($productId) {
+        $data['product'] = $this->relation_product_model->
+                with_pictures()->
+                with_options()->
+                get($productId);
+   
+        $data['allBrandsResult'] = $this->mainModel->getAllBrands();
+        $data['allCategoriesResult'] = $this->mainModel->getAllCategories();
+        $data['manualProducts'] = $this->mainModel->getManualProducts();
+  
+        
+        $this->adminPage('admin/edit_product', $data);
+    }
+    
+    public function updateNewest() {
+        if($this->input->is_ajax_request()) {
+            if($this->mainModel->updateNew()) {
+                echo true;
+            }
+            else {
+             echo false;
+            }    
+        }
+    }
+    
+
+    public function addBrand() {
+        $data['allBrandsResult'] = $this->mainModel->getAllBrands();
+        $this->adminPage('admin/add_brand', $data);
+    }
+    
+    public function deleteBrand() {
+        if($this->input->is_ajax_request()) {
+            echo $this->mainModel->deleteBrandById();
+        }
+    }
+    
+    public function deleteProduct() {
+        if($this->input->is_ajax_request()) {
+            echo $this->mainModel->deleteProductById();
+        }
+    }
+    
+    public function createBrand() {
+        if($this->input->is_ajax_request()) {
+            $brand = $this->mainModel->createBrand();
+            
+            if(!$brand) {
+                echo false;
+            }
+            
+            else {
+                echo json_encode(array(
+                    'brand_id' => $brand 
+                ));
+            }
+        }
+    }
+    
+    
+    public function allProducts() {
+        $data = $this->mainModel->getProducts();
+        $this->adminPage('admin/all_products', $data);
+    }
+    
+    public function searchProducts() {
+        if($_GET) {
+            $data = $this->mainModel->getProducts($_GET);
+            $data['get'] = $_GET['product_name'];
+            
+            $this->adminPage('admin/all_products', $data);
+        }
+    }
+    
+    public function loadProducts() {
+        if($this->input->is_ajax_request()) {
+            $products = $this->mainModel->getProducts($this->input->post());
+            
+             echo json_encode($products);
+        }
+    }
 }

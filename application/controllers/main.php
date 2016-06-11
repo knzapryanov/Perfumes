@@ -3,22 +3,15 @@
 class Main extends MyController {
     
     public function index(){
-        $data['manualNewestProductsArr'] = $this->mainModel->getManualProducts();
-
-        foreach ($data['manualNewestProductsArr'] as $index => $newestProduct) {
-            //$newestProductId = $newestProduct['id'];
-            /*$data['newestProductOptions'][$index] = $this->mainModel->getProductOptionsByProducId($newestProductId);
-            $data['newestProductPictures'][$index] = $this->mainModel->getProductPicturesByProducId($newestProductId);*/
-            $data['offPercentages'][$index] = $this->mainModel->getBiggestOffPercentByProductId($newestProduct['id']);
-        }
-
-        $productBiggestOffPercent = [];
-        /*foreach ($data['newestProductOptions'] as $currentProductOptions => $valArr) {
-            foreach ($currentProductOptions as $currentOption) {
-
-            }
-        }*/
-        //$dataToView[]
+       
+        $data['manualNewest'] = $this->relation_product_model->
+                where('is_newest', 1)->
+                with_pictures('where:`pictures`.`is_cover`=\'1\'')->
+                with_options()->
+                get_all();
+        
+        shuffle($data['manualNewest']);
+      
         $this->currentPage('index', $data);
     }
          

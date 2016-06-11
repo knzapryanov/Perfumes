@@ -2,6 +2,13 @@
 
 class MyController extends CI_Controller
 {
+    
+    public function __construct() {
+        parent::__construct();
+        
+//        $this->output->enable_profiler(TRUE);
+        $this->load->model('relation_product_model');
+    }
     public function sessionData() {
         $hasSessionId = $this->session->userdata('id');
         $role = (int)$this->session->userdata('role');

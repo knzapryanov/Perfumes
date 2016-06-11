@@ -16,6 +16,11 @@
 
                                     </div>
 
+                                   <div>
+                                        <span>Description<label></label></span>
+                                       <textarea id="description" value=""></textarea>
+                                   </div>
+                                   
                                     <div>
 
                                            <span>Brand<label>*</label></span>
@@ -76,7 +81,7 @@
                                         
                                         
                                         
-                                        <span id="newLeft">NEWEST PRODUCTS</span><span id="newRight"><?= count($manualProducts) ?> from 48</span>
+                                        <span id="newLeft">NEWEST PRODUCTS</span><span id="newRight"><b id="counterNew"><?= count($manualProducts) ?></b> from 48</span>
                                         <ol>
                                             <?php if(!empty($manualProducts)) : ?>
                                                 <?php foreach($manualProducts as $product) :  ?>

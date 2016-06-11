@@ -53,6 +53,12 @@ $route['default_controller'] = 'main';
 $route['404_override'] = '';
 $route['translate_uri_dashes'] = FALSE;
 
+$route['test'] = "Test/index";
+$route['^test/(.+)$'] = "Test/$1";
+
+$route['migrate'] = "Migrate/index";
+$route['^migrate/(.+)$'] = "Migrate/$1";
+
 $route['admin'] = "AdminController/index";
 $route['^admin/(.+)$'] = "AdminController/$1";
 

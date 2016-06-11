@@ -95,6 +95,20 @@ span.under {
 }
 #form #sale_price_div{
     margin: 0;
+    
+}
+.sale_price_div {
+    padding: 18px;
+    box-shadow: inset 0px 0px 5px #333;
+    background: #ccc;
+}
+textarea#description{
+    width: 96%;
+    min-height: 117px;
+}
+#containerHolderPrices .sale_price_div span{
+    color: #333;
+    font-weight: bold;
 }
 #sale_price_div span{
     margin-top: 5px;
@@ -138,6 +152,7 @@ span.under {
 }
 #startPoint {
     display: inline-block; 
+    margin: 10px 0;
 }
 /*.contImage a{
     position: absolute;
@@ -220,8 +235,42 @@ span.under {
     top: 0px;
     right: 0px;
 }
+#brandPageOl ,#productPageOl {
+    margin: 0;
+    padding: 13px 0 0 15px;
+}
+#brandPageOl li, #productPageOl li{
+    padding: 4px 0;
+    border-bottom: 1px solid #ccc;
+    margin-bottom: 10px;
+}
+#brandPageOl li a, #productPageOl li a{
+    float: right;
+    font-size: 15px;
+    color: red
+}
+#productPageOl li a.editProduct {
+    float: right;
+    margin-right: 10px;
+    color: green;
+    font-weight: bold;
+}
 #form #holdMl {
     margin: 0;
+}
+#loader{
+    position: fixed;
+    top: 0px;
+    left: 0px;
+    width: 100%;
+    height: 100%;
+    background-position: center center;
+    background: rgba(255, 255, 255, 0.72) url('http://loadinggif.com/images/image-selection/29.gif') no-repeat;
+    background-position: center center;
+    z-index: 999;
+}
+#contMore{
+    margin-top: 39px;
 }
 .qnty{
     margin-top: 8px;
