@@ -172,7 +172,7 @@ textarea#description{
 #addMl{
     width: 96%;
     border: 1px solid #08538C;
-    padding: 5px 17px;
+    padding: 5px 9px;
     margin-top: 6px;
     position: relative;
     top: 2px;
@@ -345,6 +345,12 @@ textarea#description{
 
   ul.topnav.responsive li a { display: block; text-align: left;}
 
+}
+
+#createBrand{
+    position: absolute;
+    top: 56px;
+    left: 344px;
 }
 
 
