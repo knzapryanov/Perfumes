@@ -83,7 +83,35 @@ class AdminController extends MyController {
                         $thumb_height = ($thumb_width/$width) * $height;
                         $thumb_create = imagecreatetruecolor($thumb_width,$thumb_height);
                         
+                        switch ($file_ext)
+                            {
+                                case "png":
+                                    // integer representation of the color black (rgb: 0,0,0)
+                                    $background = imagecolorallocate($thumb_create, 255, 255, 255
+                                        );
+                                    // removing the black from the placeholder
+                                    imagecolortransparent($thumb_create, $background);
+
+                                    // turning off alpha blending (to ensure alpha channel information 
+                                    // is preserved, rather than removed (blending with the rest of the 
+                                    // image in the form of black))
+                                    imagealphablending($thumb_create, false);
+
+                                    // turning on alpha channel information saving (to ensure the full range 
+                                    // of transparency is preserved)
+                                    imagesavealpha($thumb_create, true);
+
+                                    break;
+                                case "gif":
+                                    // integer representation of the color black (rgb: 0,0,0)
+                                    $background = imagecolorallocate($thumb_create, 0, 0, 0);
+                                    // removing the black from the placeholder
+                                    imagecolortransparent($thumb_create, $background);
+
+                                    break;
+                            }
                         
+                                
                         switch($file_ext){
                                 case 'jpg':
                                         $source = imagecreatefromjpeg($upload_image);
@@ -106,15 +134,6 @@ class AdminController extends MyController {
                                         imagejpeg($thumb_create,$thumbnail,100);
                                         break;
                                 case 'png':
-                                        $targ_w_thumb = $targ_w_thumb = 200;
-//                                        $dst_r = ImageCreateTrueColor($targ_w_thumb, $targ_h_thumb);
-                                        imagealphablending($thumb_create, false);
-                                        imagesavealpha($thumb_create, true);
-                                        imagefill($thumb_create, 0, 0, imagecolorallocatealpha($thumb_create, 0, 0, 0, 127));
-                                        imagecopyresampled($thumb_create, $this->image, 0, 0, $targ_x, $targ_y, $targ_w_thumb, $targ_h_thumb, $targ_w, $targ_h);
-//                                        imagepng($thumb_create,$thumbnail, 9);    
-                                    
-                                    
                                         imagepng($thumb_create,$thumbnail,100);
                                         break;
                                 case 'gif':
@@ -262,4 +281,11 @@ class AdminController extends MyController {
         }
     }
     
+    public function loadProducts() {
+        if($this->input->is_ajax_request()) {
+            $products = $this->mainModel->getProducts($this->input->post());
+            
+             echo json_encode($products);
+        }
+    }
 }
