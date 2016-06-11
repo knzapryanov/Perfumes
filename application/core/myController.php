@@ -23,6 +23,16 @@ class MyController extends CI_Controller
         );
     }
     
+    
+    public function loadProducts() {
+        if($this->input->is_ajax_request()) {
+            $products = $this->mainModel->getProducts($this->input->post());
+            
+             echo json_encode($products);
+        }
+    }
+    // ajax lazy loading method
+    
     // inherite user/admin method 
     public function permission($redirect = false) {
         $is_empty = $this->mainModel->validationUser();

@@ -249,14 +249,12 @@ class MainModel extends CI_Model {
         
         return false;
     }
-    
-    public function getProducts($get = false) {
-        $baseURL = base_url().'admin/all_products/'; 
 
+    public function getProducts($get = false, $perPage = 12) {
         $page = 0;
         
        if($get !== false) {
-           $page = isset($get['page']) ? $get['page'] * 10 : 0;
+           $page = isset($get['page']) ? $get['page'] * $perPage : 0;
            
            $this->db->like('product_name', $get['product_name']);
        } 
@@ -266,9 +264,8 @@ class MainModel extends CI_Model {
    
        $result_count = $count;
 
-        $config['base_url'] = $baseURL; 
         $config['total_rows'] = $result_count;
-        $config['per_page']= 10;
+        $config['per_page']= $perPage;
         $config['num_links'] = 20; 
         $config['enable_query_strings'] = TRUE;
     
@@ -283,7 +280,7 @@ class MainModel extends CI_Model {
         
         $data = array(
             'products' => $this->db->get('products', $config['per_page'], $page)->result(),
-            'nextPage' => $this->db->get('products',$config['per_page'], $page + 10)->num_rows()
+            'nextPage' => $this->db->get('products',$config['per_page'], $page + $perPage)->num_rows()
          );
         
         return $data;
