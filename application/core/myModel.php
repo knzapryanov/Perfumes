@@ -605,6 +605,7 @@ class MyModel extends CI_Model
      */
     public function where($field_or_array = NULL, $operator_or_value = NULL, $value = NULL, $with_or = FALSE, $with_not = FALSE, $custom_string = FALSE)
     {
+        
         if($this->soft_deletes===TRUE)
         {
             $backtrace = debug_backtrace(); #fix for lower PHP 5.4 version
@@ -622,6 +623,8 @@ class MyModel extends CI_Model
                 {
                     $field = $where[0];
                     $operator_or_value = isset($where[1]) ? $where[1] : NULL;
+                 
+                    
                     $value = isset($where[2]) ? $where[2] : NULL;
                     $with_or = (isset($where[3])) ? TRUE : FALSE;
                     $with_not = (isset($where[4])) ? TRUE : FALSE;
@@ -1935,4 +1938,17 @@ class MyModel extends CI_Model
 	    return $data;
     }
     */
+    
+    
+    
+    
+       
+    public function convertSlug($string) {
+         $lowerCase = mb_strtolower($string, 'UTF-8');
+         $slug = url_title($lowerCase, 'dash', true);
+         
+         return $slug;
+    }
+    // custom slug used in mainModel and some controllers
+    
 }

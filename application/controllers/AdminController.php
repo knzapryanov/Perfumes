@@ -281,11 +281,5 @@ class AdminController extends MyController {
         }
     }
     
-    public function loadProducts() {
-        if($this->input->is_ajax_request()) {
-            $products = $this->mainModel->getProducts($this->input->post());
-            
-             echo json_encode($products);
-        }
-    }
+    
 }

@@ -460,33 +460,34 @@ $(document).ready(function() {
        });
     });
     
-    var page = 1;
-    
     $('body').on('click', '.showSingle', function() {
         var productName = $.urlParam('product_name');
-        $('body').prepend('<div id="loader"></div>');  
+        var pathToController  = typeof adminPath === 'undefined' ? publicPath : adminPath;
+        
+      $('body').prepend('<div id="loader"></div>');  
+      
       $.ajax({
-         url: adminPath+"/loadProducts",
+         url: pathToController + "/loadProducts",
          type: 'POST',
          data: {
            product_name: productName,
-           page: page
+           page: pageProducts
          },
          success: function(response) {
                 var data = JSON.parse(response);
-                
-                console.info('data', data);
+
                 for(var i in data.products) {
                     var li = '<li>'
                                 +'<a href="javascript:void(0)" class="brandId" attr-id="'+ data.products[i].id +'">X</a>'
                                 +'<label>'+ data.products[i].product_name +'</label>'
-                                +'<a href="' + adminPath +'/editProduct/' + data.products[i].id + '" class="editProduct" attr-id="'+ data.products[i].id +'">edit</a>'
+                                +'<a href="' + pathToController +'/editProduct/' + data.products[i].id + '" class="editProduct" attr-id="'+ data.products[i].id +'">edit</a>'
                             +'</li>';
 
                     $('#productPageOl').append(li);
                 }
                 
-            page++;
+            pageProducts++;
+            
             $('#loader').remove();
             
             if(data.nextPage === 0) {
@@ -497,6 +498,154 @@ $(document).ready(function() {
         
         
     });
+    
+    
+    var pageManuals = 1;
+    var pagePromo = 1;
+    var pageProducts = 1;
+    
+    $('body').on('click', '.loadProducts', function() {
+        var element = $(this).parents('.container');
+        var pathToController  = typeof adminPath === 'undefined' ? publicPath : adminPath;
+        var method = $(this).attr('attr-method');
+        var page = pageManuals;
+        // default page counter for index page newest products
+        
+        if(method === 'loadPromotions') {
+          page = pagePromo;
+          // assign new page iterator
+        }
+        
+      $('body').prepend('<div id="loader"></div>');  
+      
+      $.ajax({
+         url: pathToController + "/" + method,
+         type: 'POST',
+         data: {
+           page: page
+         },
+         success: function(response) {
+                var data = JSON.parse(response);
+                 
+                for(var i in data.products) {
+                    var offPercentageArr = [];
+                    var regularPriceArr = [];
+                    var salePriceArr = [];
+                    var cashedSale = [];
+                    
+                    var salePrice = '';
+                    var regularPrice = '';
+                    var offPercentage = '';    
+                    var isSale = '';
+                    
+                    for(var j = 0; j < data.products[i].options.length; j++ ) {
+                        var option = data.products[i].options[j];
+                        
+                        if(option.sale_price !== '0') {
+                            salePriceArr.push(option.sale_price);
+                            cashedSale.push(option.sale_price);
+
+                            offPercentageArr.push(option.off_percentage);
+                        }
+                        else {
+                            salePriceArr.push(0);
+                            offPercentageArr.push(0);
+                        }
+                        
+                        regularPriceArr.push(option.price);
+                    }
+                    
+//                    console.info(regularPriceArr, salePriceArr, offPercentageArr);
+                 
+                    if(salePriceArr.indexOf(0) === -1) {
+                        var salePriceArrSort = salePriceArr.sort(function(a, b){return a - b;});
+                        var minSalePrice = salePriceArrSort[0];
+                        var index = $.inArray( minSalePrice, cashedSale );
+                       
+                        offPercentage = offPercentageArr[index];
+                        salePrice = '\u20AC ' + minSalePrice;
+                        regularPrice = regularPriceArr[index];
+                        regularPrice = '<del>\u20AC ' + regularPrice + '</del>';
+                        
+                        
+                        
+                        if(offPercentage < 30) {
+                            isSale = 1;
+                        }
+                        else {
+                             isSale = 0;
+                        }
+                        
+                    }
+                    else {
+                        var regularPriceArrSort = regularPriceArr.sort(function(a, b){return b - a;});
+                        var minRegularPrice = regularPriceArrSort[0];
+                        
+                        regularPrice = '\u20AC ' + minRegularPrice;
+                    }
+
+                    var createDiv = $('<div class="col-md-3 gallery-grid "></div>');
+                    
+                    var divContents = '<a href="'+ publicPath +'/products/' + data.products[i].id + '">'
+                                    +'<img src="'+ uploadsPath +'/thumbs/' + data.products[i].pictures[0].source + '" class="img-responsive" alt="' + data.products[i].product_name + '">'
+                                    +'<div class="gallery-info">'
+                                        +'<div class="quick">'
+                                            +'<p><span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span> view</p>'
+                                        +'</div>'
+                                    +'</div>'
+				+'</a>'
+				+'<div class="galy-info">'
+                                    +'<p>' + data.products[i].product_name + '</p>'
+                                    +'<div class="galry">'
+                                         +'<div class="home_item_price">' + regularPrice + '</div>'
+                                         +'<div class="home_new_price">' + salePrice + '</div>'
+                                            +'<div class="clearfix"></div>'
+                                    +'</div>'
+                               +'</div>';
+                            
+                   createDiv.append(divContents);         
+                            
+                    
+                    var child = '';
+                    
+                    if(isSale === 1) {
+                        child = '<div class="b-wrapper_sale">'
+                                       +'<div>SALE</div>'
+                                    +'</div>';
+                        
+                    }   
+                    else if (isSale === 0) {
+                        child = '<div class="b-wrapper_percent_off">'
+                                  +'<div>' + offPercentage + ' %<br>OFF</div>'
+                                 +'</div>';
+                    }
+                    
+                    createDiv.find('a').prepend(child);
+                    
+                    element.find('.gallery-grids').append(createDiv);
+                }
+                
+           if(method === 'loadPromotions') {
+                pagePromo++;
+                // assign new page iterator
+            } 
+           else {
+                 pageManuals++;
+           }
+            
+            $('#loader').remove();
+            
+                console.info(data);
+            
+            if(data.nextPage === 0) {
+                element.find('.loadProducts').remove();
+            }
+        }
+       });
+        
+        
+    });
+    
     
     
     $.urlParam = function(name){

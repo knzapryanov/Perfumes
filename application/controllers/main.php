@@ -3,15 +3,9 @@
 class Main extends MyController {
     
     public function index(){
-       
-        $data['manualNewest'] = $this->relation_product_model->
-                where('is_newest', 1)->
-                with_pictures('where:`pictures`.`is_cover`=\'1\'')->
-                with_options()->
-                get_all();
-        
-        shuffle($data['manualNewest']);
-      
+        $data['manualNewest'] = $this->mainModel->indexRelation(12, '', 'is_newest');
+        $data['promotions'] = $this->mainModel->indexRelation(12, '', 'is_sale');
+ 
         $this->currentPage('index', $data);
     }
          
@@ -21,7 +15,6 @@ class Main extends MyController {
     return $str;
     
     }
-    
     
     public function logout(){
              $this->session->sess_destroy();
@@ -142,5 +135,49 @@ class Main extends MyController {
             $data['error'] = 'Database error occurred, resend!';
             $this->currentPage('login', $data);
         }
+    }
+    
+    
+    public function products() {
+        $page = '';
+        $this->currentPage('products', $page);
+    }
+    
+    public function loadManual() {
+        if($this->input->is_ajax_request()) {
+            $return = $this->mainModel->getIndexProducts($this->input->post('page'));
+            
+            if(!$return) {
+                echo false;
+            }
+            else {
+                echo json_encode($return);
+            }
+        }
+    }
+    
+    public function loadPromotions() {
+        if($this->input->is_ajax_request()) {
+            $return = $this->mainModel->getIndexProducts($this->input->post('page'), 12, 'is_sale');
+            
+            if(!$return) {
+                echo false;
+            }
+            else {
+                echo json_encode($return);
+            }
+        }
+    }
+    
+    public function product($slug) {
+     
+        $data['product'] = $this->mainModel->getProduct($slug);
+        
+        echo '<pre>';
+        print_r($data);
+        echo '<pre>';
+        die;
+        
+        $this->currentPage('product', $data);
     }
 }

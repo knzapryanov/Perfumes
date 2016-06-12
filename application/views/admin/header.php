@@ -44,7 +44,8 @@ echo '</pre>';
 	<div class="header-top">
 
 		<ul class="topnav">
-                    <!--<li><span class="responsive_size responsive_menu_active"><?php echo $page_title; ?></span></li>-->
+                    <!--<li><span class="responsive_size responsive_menu_a
+                    ctive"><?php echo $page_title; ?></span></li>-->
 
                     <li><a href="<?= base_url('admin/productPage') ?>"><span class="responsive_size">Add product</span></a></li>
 

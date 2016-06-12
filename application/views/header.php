@@ -20,6 +20,11 @@
 
 <script src="<?= base_url('assets/js/jquery-2.2.4.min.js') ?>"></script>
 
+<script>
+        publicPath = '<?= base_url('main'); ?>';
+        uploadsPath = '<?= base_url('assets/uploads') ?>';
+</script>
+
 <script type="text/javascript" src="<?= base_url('assets/js/bootstrap-3.1.1.min.js') ?>"></script>
 <script type="text/javascript" src="<?= base_url('assets/js/scripts.js') ?>"></script>
 
@@ -95,6 +100,7 @@ $(window).load(function() {
 <!-- the mousewheel plugin -->
 
 <script type="text/javascript" src="<?= base_url('assets/js/jquery.mousewheel.js') ?>"></script>
+
 
 
 
@@ -193,105 +199,57 @@ echo '</pre>';
 					<div class="navbar-header">
 
 						<button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
-
 							<span class="sr-only">Toggle navigation</span>
-
 							<span class="icon-bar"></span>
-
 							<span class="icon-bar"></span>
-
 							<span class="icon-bar"></span>
-
 						</button>
-
 						<h1 class="navbar-brand"><a  href="index.php">perfumes malta</a></h1>
-
 					</div>
 
 					<!--/.navbar-header-->
-
 	
-
 					<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-
 						<ul class="nav navbar-nav">
-
 							<li><a href="index.php">Home</a></li>
-
 							<li class="dropdown">
-
 								<a href="#" class="dropdown-toggle" data-toggle="dropdown">Men <b class="caret"></b></a>
-
 								<ul class="dropdown-menu multi-column columns-3">
-
 									<div class="row">
-
 										<div class="col-sm-4">
-
 											<ul class="multi-column-dropdown">
-
-												<li><a class="list1" href="products.php">Armani</a></li>
-
-												<li><a class="list1" href="products.php">Azzaro</a></li>
-
-												<li><a class="list1" href="products.php">Benetton</a></li>
-
-												<li><a class="list1" href="products.php">Bruno Banani</a></li>
-
-												<li><a class="list1" href="products.php">Burberry</a></li>
-
-											</ul>
-
+                                                                                            <?php foreach($brands as $i => $brand) : ?>
+                                                                                              <?php if($i <= 4) : ?>
+                                                                                                   <li><a class="list1" href="<?= base_url('products').'/'.$brand->id ?>"><?= $brand->brand_name ?></a></li>
+                                                                                              <?php endif;?>  
+                                                                                            <?php endforeach; ?>        
+                                                                                        </ul>
 										</div>
+										<div class="col-sm-4">
+											<ul class="multi-column-dropdown">
+											   <?php foreach($brands as $i => $brand) : ?>
+                                                                                              <?php if($i >= 5 && $i <= 9) : ?>
+                                                                                                   <li><a class="list1" href="<?= base_url('products').'/'.$brand->id ?>"><?= $brand->brand_name ?></a></li>
+                                                                                              <?php endif;?>  
+                                                                                            <?php endforeach; ?>
+                                                                                                   
+											</ul>
+                                                                                </div>
 
 										<div class="col-sm-4">
 
 											<ul class="multi-column-dropdown">
-
-												<li><a class="list1" href="products.php">Bvlgari</a></li>
-
-												<li><a class="list1" href="products.php">Calvin Klein</a></li>
-
-												<li><a class="list1" href="products.php">Carolina Herrera</a></li>
-
-												<li><a class="list1" href="products.php">Cartier</a></li>
-
-												<li><a class="list1" href="products.php">Cerruti</a></li>
-
+											    <?php foreach($brands as $i => $brand) : ?>
+                                                                                              <?php if($i >= 10 && $i <= 14) : ?>
+                                                                                                   <li><a class="list1" href="<?= base_url('products').'/'.$brand->id ?>"><?= $brand->brand_name ?></a></li>
+                                                                                              <?php endif;?>  
+                                                                                            <?php endforeach; ?>
 											</ul>
-
-										</div>
-
-										<div class="col-sm-4">
-
-											<ul class="multi-column-dropdown">
-
-												<li><a class="list1" href="products.php">Chanel</a></li>
-
-												<li><a class="list1" href="products.php">Davidoff</a></li>
-
-												<li><a class="list1" href="products.php">Diesel</a></li>
-
-												<li><a class="list1" href="products.php">Dolce & Gabbana</a></li>
-
-												<li><a class="list1" href="products.php">Dsquared</a></li>
-
-											</ul>
-
 										</div>										
-
 									</div>
-
 									<a href = "javascript:void(0)" onclick = "document.getElementById('light').style.display='block';document.getElementById('fade').style.display='block'"><div class="menu_see_all_brands">SEE ALL BRANDS</div></a>
-
 								</ul>
-
-
-
 							</li>
-
-
-
 							<li class="dropdown">
 
 								<a href="#" class="dropdown-toggle" data-toggle="dropdown">Women <b class="caret"></b></a>

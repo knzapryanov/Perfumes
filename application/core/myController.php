@@ -23,11 +23,11 @@ class MyController extends CI_Controller
         );
     }
     
-    
     public function loadProducts() {
         if($this->input->is_ajax_request()) {
-            $products = $this->mainModel->getProducts($this->input->post());
+            $viewVar = isset($_POST['method']) ? $_POST['method'] : 'products';
             
+            $products = $this->mainModel->getProducts($this->input->post(), 12, $viewVar);
              echo json_encode($products);
         }
     }
@@ -65,7 +65,13 @@ class MyController extends CI_Controller
     }
     
     public function currentPage($page, $message = '') {
-        $this->load->view('header');
+        $data['brands'] = $this->db
+                ->select('id, brand_name')
+                ->order_by('brand_name ASC', 'id ASC')
+                ->get('brands', 12)
+                ->result();
+
+        $this->load->view('header', $data);
         $this->load->view($page, $message);
         $this->load->view('footer');
     }

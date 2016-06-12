@@ -1,6 +1,6 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
-class MainModel extends CI_Model {
+class MainModel extends myModel {
     public function validationUser(){
        $data = array(
          'email' => $this->input->post('email'),
@@ -115,6 +115,7 @@ class MainModel extends CI_Model {
 
        $productTable = array(
           'product_name' => $post['product_name'], 
+          'slug' => $this->convertSlug($post['product_name']), 
           'description' => $post['description'], 
           'brand_id' => $post['brand_id'], 
           'cat_id' => $post['cat_id'],
@@ -258,34 +259,74 @@ class MainModel extends CI_Model {
            
            $this->db->like('product_name', $get['product_name']);
        } 
-       
-       
-       $count = $this->db->get('products')->num_rows;
-   
-       $result_count = $count;
-
-        $config['total_rows'] = $result_count;
-        $config['per_page']= $perPage;
-        $config['num_links'] = 20; 
-        $config['enable_query_strings'] = TRUE;
-    
-        
-        
-        $this->pagination->initialize($config);
-
     
         $this->db->select('id, product_name');
         $this->db->like('product_name', !$get ? '' : $get['product_name']);
         $this->db->order_by('product_name','asc');
         
         $data = array(
-            'products' => $this->db->get('products', $config['per_page'], $page)->result(),
-            'nextPage' => $this->db->get('products',$config['per_page'], $page + $perPage)->num_rows()
+            'products' => $this->db->get('products', $perPage, $page)->result(),
+            'nextPage' => $this->db->get('products', $perPage, $page + $perPage)->num_rows()
          );
         
         return $data;
     }
  
+    
+    
+    public function getIndexProducts($page = 0, $perPage = 12, $paramWhere = 'is_newest') {
+        $page *= $perPage;
+        
+        $data = array(
+            'products' => $this->indexRelation($perPage, $page, $paramWhere),
+            'nextPage' => $this->db->where($paramWhere, 1)->get('products', $perPage, $page + $perPage)->num_rows()
+         );
+        
+        shuffle($data['products']);
+        
+        return $data;
+    }
+    
+     public function productsRelation($limit = '', $offset = '') {
+        $data = $this->relation_product_model->
+                where('is_newest', 1)->
+                with_pictures('where:`pictures`.`is_cover`=\'1\'')->
+                with_options()->
+                limit($limit, $offset)->
+                get_all();
+  
+        shuffle($data);
+        
+        return $data;
+    }
+    
+    
+     public function indexRelation($limit = 12, $offset = '', $param = false) {
+        $data = $this->relation_product_model->
+                where($param, 1)->
+                with_pictures('where:`pictures`.`is_cover`=\'1\'')->
+                with_options()->
+                limit($limit, $offset)->
+                get_all();
+  
+        shuffle($data);
+        
+        return $data;
+    }
+    
+     public function getProduct($slug) {
+        $product = $this->relation_product_model->
+                where('slug', $slug)->
+                with_pictures()->
+                with_options()->
+                get();
+        
+        return $product;
+    }
+    
+    
+    
+    
 }
     
     
