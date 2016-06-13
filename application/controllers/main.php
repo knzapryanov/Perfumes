@@ -68,7 +68,7 @@ class Main extends MyController {
     public function sendPasswordChangeEmail() {
 
         if(!$this->mainModel->checkEmailExist()) {
-            $data['message'] = 'This email do not exist in our database!!!';
+            $data['message'] = 'This email does not exist in our database!!!';
             $this->currentPage('forgot_password', $data) ;
         }
 
@@ -173,10 +173,10 @@ class Main extends MyController {
      
         $data['product'] = $this->mainModel->getProduct($slug);
         
-        echo '<pre>';
+        /*echo '<pre>';
         print_r($data);
         echo '<pre>';
-        die;
+        die;*/
         
         $this->currentPage('product', $data);
     }

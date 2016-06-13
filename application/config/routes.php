@@ -62,4 +62,7 @@ $route['^migrate/(.+)$'] = "Migrate/$1";
 $route['admin'] = "AdminController/index";
 $route['^admin/(.+)$'] = "AdminController/$1";
 
+$route['product'] = "main/product";
+$route['^product/(.+)$'] = "main/product/$1";
+
 $route['(:any)'] = "main/$1";

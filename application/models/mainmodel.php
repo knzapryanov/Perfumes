@@ -68,7 +68,11 @@ class MainModel extends myModel {
 
    public function getUserIdByEmail($userEmail) {
        $query = $this->db->get_where('users', array('email' => $userEmail));
-       return $query->row()->id;
+       if ($query->num_rows() > 0) {
+           return $query->row()->id;
+       } else {
+           return false;
+       }
    }
 
    public function getAllBrands() {

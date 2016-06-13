@@ -168,7 +168,7 @@
 					</div>
                                 <!-- END GALLERY -->
 
-					<div style="text-align:center;"><a attr-method="loadManual" class="button loadProducts" target="1">See all newest products</a></div>
+					<div style="text-align:center;"><a attr-method="loadManual" class="button loadProducts" target="1">See more newest products</a></div>
 
 				</div>
 
@@ -187,7 +187,7 @@
 				<div class="gallery-grids">
                                         <?php foreach($promotions as $promo) : ?>   
                                       	<div class="col-md-3 gallery-grid ">
-                                            <a href="<?= base_url('products').'/'.$promo->id ?>">
+                                            <a href="<?= base_url('product').'/'.$promo->slug ?>">
                                                         <?php
                                                         
                                                         $salePrice = array();
@@ -258,7 +258,7 @@
 					</div>
                                 <!-- END GALLERY -->
 
-					<div style="text-align:center;"><a attr-method="loadPromotions" class="button loadProducts" target="1">See all newest products</a></div>
+					<div style="text-align:center;"><a attr-method="loadPromotions" class="button loadProducts" target="1">See more promotional products</a></div>
 
 				</div>
 
