@@ -1,0 +1,11 @@
+Admin panel available at http://wakeprojects.com/Perfumes/admin
+Credentials:
+email > admin@gmail.com
+pass > admin
+
+- Add perfume with custom milliliters and price(sale price if it is on sale) for each ML type
+- Add to newest products
+- Remove newest products
+- Add/Remove brands
+- Search products
+- Edit/Delete products
