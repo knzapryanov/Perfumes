@@ -106,6 +106,7 @@ $(document).ready(function() {
 
     $('body').on('click', '#createProduct', function() {
        var productName = $('#product_name').val();
+       var isSale = 0;
        var description = $('textarea#description').val();
        var productBrandId = $('#brand_id').val();
        var productCatId = $('#cat_id').val();
@@ -121,6 +122,16 @@ $(document).ready(function() {
        if(!checkEmptyVal()) {
          alert('Some of the required fields is empty!');  
          return false;
+       }
+
+       if(isProductOnSale()) {
+
+           if(!isSalePriceFilled()) {
+               alert('Please fill sale price!');
+               return false;
+           }
+
+           isSale = 1;
        }
 
        if($('.holderPrices').length === 0 ) {
@@ -139,6 +150,7 @@ $(document).ready(function() {
           type: 'POST',
           data: {
              product_name: productName,
+             is_sale: isSale,
              brand_id: productBrandId,
              cat_id: productCatId,
              mlArray: mlArray,
@@ -264,6 +276,32 @@ $(document).ready(function() {
          
          
          return true;
+    }
+
+    function isProductOnSale() {
+
+        for(var i = 0; i < $('.holderPrices').length; i++ ) {
+            var holder = $('.holderPrices').eq(i);
+
+            if(holder.find('.is_sale').prop('checked') === true) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    function isSalePriceFilled() {
+
+        for(var i = 0; i < $('.holderPrices').length; i++ ) {
+            var holder = $('.holderPrices').eq(i);
+
+            if(holder.find('.sale_price').val() != '') {
+                return true;
+            }
+        }
+
+        return false;
     }
     
     function showWaitMessage(message) {
@@ -586,7 +624,7 @@ $(document).ready(function() {
 
                     var createDiv = $('<div class="col-md-3 gallery-grid "></div>');
                     
-                    var divContents = '<a href="'+ publicPath +'/products/' + data.products[i].id + '">'
+                    var divContents = '<a href="'+ baseUrlJS +'product/' + data.products[i].slug + '">'
                                     +'<img src="'+ uploadsPath +'/thumbs/' + data.products[i].pictures[0].source + '" class="img-responsive" alt="' + data.products[i].product_name + '">'
                                     +'<div class="gallery-info">'
                                         +'<div class="quick">'

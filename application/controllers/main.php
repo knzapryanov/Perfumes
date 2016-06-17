@@ -172,6 +172,8 @@ class Main extends MyController {
     public function product($slug) {
      
         $data['product'] = $this->mainModel->getProduct($slug);
+        $data['category'] = $this->mainModel->getCategoryById($data['product']->cat_id);
+        $data['relatedProducts'] = $this->mainModel->getRelatedByCategory($data['product']->cat_id);
         
         /*echo '<pre>';
         print_r($data);

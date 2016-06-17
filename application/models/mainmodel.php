@@ -89,7 +89,9 @@ class MainModel extends myModel {
        $post = $this->input->post();
    
        $productTable = array(
-          'product_name' => $post['product_name'], 
+          'product_name' => $post['product_name'],
+          'is_sale' => $post['is_sale'],
+          'slug' => $this->convertSlug($post['product_name']),
           'description' => $post['description'], 
           'brand_id' => $post['brand_id'], 
           'cat_id' => $post['cat_id'],
@@ -118,7 +120,8 @@ class MainModel extends myModel {
        $currentId = $post['product_id'];
 
        $productTable = array(
-          'product_name' => $post['product_name'], 
+          'product_name' => $post['product_name'],
+          'is_sale' => $post['is_sale'],
           'slug' => $this->convertSlug($post['product_name']), 
           'description' => $post['description'], 
           'brand_id' => $post['brand_id'], 
@@ -328,9 +331,23 @@ class MainModel extends myModel {
         return $product;
     }
     
-    
-    
-    
+    public function getCategoryById($id) {
+        $query = $this->db->get_where('categories', array('id' => $id));
+        return $query->row();
+    }
+
+    public function getRelatedByCategory($id) {
+        $relatedProducts = $this->relation_product_model->
+            where('cat_id', $id)->
+            with_pictures()->
+            with_options()->
+            get_all();
+
+        shuffle($relatedProducts);
+
+        return $relatedProducts;
+    }
+
 }
     
     

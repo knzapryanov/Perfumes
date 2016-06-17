@@ -21,6 +21,7 @@
 <script src="<?= base_url('assets/js/jquery-2.2.4.min.js') ?>"></script>
 
 <script>
+		baseUrlJS = '<?= base_url(); ?>';
         publicPath = '<?= base_url('main'); ?>';
         uploadsPath = '<?= base_url('assets/uploads') ?>';
 </script>
