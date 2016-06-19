@@ -5,7 +5,7 @@
         <div class="container">
             <div class="account_grid">
                 <div class="col-md-6 login-right">
-                        <h3>Create New Product</h3>
+                        <h3>Edit Product</h3>
                                <div id="form">
                                     <div>
 
@@ -67,8 +67,9 @@
                                     </div>
                                    
                                    
-                                    <?php foreach ($product->options as $option) : ?>
+                                   
                                     <div id="containerHolderPrices">
+                                       <?php foreach ($product->options as $option) : ?>  
                                       <div class="holderPrices">
                                           <div class="headerMl">
                                               <span>ML&nbsp;</span>
@@ -97,9 +98,11 @@
                                               <input type="text" name="quantity" value="<?= $option->quantity ?>" class="quantity" autocomplete="off">
                                           </div>
                                       </div>
-                                    </div>
                                     <!-- PRICEHOLDER END -->     
                                     <?php endforeach;?>
+                                        
+                                    </div>
+                                  
                                     </div>
                                     
                                     <div>

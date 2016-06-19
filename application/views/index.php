@@ -98,48 +98,21 @@
                                         <?php foreach($manualNewest as $product) : ?>   
                                       	<div class="col-md-3 gallery-grid ">
                                             <a href="<?= base_url('product').'/'.$product->slug ?>">
-                                                        <?php
                                                         
-                                                        $salePrice = array();
-                                                        $percentage = array();
-                                                        $price = array();
-                                                        $minSalePrice = array();
-                                                        
-                                                        foreach ($product->options as $option) {
-                                                               $price[] = $option->price;
-                                                               $salePrice[] = $option->sale_price;
-                                                               
-                                                               if((int)$option->sale_price !== 0) {
-                                                                   $minSalePrice[] = $option->sale_price;
-                                                               }
-                                                               
-                                                               $percentage[] = $option->off_percentage;
-                                                        }
-                                                        
-                                                        $maxSale = (int)max($salePrice);
-                                                        $minSale = count($minSalePrice) > 0 ? (int)min($minSalePrice) : '';
-                                                        $maxpercentage = (int)max($percentage);
-                                                        
-                                                        ?>
-                                                        
-                                                        
-                                                        <?php if($maxSale > 0) : ?>
-                                                           <?php if($maxpercentage < 30) : ?>
+                                                <?php if(isset($product->is_sale)) : ?>
+                                                    <?php if($product->percentage < 30 && $product->percentage !== '') : ?>
+
+                                                         <div class="b-wrapper_sale">
+                                                                 <div>SALE</div>
+                                                         </div>
+
+                                                    <?php elseif($product->percentage > 30 && $product->percentage !== '') :?>     
+                                                          <div class="b-wrapper_percent_off">
+                                                                 <div><?= $product->percentage ?>%<BR/>OFF</div>
+                                                         </div>
+                                                     <?php endif; ?>    
+                                              <?php endif; ?>    
                                                 
-                                                                <div class="b-wrapper_sale">
-                                                                        <div>SALE</div>
-                                                                </div>
-                                                               
-                                                           <?php else :?>     
-                                                                 <div class="b-wrapper_percent_off">
-                                                                        <div><?= $maxpercentage ?>%<BR/>OFF</div>
-                                                                </div>
-                                                            <?php endif; ?>    
-                                                        <?php endif; ?>    
-                                                <?php 
-                                                             
-                                                
-                                                ?>
                                                 <img src="<?= base_url('assets/uploads/thumbs').'/'.$product->pictures[0]->source ?>" class="img-responsive" alt="<?= $product->product_name ?>" />
 							<div class="gallery-info">
 								<div class="quick">
@@ -150,12 +123,9 @@
 						<div class="galy-info">
 							<p><?= $product->product_name ?></p>
 							<div class="galry">
-                                                                <?php if($maxSale > 0) : ?>
-                                                                    <div class="home_item_price"><del>€<?= min($price);  ?>.00</del></div>
-                                                                    <div class="home_new_price">€<?= $minSale;  ?>.00</div>						
-                                                                <?php else : ?>
-                                                                    <div class="home_item_price">€<?= min($price);  ?>.00</div>
-                                                                <?php endif; ?>
+                                                                <div class="home_item_price"><?= $product->price  ?></div>
+                                                                <div class="home_new_price"><?= $product->salePrice  ?></div>						
+                                                              
 								<div class="clearfix"></div>
 							</div>
 						</div>
@@ -188,48 +158,18 @@
                                         <?php foreach($promotions as $promo) : ?>   
                                       	<div class="col-md-3 gallery-grid ">
                                             <a href="<?= base_url('product').'/'.$promo->slug ?>">
-                                                        <?php
                                                         
-                                                        $salePrice = array();
-                                                        $percentage = array();
-                                                        $price = array();
-                                                        $minSalePrice = array();
-                                                        
-                                                        foreach ($promo->options as $option) {
-                                                               $price[] = $option->price;
-                                                               $salePrice[] = $option->sale_price;
-                                                               
-                                                               if((int)$option->sale_price !== 0) {
-                                                                   $minSalePrice[] = $option->sale_price;
-                                                               }
-                                                               
-                                                               $percentage[] = $option->off_percentage;
-                                                        }
-                                                        
-                                                        $maxSale = (int)max($salePrice);
-                                                        $minSale = count($minSalePrice) > 0 ? (int)min($minSalePrice) : '';
-                                                        $maxpercentage = (int)max($percentage);
-                                                        
-                                                        ?>
-                                                        
-                                                        
-                                                        <?php if($maxSale > 0) : ?>
-                                                           <?php if($maxpercentage < 30) : ?>
-                                                
-                                                                <div class="b-wrapper_sale">
-                                                                        <div>SALE</div>
-                                                                </div>
-                                                               
-                                                           <?php else :?>     
-                                                                 <div class="b-wrapper_percent_off">
-                                                                        <div><?= $maxpercentage ?>%<BR/>OFF</div>
-                                                                </div>
-                                                            <?php endif; ?>    
-                                                        <?php endif; ?>    
-                                                <?php 
-                                                             
-                                                
-                                                ?>
+                                                    <?php if($promo->percentage < 30) : ?>
+                                                         <div class="b-wrapper_sale">
+                                                                 <div>SALE</div>
+                                                         </div>
+
+                                                    <?php else :?>     
+                                                          <div class="b-wrapper_percent_off">
+                                                                 <div><?= $promo->percentage ?>%<BR/>OFF</div>
+                                                         </div>
+                                                     <?php endif; ?>    
+                                         
                                                 <img src="<?= base_url('assets/uploads/thumbs').'/'.$promo->pictures[0]->source ?>" class="img-responsive" alt="<?= $promo->product_name ?>" />
 							<div class="gallery-info">
 								<div class="quick">
@@ -240,12 +180,9 @@
 						<div class="galy-info">
 							<p><?= $promo->product_name ?></p>
 							<div class="galry">
-                                                                <?php if($maxSale > 0) : ?>
-                                                                    <div class="home_item_price"><del>€<?= min($price);  ?>.00</del></div>
-                                                                    <div class="home_new_price">€<?= $minSale;  ?>.00</div>						
-                                                                <?php else : ?>
-                                                                    <div class="home_item_price">€<?= min($price);  ?>.00</div>
-                                                                <?php endif; ?>
+                                                                <div class="home_item_price"><?= $promo->price  ?></div>
+                                                                <div class="home_new_price"><?= $promo->salePrice  ?></div>
+                                                                
 								<div class="clearfix"></div>
 							</div>
 						</div>

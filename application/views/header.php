@@ -205,14 +205,14 @@ echo '</pre>';
 							<span class="icon-bar"></span>
 							<span class="icon-bar"></span>
 						</button>
-						<h1 class="navbar-brand"><a  href="index.php">perfumes malta</a></h1>
+                                            <h1 class="navbar-brand"><a  href="<?= base_url('') ?>">perfumes malta</a></h1>
 					</div>
 
 					<!--/.navbar-header-->
 	
 					<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
 						<ul class="nav navbar-nav">
-							<li><a href="index.php">Home</a></li>
+							<li><a href="<?= base_url('') ?>">Home</a></li>
 							<li class="dropdown">
 								<a href="#" class="dropdown-toggle" data-toggle="dropdown">Men <b class="caret"></b></a>
 								<ul class="dropdown-menu multi-column columns-3">

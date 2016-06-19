@@ -293,19 +293,61 @@ class MainModel extends myModel {
         
         return $data;
     }
-    
-     public function productsRelation($limit = '', $offset = '') {
+    protected $cats = array(
+        'men' => 1,
+        'women' => 2,
+        'top' => 3,
+        'promo' => 4
+    );
+    public function productsRelation($get = array(), $offset = '') {
+          $where = array(
+                'cat_id' => 1,
+         );
+         
+         if(!empty($get)) {
+            $where = array(
+                'cat_id' => $this->cats[$get['cat']],
+             );  
+         }
+         
+//         $whereIn = isset($get['selected']) ? explode($get['selected']) : $this->getAllBrandIds();
+         
         $data = $this->relation_product_model->
-                where('is_newest', 1)->
+                where($where)->
+//                where_in('brand_id', $whereIn)->
                 with_pictures('where:`pictures`.`is_cover`=\'1\'')->
                 with_options()->
-                limit($limit, $offset)->
+                limit(6, $offset)->
                 get_all();
   
-        shuffle($data);
         
-        return $data;
+        
+        $sorted = $this->sortArray($data); 
+        // sort option for better view handling
+     
+        return $sorted;
     }
+    
+    public function sortArray($array) {
+        foreach($array as $ar) {
+         // Sort the multidimensional array
+         usort($ar->options, array($this,'custom_sort'));
+        }
+
+        return $array;
+    } 
+    
+   function custom_sort($a,$b) {
+          return $a->ml > $b->ml;
+   }
+    
+   public function getAllBrandIds() {
+       $query = $this->db
+               ->order_by('brand_name ASC')
+               ->select('id')
+               ->get('brands');
+       return $query->result();
+   }
     
     
      public function indexRelation($limit = 12, $offset = '', $param = false) {

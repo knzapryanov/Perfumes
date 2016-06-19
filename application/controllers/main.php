@@ -5,11 +5,65 @@ class Main extends MyController {
     public function index(){
         $data['manualNewest'] = $this->mainModel->indexRelation(12, '', 'is_newest');
         $data['promotions'] = $this->mainModel->indexRelation(12, '', 'is_sale');
+        
+        foreach($data as $var) {
+         $var = $this->prepareOptionsToView($var);
+        }
  
         $this->currentPage('index', $data);
     }
+    
+    public function prepareOptionsToView($products) {
+        
+       foreach($products as $product) {
+           
+        $salePriceArr = array();
+        $percentageArr = array();
+        $priceArr = array();
+        $minSalePriceArr = array();
+
+        $percentage = '';
+        $salePrice = '';
+        $price = '';
+        // only this 3 variables are needed in the view
+
+        foreach ($product->options as $option) {
+               $priceArr[] = $option->price;
+               $salePriceArr[] = $option->sale_price;
+               $minSalePriceArr[] = (int)$option->sale_price !== 0 ? (int)$option->sale_price : 0;
+               $percentageArr[] = (int)$option->off_percentage !== 0 ? (int)$option->off_percentage : 0;
+        }
+
+        if(!in_array(0, $minSalePriceArr)) {
+            $notSortedSalePriceArr = $minSalePriceArr;
+
+            sort($minSalePriceArr);
+            $minSalePrice = $minSalePriceArr[0];
+            $index = array_search($minSalePrice, $notSortedSalePriceArr);
+            // we have sale price index 
+
+            $percentage = $percentageArr[$index];
+            $salePrice = '&euro; '. $salePriceArr[$index].'.00';
+            $priceValue = $priceArr[$index];
+            $price = '<del>&euro; ' .$priceValue. '.00</del>';
+         }
+         else {
+            sort($priceArr);
+            $minPrice = $priceArr[0];
+            $price = '&euro; ' .$minPrice.'.00';
+        }
+        
+        $product->price = $price;
+        $product->salePrice = $salePrice;
+        $product->percentage = $percentage;
+        // create and assign new object attrs for current data[$var] => $data['manualNewest']...
+        
+      }           
+
+     return $products; // data[$var] => $data['manualNewest']...
+    }
          
-    function generateEncryptStr(){
+    public function generateEncryptStr(){
     $str = md5(md5(time()));
     
     return $str;
@@ -139,8 +193,24 @@ class Main extends MyController {
     
     
     public function products() {
-        $page = '';
-        $this->currentPage('products', $page);
+        $data['products'] = $this->mainModel->productsRelation($_GET);
+        $data['products'] = $this->prepareOptionsToView($data['products']);
+  
+        $this->currentPage('products', $data);
+    }
+    
+    public function loadMoreProducts() {
+        if($this->input->is_ajax_request()) {
+            $result = $this->mainModel->productsRelation($this->input->post(), $this->input->post('offset'));
+            
+            if($result !== false) {
+                echo json_encode($result);
+            }
+            
+            else {
+                echo false;
+            }
+        }
     }
     
     public function loadManual() {

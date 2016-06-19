@@ -601,9 +601,9 @@ $(document).ready(function() {
                         var index = $.inArray( minSalePrice, cashedSale );
                        
                         offPercentage = offPercentageArr[index];
-                        salePrice = '\u20AC ' + minSalePrice;
+                        salePrice = '\u20AC ' + minSalePrice + '.00';
                         regularPrice = regularPriceArr[index];
-                        regularPrice = '<del>\u20AC ' + regularPrice + '</del>';
+                        regularPrice = '<del>\u20AC ' + regularPrice + '.00</del>';
                         
                         
                         
@@ -619,7 +619,7 @@ $(document).ready(function() {
                         var regularPriceArrSort = regularPriceArr.sort(function(a, b){return b - a;});
                         var minRegularPrice = regularPriceArrSort[0];
                         
-                        regularPrice = '\u20AC ' + minRegularPrice;
+                        regularPrice = '\u20AC ' + minRegularPrice + '.00';
                     }
 
                     var createDiv = $('<div class="col-md-3 gallery-grid "></div>');

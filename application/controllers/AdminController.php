@@ -280,6 +280,5 @@ class AdminController extends MyController {
             $this->adminPage('admin/all_products', $data);
         }
     }
-    
-    
+ 
 }
