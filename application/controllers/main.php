@@ -15,7 +15,7 @@ class Main extends MyController {
     
     public function prepareOptionsToView($products) {
         
-       foreach($products as $product) {
+/*       foreach($products as $product) {
            
         $salePriceArr = array();
         $percentageArr = array();
@@ -60,7 +60,52 @@ class Main extends MyController {
         
       }           
 
-     return $products; // data[$var] => $data['manualNewest']...
+     return $products; // data[$var] => $data['manualNewest']...*/
+
+        foreach($products as $product) {
+
+            $regularPriceArr = array();
+            $salePriceArr = array();
+            $percentageArr = array();
+
+            $regularPriceToView = '';
+            $salePricetToView = '';
+            $percentageToView = '';
+
+            foreach ($product->options as $option) {
+                $regularPriceArr[] = $option->price;
+                $salePriceArr[] = (int)$option->sale_price !== 0 ? (int)$option->sale_price : 0;
+                $percentageArr[] = (int)$option->off_percentage !== 0 ? (int)$option->off_percentage : 0;
+            }
+
+            $regularPriceMin = min($regularPriceArr);
+            // manual search for sale price min because of possible 0 values when sale price is not specified
+            $salePriceMin = 9999;
+            foreach ($salePriceArr as $salePrice) {
+
+                if($salePrice > 0 && $salePrice < $salePriceMin) {
+                    $salePriceMin = $salePrice;
+                }
+            }
+
+            // when some regular price is the smallest price we need only regular price in the view
+            if ($regularPriceMin < $salePriceMin) {
+                $regularPriceToView = '&euro; ' .$regularPriceMin;
+            }
+            // when some sale price is smallest wee need also the other corresponding values(regular price, percentage)
+            else {
+                $salePriceMinIndex = array_search($salePriceMin, $salePriceArr);
+                $regularPriceToView = '<del>&euro; ' .$regularPriceArr[$salePriceMinIndex] . '</del>';
+                $salePricetToView = '&euro; ' .$salePriceMin;
+                $percentageToView = $percentageArr[$salePriceMinIndex];
+            }
+
+            $product->price = $regularPriceToView;
+            $product->salePrice = $salePricetToView;
+            $product->percentage = $percentageToView;
+        }
+
+        return $products;
     }
          
     public function generateEncryptStr(){

@@ -565,7 +565,7 @@ $(document).ready(function() {
          success: function(response) {
                 var data = JSON.parse(response);
                  
-                for(var i in data.products) {
+              /*  for(var i in data.products) {
                     var offPercentageArr = [];
                     var regularPriceArr = [];
                     var salePriceArr = [];
@@ -661,7 +661,99 @@ $(document).ready(function() {
                     createDiv.find('a').prepend(child);
                     
                     element.find('.gallery-grids').append(createDiv);
-                }
+                } */
+
+             for(var i in data.products) {
+
+                 var regularPriceArr = [];
+                 var salePriceArr = [];
+                 var percentageArr = [];
+
+                 var regularPriceToView = '';
+                 var salePriceToView = '';
+                 var percentageToView = '';
+                 var isSale = '';
+
+                 for(var j = 0; j < data.products[i].options.length; j++ ) {
+
+                     var option = data.products[i].options[j];
+                     salePriceArr.push(option.sale_price);
+                     percentageArr.push(option.off_percentage);
+                     regularPriceArr.push(option.price);
+                 }
+
+                 //console.info(regularPriceArr, salePriceArr, percentageArr);
+
+                 var regularPriceMin = Math.min.apply(Math, regularPriceArr);
+                 var salePriceMin = 9999;
+                 for(var j = 0; j < salePriceArr.length; j++) {
+
+                     if(salePriceArr[j] > 0 && parseInt(salePriceArr[j]) < salePriceMin) {
+
+                         //console.info('enter if', salePriceMin, salePriceArr[j]);
+                         salePriceMin = salePriceArr[j];
+                     }
+                 }
+
+                 if(regularPriceMin < salePriceMin) {
+                     regularPriceToView = '\u20AC ' + regularPriceMin;
+                 }
+                 else {
+                     var index = $.inArray( salePriceMin, salePriceArr );
+                     salePriceToView = '\u20AC ' + salePriceMin;
+                     regularPriceToView = '<del>\u20AC ' + regularPriceArr[index] + '</del>';
+                     percentageToView = percentageArr[index];
+
+                     if(percentageToView < 30) {
+                         isSale = 1;
+                     }
+                     else {
+                         isSale = 0;
+                     }
+                 }
+
+                 console.info(data.products[i].product_name, regularPriceToView, salePriceToView, percentageToView);
+
+                 var createDiv = $('<div class="col-md-3 gallery-grid "></div>');
+
+                 var divContents = '<a href="'+ baseUrlJS +'product/' + data.products[i].slug + '">'
+                     +'<img src="'+ uploadsPath +'/thumbs/' + data.products[i].pictures[0].source + '" class="img-responsive" alt="' + data.products[i].product_name + '">'
+                     +'<div class="gallery-info">'
+                     +'<div class="quick">'
+                     +'<p><span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span> view</p>'
+                     +'</div>'
+                     +'</div>'
+                     +'</a>'
+                     +'<div class="galy-info">'
+                     +'<p>' + data.products[i].product_name + '</p>'
+                     +'<div class="galry">'
+                     +'<div class="home_item_price">' + regularPriceToView + '</div>'
+                     +'<div class="home_new_price">' + salePriceToView + '</div>'
+                     +'<div class="clearfix"></div>'
+                     +'</div>'
+                     +'</div>';
+
+                 createDiv.append(divContents);
+
+
+                 var child = '';
+
+                 if(isSale === 1) {
+                     child = '<div class="b-wrapper_sale">'
+                         +'<div>SALE</div>'
+                         +'</div>';
+
+                 }
+                 else if (isSale === 0) {
+                     child = '<div class="b-wrapper_percent_off">'
+                         +'<div>' + percentageToView + ' %<br>OFF</div>'
+                         +'</div>';
+                 }
+
+                 createDiv.find('a').prepend(child);
+
+                 element.find('.gallery-grids').append(createDiv);
+             }
                 
            if(method === 'loadPromotions') {
                 pagePromo++;

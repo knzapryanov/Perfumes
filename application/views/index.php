@@ -1,3 +1,8 @@
+<?php
+//echo '<pre>';
+    //print_r($manualNewest);
+//echo '</pre>';
+?>
 <div class="banner-section" style="margin:0 0 20px 0;">
 
 	<div class="container">
@@ -124,7 +129,7 @@
 							<p><?= $product->product_name ?></p>
 							<div class="galry">
                                                                 <div class="home_item_price"><?= $product->price  ?></div>
-                                                                <div class="home_new_price"><?= $product->salePrice  ?></div>						
+                                                                <div class="home_new_price"><?= $product->salePrice  ?></div>
                                                               
 								<div class="clearfix"></div>
 							</div>
