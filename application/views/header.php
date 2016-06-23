@@ -163,7 +163,7 @@ echo '</pre>';
 
 						<div class="cart box_1">
 
-							<a href="checkout.php" class="cart_anchor">
+							<a href="<?= base_url('checkout') ?>" class="cart_anchor">
 
 								<span class="simpleCart_total"> €0.00 </span> (<span id="simpleCart_quantity" class="simpleCart_quantity"> 0 </span>)
 

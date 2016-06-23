@@ -289,6 +289,7 @@ class Main extends MyController {
         $data['product'] = $this->mainModel->getProduct($slug);
         $data['category'] = $this->mainModel->getCategoryById($data['product']->cat_id);
         $data['relatedProducts'] = $this->mainModel->getRelatedByCategory($data['product']->cat_id);
+        $data['relatedProducts'] = $this->prepareOptionsToView($data['relatedProducts']);
         
         /*echo '<pre>';
         print_r($data);
@@ -296,5 +297,10 @@ class Main extends MyController {
         die;*/
         
         $this->currentPage('product', $data);
+    }
+
+    public function checkout() {
+
+        $this->currentPage('checkout');
     }
 }

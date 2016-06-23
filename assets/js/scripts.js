@@ -786,8 +786,74 @@ $(document).ready(function() {
             else{
                return results[1] || '';
             }
-   };
-    
-    
+    };
+
+
+    $('input[name="perfume_ml"]').on('change', function(){
+
+        $('#quantity').val(1);
+        $('h5.item_price').text('Price: €' + $(this).val());
+    });
+
+
+    $(function() {
+
+        var $radios = $('input:radio[name=perfume_ml]');
+        $radios.eq(0).prop('checked', true);
+        $("h5.item_price").text('Price: €' + $radios.eq(0).val());
+    });
+
+
+    $('#quantity').on('change', function(){
+
+        var quantityVal = $(this).val();
+        var currentSelectedPrice = $('input[name="perfume_ml"]:checked').val();
+        $("h5.item_price").text('Price: €' + (quantityVal * currentSelectedPrice));
+    });
+
+
+    $('select[name="perfum_available_ml"]').change(function(){
+
+        $(this).parents('.product-info-cust, .prt_name').find('.item_quantity').val(1);
+        var optionPrice = $(this).val();
+
+        if(optionPrice.indexOf(',') > -1) {
+
+            optionPrice = optionPrice.split(',');
+            $(this).parents('.product-info-cust, .prt_name').find('.item_price').html('\<del\>€ ' + optionPrice[0] + '\</del\>');
+            $(this).parents('.ofr').find('.new_price > p').text('€ ' + optionPrice[1]);
+
+            if(optionPrice[2] > 30){
+
+                var newPercentOffDiv = '<div class="b-wrapper_percent_off">' +
+                    '<div>' + optionPrice[2] + '%<BR/>OFF</div>' +
+                    '</div>';
+
+                $(this).parents('.product-grid').find('.b-wrapper_percent_off').remove();
+                $(this).parents('.product-grid').find('.b-wrapper_sale').remove();
+
+                $(this).parents('.product-grid').find('.img-responsive').after(newPercentOffDiv);
+            }
+            else {
+
+                var newSaleDiv = '<div class="b-wrapper_sale">' +
+                                    '<div>SALE</div>' +
+                                 '</div>';
+
+                $(this).parents('.product-grid').find('.b-wrapper_percent_off').remove();
+                $(this).parents('.product-grid').find('.b-wrapper_sale').remove();
+
+                $(this).parents('.product-grid').find('.img-responsive').after(newSaleDiv);
+            }
+        }
+        else {
+
+            $(this).parents('.product-info-cust, .prt_name').find('.item_price').html('€ ' + optionPrice);
+            $(this).parents('.ofr').find('.new_price > p').text('');
+            $(this).parents('.product-grid').find('.b-wrapper_percent_off').remove();
+            $(this).parents('.product-grid').find('.b-wrapper_sale').remove();
+        }
+    });
+
 }); 
 // ready end
