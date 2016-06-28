@@ -278,8 +278,6 @@ class MainModel extends myModel {
         
         return $data;
     }
- 
-    
     
     public function getIndexProducts($page = 0, $perPage = 12, $paramWhere = 'is_newest') {
         $page *= $perPage;
@@ -293,25 +291,27 @@ class MainModel extends myModel {
         
         return $data;
     }
+
     protected $cats = array(
         'men' => 1,
         'women' => 2,
         'top' => 3,
         'promo' => 4
     );
+
     public function productsRelation($get = array(), $offset = '') {
           $where = array(
                 'cat_id' => 1,
          );
-         
+
          if(!empty($get)) {
             $where = array(
                 'cat_id' => $this->cats[$get['cat']],
-             );  
+             );
          }
-         
+
 //         $whereIn = isset($get['selected']) ? explode($get['selected']) : $this->getAllBrandIds();
-         
+
         $data = $this->relation_product_model->
                 where($where)->
 //                where_in('brand_id', $whereIn)->
@@ -319,13 +319,104 @@ class MainModel extends myModel {
                 with_options()->
                 limit(6, $offset)->
                 get_all();
-  
-        
-        
-        $sorted = $this->sortArray($data); 
+
+        $sorted = $this->sortArray($data);
         // sort option for better view handling
-     
+
         return $sorted;
+    }
+
+   /*  test    public function productsRelation($get = array(), $offset = '') {
+          $where = array(
+                'cat_id' => 1,
+         );
+
+         if(!empty($get)) {
+            $where = array(
+                'cat_id' => $this->cats[$get['cat']],
+             );
+         }
+
+        $data = $this->relation_product_model->
+                where($where)->
+                with_pictures('where:`pictures`.`is_cover`=\'1\'')->
+                with_options('where:`product_options`.`price`>'. 155 .' AND `product_options`.`price`<'. 170 .'')->
+                //limit(6, $offset)->
+                //as_array()->
+                get_all();
+
+    echo '<pre>';
+    print_r($data);
+    echo '</pre>';
+
+        $productsCount = count($data);
+    print_r($productsCount);
+        $filteredProductsData = array();
+        foreach ($data as $product) {
+
+            if(isset($product->options)) {
+                $filteredProductsData[] = $product;
+            }
+        }
+
+    echo '<pre>';
+    echo 'filteredProductsData array<br>';
+    print_r($filteredProductsData);
+    echo '</pre>';
+    //die;
+
+        if(count($filteredProductsData) > 0) {
+
+            // sort option for better view handling
+            $sorted = $this->sortArray($data);
+
+            return $sorted;
+        }
+        else {
+            return false;
+        }
+    } */
+
+    public function getFilteredProducts($get = array(), $offset = '') {
+        $where = array(
+            'cat_id' => 1,
+        );
+
+        if(!empty($get)) {
+            $where = array(
+                'cat_id' => $this->cats[$get['cat']],
+            );
+        }
+
+        $fromValue = $_POST['fromValue'];
+        $toValue = $_POST['toValue'];
+
+        $data = $this->relation_product_model->
+        where($where)->
+        with_pictures('where:`pictures`.`is_cover`=\'1\'')->
+        with_options('where:`product_options`.`price`>='. (int)$fromValue .' AND `product_options`.`price`<='. (int)$toValue .'')->
+        //limit(6, $offset)->
+        //as_array()->
+        get_all();
+
+        $filteredProductsData = array();
+        foreach ($data as $product) {
+
+            if(isset($product->options)) {
+                $filteredProductsData[] = $product;
+            }
+        }
+
+        if(count($filteredProductsData) > 0) {
+
+            // sort option for better view handling
+            $sorted = $this->sortArray($filteredProductsData);
+
+            return $sorted;
+        }
+        else {
+            return false;
+        }
     }
     
     public function sortArray($array) {

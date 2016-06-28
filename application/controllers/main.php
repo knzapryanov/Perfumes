@@ -243,6 +243,25 @@ class Main extends MyController {
   
         $this->currentPage('products', $data);
     }
+
+    public function filteredProducts()
+    {
+
+        if($this->input->is_ajax_request()) {
+            $data['products'] = $this->mainModel->getFilteredProducts($_GET);
+            //print_r($data['products']);
+
+            if($data['products'] != false) {
+
+               $data['products'] = $this->prepareOptionsToView($data['products']);
+               echo json_encode($data['products']);
+            }
+            else {
+
+               echo false;
+            }
+        }
+    }
     
     public function loadMoreProducts() {
         if($this->input->is_ajax_request()) {
