@@ -812,21 +812,22 @@ $(document).ready(function() {
     });
 
 
-    $('select[name="perfum_available_ml"]').change(function(){
+    //$('select[name="perfum_available_ml"]').on('change',function(){
+    $('.col-md-9, .product-model-sec').on('change', 'select[name="perfum_available_ml"]', function(){
 
         $(this).parents('.product-info-cust, .prt_name').find('.item_quantity').val(1);
         var optionPrice = $(this).val();
 
-        if(optionPrice.indexOf(',') > -1) {
+        if(optionPrice.indexOf('-') > -1) {
 
-            optionPrice = optionPrice.split(',');
+            optionPrice = optionPrice.split('-');
             $(this).parents('.product-info-cust, .prt_name').find('.item_price').html('\<del\>€ ' + optionPrice[0] + '\</del\>');
             $(this).parents('.ofr').find('.new_price > p').text('€ ' + optionPrice[1]);
 
             if(optionPrice[2] > 30){
 
                 var newPercentOffDiv = '<div class="b-wrapper_percent_off">' +
-                    '<div>' + optionPrice[2] + '%<BR/>OFF</div>' +
+                    '<div>' + optionPrice[2] + ' %<BR/>OFF</div>' +
                     '</div>';
 
                 $(this).parents('.product-grid').find('.b-wrapper_percent_off').remove();
@@ -857,22 +858,34 @@ $(document).ready(function() {
 
 
     $('.sky-form').on('change', '#range', function(){
-        //console.log($('#range').val());
+
         var fromToValuesArr = $('#range').val().split(';');
         // fromToValuesArr is string array if needed parse to int
         //console.log(fromToValuesArr[0]);
         //console.log(fromToValuesArr[1]);
+
+        // Create GET array to have access to the GET variables in jquery
+        var $_GET = {};
+        document.location.search.replace(/\??(?:([^=]+)=([^&]*)&?)/g, function () {
+            function decode(s) {
+                return decodeURIComponent(s.split("+").join(" "));
+            }
+
+            $_GET[decode(arguments[1])] = decode(arguments[2]);
+        });
+        //alert($_GET["cat"]);
 
         $.ajax({
             url: publicPath + "/filteredProducts",
             type: 'POST',
             data: {
                 fromValue: fromToValuesArr[0],
-                toValue: fromToValuesArr[1]
+                toValue: fromToValuesArr[1],
+                category: $_GET["cat"]
             },
             success: function(response) {
                 if(response != false) {
-                    console.log('ajax success');
+                    //console.log('ajax success');
                     //console.log(response);
                     var jsonData = JSON.parse(response);
                     console.log(jsonData);
@@ -882,52 +895,65 @@ $(document).ready(function() {
 
                         var productDiv = $('<div class="product-grid"></div>');
 
-                        var productDivContents = '<a href="' + baseUrlJS + 'product/' + jsonData[i].slug + '">' +
-                            '<div class="more-product"><span> </span></div>' +
-                            '<div class="product-img b-link-stripe b-animate-go  thickbox">' +
-                            '<img src="'+ uploadsPath +'/thumbs/' + jsonData[i].pictures[0].source + '" class="img-responsive" alt="' + jsonData[i].product_name + '">' +
-                            '<div class="b-wrapper">' +
-                            '<h4 class="b-animate b-from-left  b-delay03">' +
-                            '<button><span class="glyphicon glyphicon-info-sign"></span></button>' +
-                            '</h4>' +
-                            '</div>' +
-                            '</div>' +
+                        var productDivContents =
+                            '<a href="' + baseUrlJS + 'product/' + jsonData[i].slug + '">' +
+                                '<div class="more-product"><span> </span></div>' +
+                                '<div class="product-img b-link-stripe b-animate-go  thickbox">' +
+                                '<img src="'+ uploadsPath +'/thumbs/' + jsonData[i].pictures[0].source + '" class="img-responsive" alt="' + jsonData[i].product_name + '">' +
+                                '<div class="b-wrapper">' +
+                                '<h4 class="b-animate b-from-left  b-delay03">' +
+                                '<button><span class="glyphicon glyphicon-info-sign"></span></button>' +
+                                '</h4>' +
+                                '</div>' +
+                                '</div>' +
                             '</a>' +
                             '<div class="product-info simpleCart_shelfItem">' +
-                            '<div class="product-info-cust prt_name">' +
-                            '<h4>' + jsonData[i].product_name + '</h4>' +
-                            '<span class="item_price">' + jsonData[i].price + '</span>' +
-                            '<div class="ofr">' +
-                            '<div class="new_price">' +
-                            '<p class="pric1">' + jsonData[i].salePrice + '</p>' +
-                            '</div>' +
-                            '<div class="perfum_available_ml">' +
-                            '<select name="perfum_available_ml">' +
-                            '<option value="100,20,80">' +
-                            '220 ml' +
-                            '</option>' +
-                            '<option value="1000,499,51">' +
-                            '2200 ml' +
-                            '</option>' +
-                            '</select>' +
-                            '</div>' +
-                            '<div class="clearfix"> </div>' +
-                            '</div>' +
-                            '<input type="number" class="item_quantity" min="1" value="1">' +
-                            '<button href="javascript:void(0);" class="item_add add-to-cart">' +
-                            '<span class="glyphicon glyphicon-shopping-cart"></span>' +
-                            '<div style="display:none;">' +
-                            '<!--<img src="images/m1.jpg" class="img-responsive" alt="">-->' +
-                            '</div>' +
-                            '</button>' +
-                            '<div class="clearfix"> </div>' +
-                            '</div>' +
+                                '<div class="product-info-cust prt_name">' +
+                                '<h4>' + jsonData[i].product_name + '</h4>' +
+                                '<span class="item_price">' + jsonData[i].price + '</span>' +
+                                '<div class="ofr">' +
+                                '<div class="new_price">' +
+                                '<p class="pric1">' + jsonData[i].salePrice + '</p>' +
+                                '</div>' +
+                                '<div class="perfum_available_ml">' +
+                                    /*'<select name="perfum_available_ml">' +
+                                        '<option value="100,20,80">' +
+                                        '220 ml' +
+                                        '</option>' +
+                                        '<option value="1000,499,51">' +
+                                        '2200 ml' +
+                                        '</option>' +
+                                    '</select>' +*/
+                                '</div>' +
+                                '<div class="clearfix"> </div>' +
+                                '</div>' +
+                                '<input type="number" class="item_quantity" min="1" value="1">' +
+                                '<button href="javascript:void(0);" class="item_add add-to-cart">' +
+                                '<span class="glyphicon glyphicon-shopping-cart"></span>' +
+                                '<div style="display:none;">' +
+                                '<!--<img src="images/m1.jpg" class="img-responsive" alt="">-->' +
+                                '</div>' +
+                                '</button>' +
+                                '<div class="clearfix"> </div>' +
+                                '</div>' +
                             '</div>';
 
 
+                        var isSaleOptionAvailable = false;
+                        var select = $("<select name=\"perfum_available_ml\" />");
+                        for(var j in jsonData[i].options) {
+                            $("<option />", {value: jsonData[i].options[j].sale_price != 0 ? jsonData[i].options[j].price + '-' + jsonData[i].options[j].sale_price + '-' + jsonData[i].options[j].off_percentage : jsonData[i].options[j].price, text: jsonData[i].options[j].ml}).appendTo(select);
+
+                            if(jsonData[i].options[j].sale_price != 0) {
+                                isSaleOptionAvailable = true;
+                            }
+                        }
+
                         var child = '';
 
-                        if(jsonData[i].is_sale == 1) {
+                        // additional check for is sale option remaining after filter some of the options
+                        // because the global jsonData[i].is_sale may not be valid after the filtering
+                        if(jsonData[i].is_sale == 1 && isSaleOptionAvailable == true) {
 
                             if(jsonData[i].percentage < 30) {
                                 child = '<div class="b-wrapper_sale">'
@@ -941,13 +967,29 @@ $(document).ready(function() {
                             }
                         }
 
+                        if(jsonData[i].is_sale == 1 && isSaleOptionAvailable == true) {
+
+                            // to represent select value correctly remove everything except numbers,dot,comma and -
+                            var valueToShowOnLoad = (jsonData[i].price + '-' + jsonData[i].salePrice + '-' + jsonData[i].percentage).replace(/[^0-9.,-]/g, "");
+                            //console.log(valueToShowOnLoad);
+                            select.val(valueToShowOnLoad);
+                        }
+                        else {
+
+                            // to represent select value correctly remove everything except numbers,dot,comma and -
+                            var valueToShowOnLoad = (jsonData[i].price).replace(/[^0-9.,-]/g, "");
+                            //console.log(valueToShowOnLoad);
+                            select.val(valueToShowOnLoad);
+                        }
+
                         productDiv.append(productDivContents);
                         productDiv.find('.product-img, .b-link-stripe, .b-animate-go, .thickbox').prepend(child);
+                        productDiv.find('.perfum_available_ml').prepend(select);
                         $('.col-md-9, .product-model-sec').append(productDiv);
                     }
                 }
                 else {
-                    console.log('ajax fail');
+                    //console.log('ajax fail');
                     var h4 = '<h4 class="noFilterProducts">There are no products matching your filter settings!</h4>';
                     $('.col-md-9, .product-model-sec').html(h4);
                 }

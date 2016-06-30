@@ -326,65 +326,16 @@ class MainModel extends myModel {
         return $sorted;
     }
 
-   /*  test    public function productsRelation($get = array(), $offset = '') {
-          $where = array(
-                'cat_id' => 1,
-         );
-
-         if(!empty($get)) {
-            $where = array(
-                'cat_id' => $this->cats[$get['cat']],
-             );
-         }
-
-        $data = $this->relation_product_model->
-                where($where)->
-                with_pictures('where:`pictures`.`is_cover`=\'1\'')->
-                with_options('where:`product_options`.`price`>'. 155 .' AND `product_options`.`price`<'. 170 .'')->
-                //limit(6, $offset)->
-                //as_array()->
-                get_all();
-
-    echo '<pre>';
-    print_r($data);
-    echo '</pre>';
-
-        $productsCount = count($data);
-    print_r($productsCount);
-        $filteredProductsData = array();
-        foreach ($data as $product) {
-
-            if(isset($product->options)) {
-                $filteredProductsData[] = $product;
-            }
-        }
-
-    echo '<pre>';
-    echo 'filteredProductsData array<br>';
-    print_r($filteredProductsData);
-    echo '</pre>';
-    //die;
-
-        if(count($filteredProductsData) > 0) {
-
-            // sort option for better view handling
-            $sorted = $this->sortArray($data);
-
-            return $sorted;
-        }
-        else {
-            return false;
-        }
-    } */
 
     public function getFilteredProducts($get = array(), $offset = '') {
         $where = array(
             'cat_id' => 1,
         );
 
-        if(!empty($get)) {
+        if(isset($_POST['category'])) {
+
             $where = array(
-                'cat_id' => $this->cats[$get['cat']],
+                'cat_id' => $this->cats[$_POST['category']],
             );
         }
 
@@ -409,7 +360,6 @@ class MainModel extends myModel {
 
         if(count($filteredProductsData) > 0) {
 
-            // sort option for better view handling
             $sorted = $this->sortArray($filteredProductsData);
 
             return $sorted;

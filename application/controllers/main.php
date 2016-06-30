@@ -74,8 +74,8 @@ class Main extends MyController {
 
             foreach ($product->options as $option) {
                 $regularPriceArr[] = $option->price;
-                $salePriceArr[] = (int)$option->sale_price !== 0 ? (int)$option->sale_price : 0;
-                $percentageArr[] = (int)$option->off_percentage !== 0 ? (int)$option->off_percentage : 0;
+                $salePriceArr[] = $option->sale_price;
+                $percentageArr[] = $option->off_percentage;
             }
 
             $regularPriceMin = min($regularPriceArr);
@@ -85,6 +85,14 @@ class Main extends MyController {
 
                 if($salePrice > 0 && $salePrice < $salePriceMin) {
                     $salePriceMin = $salePrice;
+                }
+            }
+
+            $smallestOptionId = '';
+            foreach ($product->options as $option) {
+
+                if($option->sale_price == $salePriceMin){
+                    $smallestOptionId = $option->id;
                 }
             }
 
@@ -103,6 +111,7 @@ class Main extends MyController {
             $product->price = $regularPriceToView;
             $product->salePrice = $salePricetToView;
             $product->percentage = $percentageToView;
+            $product->smallestOptionId = $smallestOptionId;
         }
 
         return $products;
@@ -248,8 +257,8 @@ class Main extends MyController {
     {
 
         if($this->input->is_ajax_request()) {
-            $data['products'] = $this->mainModel->getFilteredProducts($_GET);
-            //print_r($data['products']);
+
+            $data['products'] = $this->mainModel->getFilteredProducts();
 
             if($data['products'] != false) {
 
