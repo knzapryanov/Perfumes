@@ -51,7 +51,6 @@ $(document).ready(function() {
 
 
     $('#uploadImageForm').on('submit', function() {
-        console.info($('.imageInput').val());
         if($('.imageInput').val() === '') {
             return false;
         }
@@ -83,8 +82,6 @@ $(document).ready(function() {
         });
     });
     
-
-    
      $('body').on('click', '#overLayerManual ol li input', function() {
         var value = $(this).val(); 
         var isChecked = $(this).is(':checked') === true ? 1 : 0; 
@@ -98,7 +95,6 @@ $(document).ready(function() {
                 is_newest: isChecked 
             },
             success: function(response) {
-                console.info(response);
             }
         });
         
@@ -565,105 +561,7 @@ $(document).ready(function() {
          success: function(response) {
                 var data = JSON.parse(response);
                  
-              /*  for(var i in data.products) {
-                    var offPercentageArr = [];
-                    var regularPriceArr = [];
-                    var salePriceArr = [];
-                    var cashedSale = [];
-                    
-                    var salePrice = '';
-                    var regularPrice = '';
-                    var offPercentage = '';    
-                    var isSale = '';
-                    
-                    for(var j = 0; j < data.products[i].options.length; j++ ) {
-                        var option = data.products[i].options[j];
-                        
-                        if(option.sale_price !== '0') {
-                            salePriceArr.push(option.sale_price);
-                            cashedSale.push(option.sale_price);
-
-                            offPercentageArr.push(option.off_percentage);
-                        }
-                        else {
-                            salePriceArr.push(0);
-                            offPercentageArr.push(0);
-                        }
-                        
-                        regularPriceArr.push(option.price);
-                    }
-                    
-//                    console.info(regularPriceArr, salePriceArr, offPercentageArr);
-                 
-                    if(salePriceArr.indexOf(0) === -1) {
-                        var salePriceArrSort = salePriceArr.sort(function(a, b){return a - b;});
-                        var minSalePrice = salePriceArrSort[0];
-                        var index = $.inArray( minSalePrice, cashedSale );
-                       
-                        offPercentage = offPercentageArr[index];
-                        salePrice = '\u20AC ' + minSalePrice + '.00';
-                        regularPrice = regularPriceArr[index];
-                        regularPrice = '<del>\u20AC ' + regularPrice + '.00</del>';
-                        
-                        
-                        
-                        if(offPercentage < 30) {
-                            isSale = 1;
-                        }
-                        else {
-                             isSale = 0;
-                        }
-                        
-                    }
-                    else {
-                        var regularPriceArrSort = regularPriceArr.sort(function(a, b){return b - a;});
-                        var minRegularPrice = regularPriceArrSort[0];
-                        
-                        regularPrice = '\u20AC ' + minRegularPrice + '.00';
-                    }
-
-                    var createDiv = $('<div class="col-md-3 gallery-grid "></div>');
-                    
-                    var divContents = '<a href="'+ baseUrlJS +'product/' + data.products[i].slug + '">'
-                                    +'<img src="'+ uploadsPath +'/thumbs/' + data.products[i].pictures[0].source + '" class="img-responsive" alt="' + data.products[i].product_name + '">'
-                                    +'<div class="gallery-info">'
-                                        +'<div class="quick">'
-                                            +'<p><span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span> view</p>'
-                                        +'</div>'
-                                    +'</div>'
-				+'</a>'
-				+'<div class="galy-info">'
-                                    +'<p>' + data.products[i].product_name + '</p>'
-                                    +'<div class="galry">'
-                                         +'<div class="home_item_price">' + regularPrice + '</div>'
-                                         +'<div class="home_new_price">' + salePrice + '</div>'
-                                            +'<div class="clearfix"></div>'
-                                    +'</div>'
-                               +'</div>';
-                            
-                   createDiv.append(divContents);         
-                            
-                    
-                    var child = '';
-                    
-                    if(isSale === 1) {
-                        child = '<div class="b-wrapper_sale">'
-                                       +'<div>SALE</div>'
-                                    +'</div>';
-                        
-                    }   
-                    else if (isSale === 0) {
-                        child = '<div class="b-wrapper_percent_off">'
-                                  +'<div>' + offPercentage + ' %<br>OFF</div>'
-                                 +'</div>';
-                    }
-                    
-                    createDiv.find('a').prepend(child);
-                    
-                    element.find('.gallery-grids').append(createDiv);
-                } */
-
-             for(var i in data.products) {
+                for(var i in data.products) {
 
                  var regularPriceArr = [];
                  var salePriceArr = [];
@@ -781,7 +679,7 @@ $(document).ready(function() {
     $.urlParam = function(name){
             var results = new RegExp('[\?&]' + name + '=([^&#]*)').exec(window.location.href);
             if (results === null){
-               return null;
+               return 'men';
             }
             else{
                return results[1] || '';
@@ -855,51 +753,274 @@ $(document).ready(function() {
             $(this).parents('.product-grid').find('.b-wrapper_sale').remove();
         }
     });
+    
+    var currentUrl = document.URL;
+    
+    if(currentUrl.indexOf('products') > - 1) {
+        var min = 0;
+        var minOld = min;
+        var max = 500;
+        var brands = '';
+        var cat = $.urlParam('cat');
 
 
-    $('.sky-form').on('change', '#range', function(){
+        // check price
 
-        var fromToValuesArr = $('#range').val().split(';');
-        // fromToValuesArr is string array if needed parse to int
-        //console.log(fromToValuesArr[0]);
-        //console.log(fromToValuesArr[1]);
+        if(currentUrl.indexOf('min') > - 1) {
+           min = $.urlParam('min');
+           max = $.urlParam('max');
 
-        // Create GET array to have access to the GET variables in jquery
-        var $_GET = {};
-        document.location.search.replace(/\??(?:([^=]+)=([^&]*)&?)/g, function () {
-            function decode(s) {
-                return decodeURIComponent(s.split("+").join(" "));
-            }
+           minOld = min < 0 || min > 500 || min > max ? 0 : min;
 
-            $_GET[decode(arguments[1])] = decode(arguments[2]);
+           max = max < 0 || max > 500 || min > max ? 500 : max;
+       }
+
+       brands = getUrlBrands(brands, currentUrl); 
+
+       loadFilteredProducts(cat, brands,  parseInt(minOld), parseInt(max));
+    }
+    
+    function setRangeFilterVal(min, max) {
+        var rangeSlider = $("#range").data("ionRangeSlider");
+
+        rangeSlider.update({
+            from: min,
+            to  : max
         });
-        //alert($_GET["cat"]);
+    }
+    
+    function getUrlBrands(brands, url) {
+        $('#brandsSlider label input, .all_brands_column label input').attr('checked', false);
+        // clean before add
+        
+        if(url.indexOf('brand') > - 1) {
+            brands = $.urlParam('brand');
+            var brandsArr = [brands];
+                    
+            if(brands.indexOf(';') > -1 ) {
+              brandsArr = brands.split(';');   
+            }
+            
+               var length = brands.length;
+               
+               for(var i = 0; i < length; i++) {
+                   // on load page check and click for header brands search and left filter 
+                   $('#brandsSlider label input').each(function() {
+                       if($(this).val() == brandsArr[i]) {
+                           $(this).prop('checked', true);
+                           
+                           $('.all_brands_column label input[value="' + $(this).val() + '"]').prop('checked', true);
+                       }
+                   });
+               }
+        
+        }
+        
+        return brands;
+        
+    }
+    
+     
+     $('.left_side_categories').on('click', 'a', function() {
+         
+         if(document.URL.indexOf('products') > - 1) {
+            var cat = $(this).find('div').attr('cat');
 
+            loadFilteredProducts(cat, '',  0, 500);
+            setActiveClass();
+
+            return false;
+         }
+         // check page for optimize ajax request than php 
+     });
+    
+    $('body').on('click', '.menu_see_all_brands', function() {
+        $('.searchOverlyBrands').attr('attr-cat', $(this).attr('attr-cat'));
+        
+        getUrlBrands('', document.URL);
+       
+    });
+    
+    $('body').on('click', '#cleanFilter', function() {
+       loadFilteredProducts('man', '',  0, 500);
+       // reset defaul filter! 
+    });
+    
+        
+    
+    $('body').on('click', '.searchOverlyBrands', function() {
+        var brands = '';
+        $('.all_brands_column label input').each(function() {
+            if($(this).is(':checked')) {
+                if(brands === '') {
+                     brands = $(this).val();
+                }
+                else {
+                   brands += ';' + $(this).val();
+                }
+            }
+         });
+        
+        loadFilteredProducts($(this).attr('attr-cat'), brands,  $.urlParam('min'), $.urlParam('max'));
+    });
+    
+   $(document).on('draging:finish', function() {
+
+    var fromToValuesArr = $('#range').val().split(';');
+    // fromToValuesArr is string array if needed parse to int
+    var min = fromToValuesArr[0];
+    var max = fromToValuesArr[1];
+    var brands = '';
+
+    brands = getUrlBrands(brands, document.URL);
+
+    loadFilteredProducts($.urlParam('cat'), brands,  min, max);
+    });
+    
+   
+    $('.sky-form').on('click', '#brandsSlider label input', function(){ 
+        var brandId = $(this).val();
+        var currentBrand = $.urlParam('brand');
+        var currentCat = $.urlParam('cat');
+        var min = $.urlParam('min');
+        var max = $.urlParam('max');
+        
+        if(!$(this).is(':checked')) {
+            // remove
+            var splitArr = currentBrand.split(';');
+
+            if(splitArr.length > 1) {
+                var index = $.inArray(brandId, splitArr);
+                    splitArr.splice(index, 1); // return deleted item!!!!
+                
+                currentBrand = splitArr.join(';');
+                 
+               // we have more than one brand in url
+            }
+            else {
+               currentBrand = ''; 
+               // we have 1 and just clean
+            }
+        }
+        
+        else {
+            // add
+            if(currentBrand === '') {
+                currentBrand = brandId;
+            }
+            else {
+                currentBrand += ';' + brandId;
+            }
+        }
+        
+       loadFilteredProducts(currentCat, currentBrand,  min, max);
+    });
+    
+    
+    $('.dropdown').on('click', '.list1', function() {
+        
+        if(document.URL.indexOf('products') > -1) {
+            var closeElement = $(this).parents('.dropdown');
+            
+            loadFilteredProducts(
+                    closeElement.attr('attr-cat'),
+                    $(this).attr('brandId'),  
+                    0, 
+                    500
+            );
+            
+            closeElement.removeClass('open');
+            
+            return false;
+            
+            // ignore php and let ajax do the work
+        }
+        
+        
+    });
+    
+    
+    // set active class in products and product page
+    function setActiveClass() {
+        $('.left_side_categories a div').removeClass('selected_category');
+        $('.left_side_categories a div[cat="'+ $.urlParam('cat') +'"]').addClass('selected_category');
+        
+        $('#headerFilter').text(ucfirst($.urlParam('cat')) + ' ' + 'Perfumes');
+    }
+    
+    function ucfirst(str) {
+     var firstLetter = str.substr(0, 1);
+    return firstLetter.toUpperCase() + str.substr(1);
+    }
+    
+    // on laod
+    setActiveClass();
+    
+    var counterPage = 0;
+    
+    $('body').on('click', '.loadFilteredProducts', function() {
+        loadFilteredProducts(
+            $.urlParam('cat'), 
+            $.urlParam('brand'),  
+            $.urlParam('min'), 
+            $.urlParam('max')
+        );
+
+        $.event.trigger({
+                      type: 'counterPage',
+                      bool: true
+                  });
+
+    });
+    
+    function loadFilteredProducts(catParam, brands,  min, max) {
+        catParam = catParam === '' ? 'man' : catParam;
+        
+        var url = document.URL.split('?')[0] + '?';
+        var cat = 'cat=' + catParam;
+        var brand= '&brand=' + brands;
+        var price = '&min=' + min + '&max=' + max;
+        
+        var buildUrl = url + cat + brand + price;
+        
+        window.history.pushState('', '', buildUrl);
+        
+        $('body').prepend('<div id="loader"></div>'); 
+    
+        
         $.ajax({
             url: publicPath + "/filteredProducts",
             type: 'POST',
             data: {
-                fromValue: fromToValuesArr[0],
-                toValue: fromToValuesArr[1],
-                category: $_GET["cat"]
+                min: isNaN(min) ? 0 : min,
+                max: isNaN(max) ? 500 : max,
+                cat: catParam,
+                brand: brands,
+                page: counterPage
             },
             success: function(response) {
-                if(response != false) {
-                    //console.log('ajax success');
-                    //console.log(response);
-                    var jsonData = JSON.parse(response);
-                    console.log(jsonData);
 
-                    $('.col-md-9, .product-model-sec').html('');
-                    for(var i in jsonData) {
+                if(response != false) {
+                    setRangeFilterVal(min, max);
+                    // set globaly min and max value on range filter
+                            
+                    var jsonData = JSON.parse(response);
+                    
+                    console.info(jsonData);
+                    
+                    if(parseInt(jsonData.nextPage) === 0) {
+                       $('.col-md-9, .product-model-sec').html('');
+                    }
+                    
+                    for(var i in jsonData.sorted) {
 
                         var productDiv = $('<div class="product-grid"></div>');
 
                         var productDivContents =
-                            '<a href="' + baseUrlJS + 'product/' + jsonData[i].slug + '">' +
+                            '<a href="' + baseUrlJS + 'product/' + jsonData.sorted[i].slug + '">' +
                                 '<div class="more-product"><span> </span></div>' +
                                 '<div class="product-img b-link-stripe b-animate-go  thickbox">' +
-                                '<img src="'+ uploadsPath +'/thumbs/' + jsonData[i].pictures[0].source + '" class="img-responsive" alt="' + jsonData[i].product_name + '">' +
+                                '<img src="'+ uploadsPath +'/thumbs/' + jsonData.sorted[i].pictures[0].source + '" class="img-responsive" alt="' + jsonData.sorted[i].product_name + '">' +
                                 '<div class="b-wrapper">' +
                                 '<h4 class="b-animate b-from-left  b-delay03">' +
                                 '<button><span class="glyphicon glyphicon-info-sign"></span></button>' +
@@ -909,11 +1030,11 @@ $(document).ready(function() {
                             '</a>' +
                             '<div class="product-info simpleCart_shelfItem">' +
                                 '<div class="product-info-cust prt_name">' +
-                                '<h4>' + jsonData[i].product_name + '</h4>' +
-                                '<span class="item_price">' + jsonData[i].price + '</span>' +
+                                '<h4>' + jsonData.sorted[i].product_name + '</h4>' +
+                                '<span class="item_price">' + jsonData.sorted[i].price + '</span>' +
                                 '<div class="ofr">' +
                                 '<div class="new_price">' +
-                                '<p class="pric1">' + jsonData[i].salePrice + '</p>' +
+                                '<p class="pric1">' + jsonData.sorted[i].salePrice + '</p>' +
                                 '</div>' +
                                 '<div class="perfum_available_ml">' +
                                     /*'<select name="perfum_available_ml">' +
@@ -941,61 +1062,83 @@ $(document).ready(function() {
 
                         var isSaleOptionAvailable = false;
                         var select = $("<select name=\"perfum_available_ml\" />");
-                        for(var j in jsonData[i].options) {
-                            $("<option />", {value: jsonData[i].options[j].sale_price != 0 ? jsonData[i].options[j].price + '-' + jsonData[i].options[j].sale_price + '-' + jsonData[i].options[j].off_percentage : jsonData[i].options[j].price, text: jsonData[i].options[j].ml}).appendTo(select);
+                        for(var j in jsonData.sorted[i].options) {
+                            $("<option />", {value: 
+                                                jsonData.sorted[i].options[j].sale_price != 0 
+                                                     ? jsonData.sorted[i].options[j].price + '-' +
+                                                             jsonData.sorted[i].options[j].sale_price + 
+                                                             '-' + jsonData.sorted[i].options[j].off_percentage 
+                                                     
+                                                     : jsonData.sorted[i].options[j].price, 
+                                                     
+                                            text: jsonData.sorted[i].options[j].ml})
+                                                .appendTo(select);
 
-                            if(jsonData[i].options[j].sale_price != 0) {
+                            if(jsonData.sorted[i].options[j].sale_price != 0) {
                                 isSaleOptionAvailable = true;
                             }
                         }
-
+ 
                         var child = '';
 
                         // additional check for is sale option remaining after filter some of the options
-                        // because the global jsonData[i].is_sale may not be valid after the filtering
-                        if(jsonData[i].is_sale == 1 && isSaleOptionAvailable == true) {
+                        // because the global jsonData.sorted[i].is_sale may not be valid after the filtering
 
-                            if(jsonData[i].percentage < 30) {
+                        if(jsonData.sorted[i].is_sale == 1 && isSaleOptionAvailable == true) {
+                            
+                           if(jsonData.sorted[i].percentage < 30) {
                                 child = '<div class="b-wrapper_sale">'
                                     +'<div>SALE</div>'
                                     +'</div>';
                             }
                             else {
                                 child = '<div class="b-wrapper_percent_off">'
-                                    +'<div>' + jsonData[i].percentage + ' %<br>OFF</div>'
+                                    +'<div>' + jsonData.sorted[i].percentage + ' %<br>OFF</div>'
                                     +'</div>';
                             }
-                        }
-
-                        if(jsonData[i].is_sale == 1 && isSaleOptionAvailable == true) {
 
                             // to represent select value correctly remove everything except numbers,dot,comma and -
-                            var valueToShowOnLoad = (jsonData[i].price + '-' + jsonData[i].salePrice + '-' + jsonData[i].percentage).replace(/[^0-9.,-]/g, "");
+                            var valueToShowOnLoad = (jsonData.sorted[i].price + '-' + jsonData.sorted[i].salePrice + '-' + jsonData.sorted[i].percentage).replace(/[^0-9.,-]/g, "");
                             //console.log(valueToShowOnLoad);
                             select.val(valueToShowOnLoad);
                         }
                         else {
-
+                         
                             // to represent select value correctly remove everything except numbers,dot,comma and -
-                            var valueToShowOnLoad = (jsonData[i].price).replace(/[^0-9.,-]/g, "");
+                            var valueToShowOnLoad = (jsonData.sorted[i].price).replace(/[^0-9.,-]/g, "");
                             //console.log(valueToShowOnLoad);
                             select.val(valueToShowOnLoad);
                         }
-
+                        
                         productDiv.append(productDivContents);
-                        productDiv.find('.product-img, .b-link-stripe, .b-animate-go, .thickbox').prepend(child);
+                        
+                        productDiv.find('.product-img.b-link-stripe.b-animate-go.thickbox').prepend(child);
                         productDiv.find('.perfum_available_ml').prepend(select);
                         $('.col-md-9, .product-model-sec').append(productDiv);
+                    }
+                    
+                    if(parseInt(jsonData.nextPage) === 0) {
+                        $('.loadFilteredProducts').hide();
+                    }
+                    else {
+                        $('.loadFilteredProducts').show();
                     }
                 }
                 else {
                     //console.log('ajax fail');
                     var h4 = '<h4 class="noFilterProducts">There are no products matching your filter settings!</h4>';
                     $('.col-md-9, .product-model-sec').html(h4);
+                    
+                    $('.loadFilteredProducts').hide();
                 }
+                
+                getUrlBrands('', document.URL);
+                // select filter brands after header brads search!
+                
+                $('#loader').remove();
             }
         });
-    });
+    }
 
 }); 
 // ready end

@@ -293,76 +293,92 @@ class MainModel extends myModel {
     }
 
     protected $cats = array(
-        'men' => 1,
-        'women' => 2,
+        'man' => 1,
+        'woman' => 2,
         'top' => 3,
-        'promo' => 4
+        'promo' => 4,
+        'newest' => 5
     );
+    
+    public function getFilteredProducts($perPage = 6) {
+        $postFilter = $this->input->post();
 
-    public function productsRelation($get = array(), $offset = '') {
-          $where = array(
-                'cat_id' => 1,
-         );
+        $page = isset($postFilter['page']) ? $postFilter['page'] : 0;
+        
+        $page *= $perPage;
+        
+        $offsetNextPage = $page + $perPage;
+        
+ 
+        $postFilter['cat']   =  isset($postFilter['cat']) ? $postFilter['cat'] : 'man';
+        $postFilter['brand'] =  isset($postFilter['brand']) ? $postFilter['brand'] : '';
+        $postFilter['min']   =  isset($postFilter['min']) ? $postFilter['min'] : 0;
+        $postFilter['max']   =  isset($postFilter['max']) ? $postFilter['max'] : 500;
+     // fill manualy like an pussy!  
 
-         if(!empty($get)) {
-            $where = array(
-                'cat_id' => $this->cats[$get['cat']],
-             );
-         }
+        $fromValue = $postFilter['min'];
+        $toValue = $postFilter['max'];
+     
+       if($this->cats[$postFilter['cat']] === 5) {
+           // we have newest product serach
+            $products = $this->relation_product_model->
+            order_by('created_time', 'ASC')->
+            with_pictures('where:`pictures`.`is_cover`=\'1\'')->
+            with_options('where:`product_options`.`price`>='. (int)$fromValue .' AND `product_options`.`price`<='. (int)$toValue .'')->
+            limit($perPage, $page)->
+            get_all();
+            
+       }
+       else {
+           
+           $where = array('cat_id' => $this->cats[$postFilter['cat']]);
+           if($this->cats[$postFilter['cat']] === 4) {
+               $where = array('is_sale' =>  1);
+           }
+           
+           $products = $this->relation_product_model->
+            where($where)->
+            with_pictures('where:`pictures`.`is_cover`=\'1\'')->
+            with_options('where:`product_options`.`price`>='. (int)$fromValue .' AND `product_options`.`price`<='. (int)$toValue .'')->
+            limit($perPage, $page)->
+            get_all();
+           
+       }
 
-//         $whereIn = isset($get['selected']) ? explode($get['selected']) : $this->getAllBrandIds();
-
-        $data = $this->relation_product_model->
-                where($where)->
-//                where_in('brand_id', $whereIn)->
-                with_pictures('where:`pictures`.`is_cover`=\'1\'')->
-                with_options()->
-                limit(6, $offset)->
-                get_all();
-
-        $sorted = $this->sortArray($data);
-        // sort option for better view handling
-
-        return $sorted;
-    }
-
-
-    public function getFilteredProducts($get = array(), $offset = '') {
-        $where = array(
-            'cat_id' => 1,
-        );
-
-        if(isset($_POST['category'])) {
-
-            $where = array(
-                'cat_id' => $this->cats[$_POST['category']],
-            );
-        }
-
-        $fromValue = $_POST['fromValue'];
-        $toValue = $_POST['toValue'];
-
-        $data = $this->relation_product_model->
-        where($where)->
-        with_pictures('where:`pictures`.`is_cover`=\'1\'')->
-        with_options('where:`product_options`.`price`>='. (int)$fromValue .' AND `product_options`.`price`<='. (int)$toValue .'')->
-        //limit(6, $offset)->
-        //as_array()->
-        get_all();
-
+        $nextPage = 1;
+        
         $filteredProductsData = array();
-        foreach ($data as $product) {
-
+        
+        if($postFilter['brand'] === '') {
+            $brands = $this->getAllBrandIds();
+        }
+        else {
+         $brands =  explode(';', $postFilter['brand']);  
+        }  
+ 
+        // filter further by brands fuck!
+            foreach($products as $product) {
+                if(array_search($product->brand_id, $brands) !== false) {
+                    $filteredProductsData[] = $product;
+                }
+            }
+       
+        
+        $filtredProductsFinal = array();
+        foreach ($filteredProductsData as $product) {
             if(isset($product->options)) {
-                $filteredProductsData[] = $product;
+                $filtredProductsFinal[] = $product;
             }
         }
 
-        if(count($filteredProductsData) > 0) {
+        if(count($filtredProductsFinal) > 0) {
 
-            $sorted = $this->sortArray($filteredProductsData);
+            $sorted = $this->sortArray($filtredProductsFinal);
 
-            return $sorted;
+            return array(
+                'sorted' => $sorted,
+                'nextPage' => $nextPage
+            );
         }
         else {
             return false;
@@ -382,12 +398,25 @@ class MainModel extends myModel {
           return $a->ml > $b->ml;
    }
     
-   public function getAllBrandIds() {
+   public function getAllBrandIdName() {
        $query = $this->db
                ->order_by('brand_name ASC')
-               ->select('id')
+               ->select('id, brand_name')
                ->get('brands');
        return $query->result();
+   }
+   
+    public function getAllBrandIds() {
+       $query = $this->db
+               ->select('id')
+               ->get('brands');
+       $arr = array();
+       
+       foreach ($query->result_array() as $row) {
+        $arr[] = $row['id'];
+       }
+       
+       return $arr;
    }
     
     

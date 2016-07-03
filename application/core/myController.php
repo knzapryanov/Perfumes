@@ -65,11 +65,7 @@ class MyController extends CI_Controller
     }
     
     public function currentPage($page, $message = '') {
-        $data['brands'] = $this->db
-                ->select('id, brand_name')
-                ->order_by('brand_name ASC', 'id ASC')
-                ->get('brands', 12)
-                ->result();
+        $data['brands'] = $this->mainModel->getAllBrandIdName();
 
         $this->load->view('header', $data);
         $this->load->view($page, $message);

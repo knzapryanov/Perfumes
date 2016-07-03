@@ -21,7 +21,7 @@
 <script src="<?= base_url('assets/js/jquery-2.2.4.min.js') ?>"></script>
 
 <script>
-		baseUrlJS = '<?= base_url(); ?>';
+	baseUrlJS = '<?= base_url(); ?>';
         publicPath = '<?= base_url('main'); ?>';
         uploadsPath = '<?= base_url('assets/uploads') ?>';
 </script>
@@ -205,7 +205,7 @@ echo '</pre>';
 							<span class="icon-bar"></span>
 							<span class="icon-bar"></span>
 						</button>
-                                            <h1 class="navbar-brand"><a  href="<?= base_url('') ?>">perfumes malta</a></h1>
+                                            <h1 class="navbar-brand"><a  href="<?= base_url('') ?>">perfumes Malta</a></h1>
 					</div>
 
 					<!--/.navbar-header-->
@@ -213,15 +213,15 @@ echo '</pre>';
 					<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
 						<ul class="nav navbar-nav">
 							<li><a href="<?= base_url('') ?>">Home</a></li>
-							<li class="dropdown">
+							<li class="dropdown" attr-cat="man">
 								<a href="#" class="dropdown-toggle" data-toggle="dropdown">Men <b class="caret"></b></a>
 								<ul class="dropdown-menu multi-column columns-3">
 									<div class="row">
 										<div class="col-sm-4">
 											<ul class="multi-column-dropdown">
                                                                                             <?php foreach($brands as $i => $brand) : ?>
-                                                                                              <?php if($i <= 4) : ?>
-                                                                                                   <li><a class="list1" href="<?= base_url('products').'/'.$brand->id ?>"><?= $brand->brand_name ?></a></li>
+                                                                                                <?php if($i <= 4) : ?>
+                                                                                                      <li><a brandId="<?= $brand->id ?>" class="list1" href="<?= base_url('products').'?cat=man&brand='.$brand->id ?>"><?= $brand->brand_name ?></a></li>
                                                                                               <?php endif;?>  
                                                                                             <?php endforeach; ?>        
                                                                                         </ul>
@@ -230,7 +230,7 @@ echo '</pre>';
 											<ul class="multi-column-dropdown">
 											   <?php foreach($brands as $i => $brand) : ?>
                                                                                               <?php if($i >= 5 && $i <= 9) : ?>
-                                                                                                   <li><a class="list1" href="<?= base_url('products').'/'.$brand->id ?>"><?= $brand->brand_name ?></a></li>
+                                                                                                   <li><a brandId="<?= $brand->id ?>"  class="list1" href="<?= base_url('products').'?cat=man&brand='.$brand->id ?>"><?= $brand->brand_name ?></a></li>
                                                                                               <?php endif;?>  
                                                                                             <?php endforeach; ?>
                                                                                                    
@@ -242,81 +242,56 @@ echo '</pre>';
 											<ul class="multi-column-dropdown">
 											    <?php foreach($brands as $i => $brand) : ?>
                                                                                               <?php if($i >= 10 && $i <= 14) : ?>
-                                                                                                   <li><a class="list1" href="<?= base_url('products').'/'.$brand->id ?>"><?= $brand->brand_name ?></a></li>
+                                                                                                   <li><a brandId="<?= $brand->id ?>"  class="list1" href="<?= base_url('products').'?cat=man&brand='.$brand->id ?>"><?= $brand->brand_name ?></a></li>
                                                                                               <?php endif;?>  
                                                                                             <?php endforeach; ?>
 											</ul>
 										</div>										
 									</div>
-									<a href = "javascript:void(0)" onclick = "document.getElementById('light').style.display='block';document.getElementById('fade').style.display='block'"><div class="menu_see_all_brands">SEE ALL BRANDS</div></a>
+									<a class="triggerAllOverLay"  href = "javascript:void(0)" onclick = "document.getElementById('light').style.display='block';document.getElementById('fade').style.display='block'">
+                                                                            <div class="menu_see_all_brands" attr-cat="man">SEE ALL BRANDS</div>
+                                                                        </a>
 								</ul>
 							</li>
-							<li class="dropdown">
-
-								<a href="#" class="dropdown-toggle" data-toggle="dropdown">Women <b class="caret"></b></a>
-
+							<li class="dropdown" attr-cat="woman">
+                                                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">Women <b class="caret"></b></a>
 								<ul class="dropdown-menu multi-column columns-3">
-
 									<div class="row">
+										<div class="col-sm-4">
+											<ul class="multi-column-dropdown">
+                                                                                            <?php foreach($brands as $i => $brand) : ?>
+                                                                                                <?php if($i <= 4) : ?>
+                                                                                                      <li><a brandId="<?= $brand->id ?>" class="list1" href="<?= base_url('products').'?cat=women&brand='.$brand->id ?>"><?= $brand->brand_name ?></a></li>
+                                                                                              <?php endif;?>  
+                                                                                            <?php endforeach; ?>        
+                                                                                        </ul>
+										</div>
+										<div class="col-sm-4">
+											<ul class="multi-column-dropdown">
+											   <?php foreach($brands as $i => $brand) : ?>
+                                                                                              <?php if($i >= 5 && $i <= 9) : ?>
+                                                                                                   <li><a brandId="<?= $brand->id ?>"  class="list1" href="<?= base_url('products').'?cat=women&brand='.$brand->id ?>"><?= $brand->brand_name ?></a></li>
+                                                                                              <?php endif;?>  
+                                                                                            <?php endforeach; ?>
+                                                                                                   
+											</ul>
+                                                                                </div>
 
 										<div class="col-sm-4">
 
 											<ul class="multi-column-dropdown">
-
-												<li><a class="list" href="products.php">Category</a></li>
-
-												<li><a class="list1" href="products.php">Sub Category</a></li>
-
-												<li><a class="list1" href="products.php">Sub Category</a></li>
-
-												<li><a class="list1" href="products.php">Sub Category</a></li>
-
-												<li><a class="list1" href="products.php">Sub Category</a></li>
-
+											    <?php foreach($brands as $i => $brand) : ?>
+                                                                                              <?php if($i >= 10 && $i <= 14) : ?>
+                                                                                                   <li><a brandId="<?= $brand->id ?>"  class="list1" href="<?= base_url('products').'?cat=women&brand='.$brand->id ?>"><?= $brand->brand_name ?></a></li>
+                                                                                              <?php endif;?>  
+                                                                                            <?php endforeach; ?>
 											</ul>
-
-										</div>
-
-										<div class="col-sm-4">
-
-											<ul class="multi-column-dropdown">
-
-												<li><a class="list" href="products.php">Category</a></li>
-
-												<li><a class="list1" href="products.php">Sub Category</a></li>
-
-												<li><a class="list1" href="products.php">Sub Category</a></li>
-
-												<li><a class="list1" href="products.php">Sub Category</a></li>
-
-												<li><a class="list1" href="products.php">Sub Category</a></li>
-
-											</ul>
-
-										</div>
-
-										<div class="col-sm-4">
-
-											<ul class="multi-column-dropdown">
-
-												<li><a class="list" href="products.php">Category</a></li>
-
-												<li><a class="list1" href="products.php">Sub Category</a></li>
-
-												<li><a class="list1" href="products.php">Sub Category</a></li>
-
-												<li><a class="list1" href="products.php">Sub Category</a></li>
-
-												<li><a class="list1" href="products.php">Sub Category</a></li>
-
-											</ul>
-
-										</div>
-
+										</div>										
 									</div>
-
+									<a  href = "javascript:void(0)" onclick = "document.getElementById('light').style.display='block';document.getElementById('fade').style.display='block'">
+                                                                            <div class="menu_see_all_brands" attr-cat="woman">SEE ALL BRANDS</div>
+                                                                        </a>
 								</ul>
-
 							</li>
 
 
