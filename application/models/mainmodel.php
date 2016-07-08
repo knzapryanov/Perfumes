@@ -305,33 +305,40 @@ class MainModel extends myModel {
 
         $page = isset($postFilter['page']) ? $postFilter['page'] : 0;
         
-        $page *= $perPage;
+        $startingProductForCurrentPage = $page * $perPage;
         
-        $offsetNextPage = $page + $perPage;
-        
- 
+        $startingProductNextPage = $startingProductForCurrentPage + $perPage;
+
+        /*echo '<pre>';
+        print_r($page);
+        print_r($offsetNextPage);
+        echo '</pre>';
+        die;*/
+
+        // fill manually like a pussy!
         $postFilter['cat']   =  isset($postFilter['cat']) ? $postFilter['cat'] : 'man';
         $postFilter['brand'] =  isset($postFilter['brand']) ? $postFilter['brand'] : '';
         $postFilter['min']   =  isset($postFilter['min']) ? $postFilter['min'] : 0;
         $postFilter['max']   =  isset($postFilter['max']) ? $postFilter['max'] : 500;
-     // fill manualy like an pussy!  
+
 
         $fromValue = $postFilter['min'];
         $toValue = $postFilter['max'];
      
        if($this->cats[$postFilter['cat']] === 5) {
-           // we have newest product serach
+           // we have newest product search
             $products = $this->relation_product_model->
             order_by('created_time', 'ASC')->
             with_pictures('where:`pictures`.`is_cover`=\'1\'')->
             with_options('where:`product_options`.`price`>='. (int)$fromValue .' AND `product_options`.`price`<='. (int)$toValue .'')->
-            limit($perPage, $page)->
+            //limit($perPage, $page)->
             get_all();
             
        }
        else {
            
            $where = array('cat_id' => $this->cats[$postFilter['cat']]);
+           // cat === 4 is promo cat
            if($this->cats[$postFilter['cat']] === 4) {
                $where = array('is_sale' =>  1);
            }
@@ -340,12 +347,12 @@ class MainModel extends myModel {
             where($where)->
             with_pictures('where:`pictures`.`is_cover`=\'1\'')->
             with_options('where:`product_options`.`price`>='. (int)$fromValue .' AND `product_options`.`price`<='. (int)$toValue .'')->
-            limit($perPage, $page)->
+            //limit($perPage, $page)->
             get_all();
            
        }
 
-        $nextPage = 1;
+        /*$nextPage = 1;*/
         
         $filteredProductsData = array();
         
@@ -353,17 +360,18 @@ class MainModel extends myModel {
             $brands = $this->getAllBrandIds();
         }
         else {
-         $brands =  explode(';', $postFilter['brand']);  
+            $brands =  explode(';', $postFilter['brand']);
         }  
  
         // filter further by brands fuck!
-            foreach($products as $product) {
-                if(array_search($product->brand_id, $brands) !== false) {
-                    $filteredProductsData[] = $product;
-                }
+        foreach($products as $product) {
+            if(array_search($product->brand_id, $brands) !== false) {
+                $filteredProductsData[] = $product;
             }
+        }
        
-        
+
+        // remove the products which have no options with price in the selected range
         $filtredProductsFinal = array();
         foreach ($filteredProductsData as $product) {
             if(isset($product->options)) {
@@ -371,13 +379,22 @@ class MainModel extends myModel {
             }
         }
 
+        $filtredProductsFinalPagePart = array_slice($filtredProductsFinal, $startingProductForCurrentPage, $perPage);
+        $filteredProductsFinalNextPage = array_slice($filtredProductsFinal, $startingProductNextPage, $perPage);
+        $productsNextPageCount = count($filteredProductsFinalNextPage);
+
+        /*echo '<pre>';
+        print_r($filtredProductsFinal);
+        echo '</pre>';
+        die;*/
+
         if(count($filtredProductsFinal) > 0) {
 
-            $sorted = $this->sortArray($filtredProductsFinal);
+            $sorted = $this->sortArray($filtredProductsFinalPagePart);
 
             return array(
                 'sorted' => $sorted,
-                'nextPage' => $nextPage
+                'nextPageProductsCount' => $productsNextPageCount
             );
         }
         else {

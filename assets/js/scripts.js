@@ -679,7 +679,7 @@ $(document).ready(function() {
     $.urlParam = function(name){
             var results = new RegExp('[\?&]' + name + '=([^&#]*)').exec(window.location.href);
             if (results === null){
-               return 'men';
+               return 'man';
             }
             else{
                return results[1] || '';
@@ -755,6 +755,7 @@ $(document).ready(function() {
     });
     
     var currentUrl = document.URL;
+    var counterPage = 0;
     
     if(currentUrl.indexOf('products') > - 1) {
         var min = 0;
@@ -781,12 +782,12 @@ $(document).ready(function() {
     }
     
     function setRangeFilterVal(min, max) {
-        var rangeSlider = $("#range").data("ionRangeSlider");
+        /*var rangeSlider = $("#range").data("ionRangeSlider");
 
         rangeSlider.update({
             from: min,
             to  : max
-        });
+        });*/
     }
     
     function getUrlBrands(brands, url) {
@@ -821,7 +822,7 @@ $(document).ready(function() {
     }
     
      
-     $('.left_side_categories').on('click', 'a', function() {
+/*     $('.left_side_categories').on('click', 'a', function() {
          
          if(document.URL.indexOf('products') > - 1) {
             var cat = $(this).find('div').attr('cat');
@@ -832,18 +833,24 @@ $(document).ready(function() {
             return false;
          }
          // check page for optimize ajax request than php 
-     });
-    
+     });*/
+
+
     $('body').on('click', '.menu_see_all_brands', function() {
         $('.searchOverlyBrands').attr('attr-cat', $(this).attr('attr-cat'));
         
         getUrlBrands('', document.URL);
        
     });
-    
+
+    // reset filter options to default!
     $('body').on('click', '#cleanFilter', function() {
-       loadFilteredProducts('man', '',  0, 500);
-       // reset defaul filter! 
+
+       $currentCat = $.urlParam('cat');
+
+       counterPage = 0;
+        console.log('clenfiler click' + counterPage);
+       loadFilteredProducts($currentCat, '',  0, 500);
     });
     
         
@@ -860,8 +867,18 @@ $(document).ready(function() {
                 }
             }
          });
-        
-        loadFilteredProducts($(this).attr('attr-cat'), brands,  $.urlParam('min'), $.urlParam('max'));
+
+        counterPage = 0;
+
+        var url = document.URL.split('?')[0] + 'products?';
+        var cat = 'cat=' + $(this).attr('attr-cat');
+        var brand= '&brand=' + brands;
+        var price = '&min=' + 0 + '&max=' + 500;
+
+        var buildUrl = url + cat + brand + price;
+
+        window.location.href = buildUrl;
+        //window.location.replace(buildUrl);
     });
     
    $(document).on('draging:finish', function() {
@@ -873,6 +890,10 @@ $(document).ready(function() {
     var brands = '';
 
     brands = getUrlBrands(brands, document.URL);
+
+    /*console.log($.urlParam('cat'), min, max, brands);
+    return;*/
+    counterPage = 0;
 
     loadFilteredProducts($.urlParam('cat'), brands,  min, max);
     });
@@ -912,7 +933,8 @@ $(document).ready(function() {
                 currentBrand += ';' + brandId;
             }
         }
-        
+
+       counterPage = 0;
        loadFilteredProducts(currentCat, currentBrand,  min, max);
     });
     
@@ -955,8 +977,7 @@ $(document).ready(function() {
     
     // on laod
     setActiveClass();
-    
-    var counterPage = 0;
+
     
     $('body').on('click', '.loadFilteredProducts', function() {
         loadFilteredProducts(
@@ -974,19 +995,23 @@ $(document).ready(function() {
     });
     
     function loadFilteredProducts(catParam, brands,  min, max) {
+
         catParam = catParam === '' ? 'man' : catParam;
         
         var url = document.URL.split('?')[0] + '?';
         var cat = 'cat=' + catParam;
         var brand= '&brand=' + brands;
         var price = '&min=' + min + '&max=' + max;
+        //var counterPage = 0;
         
         var buildUrl = url + cat + brand + price;
         
         window.history.pushState('', '', buildUrl);
         
-        $('body').prepend('<div id="loader"></div>'); 
-    
+        $('body').prepend('<div id="loader"></div>');
+
+        console.log(min, max, catParam, brands, counterPage);
+        //return;
         
         $.ajax({
             url: publicPath + "/filteredProducts",
@@ -1003,14 +1028,18 @@ $(document).ready(function() {
                 if(response != false) {
                     setRangeFilterVal(min, max);
                     // set globaly min and max value on range filter
-                            
+
+                    //console.log(response);
                     var jsonData = JSON.parse(response);
                     
                     console.info(jsonData);
-                    
-                    if(parseInt(jsonData.nextPage) === 0) {
+
+
+                    if(counterPage == 0) {
                        $('.col-md-9, .product-model-sec').html('');
                     }
+                    counterPage++;
+
                     
                     for(var i in jsonData.sorted) {
 
@@ -1117,11 +1146,12 @@ $(document).ready(function() {
                         $('.col-md-9, .product-model-sec').append(productDiv);
                     }
                     
-                    if(parseInt(jsonData.nextPage) === 0) {
-                        $('.loadFilteredProducts').hide();
+                    //if(parseInt(jsonData.nextPage) === 0) {
+                    if(jsonData.nextPageProductsCount > 0) {
+                        $('.loadFilteredProducts').show();
                     }
                     else {
-                        $('.loadFilteredProducts').show();
+                        $('.loadFilteredProducts').hide();
                     }
                 }
                 else {

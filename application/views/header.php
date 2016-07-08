@@ -27,8 +27,6 @@
 </script>
 
 <script type="text/javascript" src="<?= base_url('assets/js/bootstrap-3.1.1.min.js') ?>"></script>
-<script type="text/javascript" src="<?= base_url('assets/js/scripts.js') ?>"></script>
-
 
 
 <!-- cart animation-->
@@ -54,7 +52,6 @@
 <script defer src="<?= base_url('assets/js/jquery.flexslider.js') ?>"></script>
 
 <link rel="stylesheet" href="<?= base_url('assets/css/flexslider.css') ?>" type="text/css" media="screen" />
-
 
 
 <script>
@@ -103,7 +100,7 @@ $(window).load(function() {
 <script type="text/javascript" src="<?= base_url('assets/js/jquery.mousewheel.js') ?>"></script>
 
 
-
+	<script type="text/javascript" src="<?= base_url('assets/js/scripts.js') ?>"></script>
 
 </head>
 
@@ -261,7 +258,7 @@ echo '</pre>';
 											<ul class="multi-column-dropdown">
                                                                                             <?php foreach($brands as $i => $brand) : ?>
                                                                                                 <?php if($i <= 4) : ?>
-                                                                                                      <li><a brandId="<?= $brand->id ?>" class="list1" href="<?= base_url('products').'?cat=women&brand='.$brand->id ?>"><?= $brand->brand_name ?></a></li>
+                                                                                                      <li><a brandId="<?= $brand->id ?>" class="list1" href="<?= base_url('products').'?cat=woman&brand='.$brand->id ?>"><?= $brand->brand_name ?></a></li>
                                                                                               <?php endif;?>  
                                                                                             <?php endforeach; ?>        
                                                                                         </ul>
@@ -270,7 +267,7 @@ echo '</pre>';
 											<ul class="multi-column-dropdown">
 											   <?php foreach($brands as $i => $brand) : ?>
                                                                                               <?php if($i >= 5 && $i <= 9) : ?>
-                                                                                                   <li><a brandId="<?= $brand->id ?>"  class="list1" href="<?= base_url('products').'?cat=women&brand='.$brand->id ?>"><?= $brand->brand_name ?></a></li>
+                                                                                                   <li><a brandId="<?= $brand->id ?>"  class="list1" href="<?= base_url('products').'?cat=woman&brand='.$brand->id ?>"><?= $brand->brand_name ?></a></li>
                                                                                               <?php endif;?>  
                                                                                             <?php endforeach; ?>
                                                                                                    
@@ -282,7 +279,7 @@ echo '</pre>';
 											<ul class="multi-column-dropdown">
 											    <?php foreach($brands as $i => $brand) : ?>
                                                                                               <?php if($i >= 10 && $i <= 14) : ?>
-                                                                                                   <li><a brandId="<?= $brand->id ?>"  class="list1" href="<?= base_url('products').'?cat=women&brand='.$brand->id ?>"><?= $brand->brand_name ?></a></li>
+                                                                                                   <li><a brandId="<?= $brand->id ?>"  class="list1" href="<?= base_url('products').'?cat=woman&brand='.$brand->id ?>"><?= $brand->brand_name ?></a></li>
                                                                                               <?php endif;?>  
                                                                                             <?php endforeach; ?>
 											</ul>

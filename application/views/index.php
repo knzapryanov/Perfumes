@@ -15,7 +15,7 @@
 
 				<p>Wellcome to our perfumes shop. Here you can find the biggest collection of all original perfumes you need ! We can offer you the lowest prices and over 1500 perfumes.</p>
 
-				<a href="products.php" class="button"> shop now </a>
+				<a href="<?= base_url('products').'?cat=man&brand=' ?>" class="button"> shop now </a>
 
 			</div>
 
