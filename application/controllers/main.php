@@ -204,12 +204,40 @@ class Main extends MyController {
     
     
     public function products() {
-//        $data['products'] = $this->mainModel->getFilteredProducts();
-//        $data['products'] = $this->prepareOptionsToView($data['products']);
+        $products = $this->mainModel->getFilteredProducts();
         
-        $data['brands'] = $this->mainModel->getAllBrandIdName();
+        
+        
+        if(is_array($products['sorted'])) {
+              $products['sorted'] = $this->prepareOptionsToView($products['sorted']);
+            }
+        
+        if(!isset($products['nextPageProductsCount'])) {
+            $products = array(
+                'sorted' => array(),
+                'nextPageProductsCount' => 0
+            );
+        }    
+            
+        $products['brands'] = $this->mainModel->getAllBrandIdName();
+  
+       
+        
+        $this->currentPage('products', $products);
+    }
     
-        $this->currentPage('products', $data);
+    public function searchByName() {
+        $products = $this->mainModel->getSearchProducts();
+     
+        if(is_array($products['sorted'])) {
+              $products['sorted'] = $this->prepareOptionsToView($products['sorted']);
+        }
+        else {
+            redirect('index');
+            // fuck hacker!!
+        }
+        
+        $this->currentPage('search', $products);
     }
 
     public function filteredProducts() {
@@ -228,21 +256,8 @@ class Main extends MyController {
             }
         }
     }
-//    
-//    public function loadMoreProducts() {
-//        if($this->input->is_ajax_request()) {
-//            $result = $this->mainModel->productsRelation($this->input->post(), $this->input->post('offset'));
-//            
-//            if($result !== false) {
-//                echo json_encode($result);
-//            }
-//            
-//            else {
-//                echo false;
-//            }
-//        }
-//    }
     
+   
     public function loadManual() {
         if($this->input->is_ajax_request()) {
             $return = $this->mainModel->getIndexProducts($this->input->post('page'));

@@ -9,7 +9,6 @@
 <link href="<?= base_url('assets/css/style.css') ?>" rel="stylesheet" type="text/css" media="all" />
 
 <link href="<?= base_url('assets/css/owl.carousel.css') ?>" rel="stylesheet">
-
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
@@ -381,7 +380,7 @@ echo '</pre>';
 
 				<div id="sb-search" class="sb-search">
 
-					<form>
+                                    <form action="<?= base_url('searchByName')?>" method="GET">
 
 						<input class="sb-search-input" placeholder="Enter perfume name..." type="search" name="search" id="search">
 

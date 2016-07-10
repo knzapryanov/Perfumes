@@ -300,59 +300,112 @@ class MainModel extends myModel {
         'newest' => 5
     );
     
-    public function getFilteredProducts($perPage = 6) {
-        $postFilter = $this->input->post();
+    
+    public function getSearchProducts() {
+         $like = self::buildLikeWhere($_GET['search']);
+         if($like === false) {
+             return false;
+         }
+         
+         $products = $this->relation_product_model->
+            where($like, NULL, NULL, FALSE, FALSE, true)->
+            with_pictures('where:`pictures`.`is_cover`=\'1\'')->
+            with_options()->
+            get_all();
+         
+            
+         return array(
+                'sorted' => $products === false ? array() : $products,
+                'nextPageProductsCount' => 1
+            );
+         
+         
+    }
+    
+    public function buildLikeWhere($string) {
+        $escapedString = preg_replace('/[^A-Za-z0-9\-]/', '', $string); // Removes special chars
+        
+        if($escapedString === '') {
+          return false;
+        }
+        
+        $searchTerms = explode(' ', $escapedString);
+        $searchTermBits = array();
+        foreach ($searchTerms as $term) {
+            $term = trim($term);
+            if (!empty($term)) {
+                $searchTermBits[] = "(product_name LIKE '%$term%' OR description LIKE '%$term%')";
+            }
+        }
+        
+        $result = implode(' OR ', $searchTermBits);
+
+        return $result;
+    }
+    
+    public function getFilteredProducts() {
+        
+        $perPage = 6;
+        $get = $_GET;
+        
+        if(empty($get)) {
+             $postFilter = $this->input->post();
+             
+            $postFilter['cat']   =  isset($postFilter['cat']) ? $postFilter['cat'] : 'man';
+            $postFilter['brand'] =  isset($postFilter['brand']) ? $postFilter['brand'] : '';
+            $postFilter['min']   =  isset($postFilter['min']) ? $postFilter['min'] : 0;
+            $postFilter['max']   =  isset($postFilter['max']) ? $postFilter['max'] : 500;
+            $postFilter['search']   =  isset($postFilter['search']) ? $postFilter['search'] : '';
+        }
+        else {
+           $postFilter = array(
+                'cat'   => isset($get['cat']) ? $get['cat'] : 'man',
+                'brand' => isset($get['brand']) ? $get['brand'] : '',
+                'min'   => isset($get['min']) ? $get['min'] : 0,
+                'max'   => isset($get['max']) ? $get['max'] : 500,
+                'search'   => isset($get['search']) ? $get['search'] : '',
+            );
+        }
 
         $page = isset($postFilter['page']) ? $postFilter['page'] : 0;
-        
         $startingProductForCurrentPage = $page * $perPage;
-        
         $startingProductNextPage = $startingProductForCurrentPage + $perPage;
-
-        /*echo '<pre>';
-        print_r($page);
-        print_r($offsetNextPage);
-        echo '</pre>';
-        die;*/
-
-        // fill manually like a pussy!
-        $postFilter['cat']   =  isset($postFilter['cat']) ? $postFilter['cat'] : 'man';
-        $postFilter['brand'] =  isset($postFilter['brand']) ? $postFilter['brand'] : '';
-        $postFilter['min']   =  isset($postFilter['min']) ? $postFilter['min'] : 0;
-        $postFilter['max']   =  isset($postFilter['max']) ? $postFilter['max'] : 500;
-
 
         $fromValue = $postFilter['min'];
         $toValue = $postFilter['max'];
-     
+        
+        
+        
+        
        if($this->cats[$postFilter['cat']] === 5) {
            // we have newest product search
             $products = $this->relation_product_model->
             order_by('created_time', 'ASC')->
             with_pictures('where:`pictures`.`is_cover`=\'1\'')->
             with_options('where:`product_options`.`price`>='. (int)$fromValue .' AND `product_options`.`price`<='. (int)$toValue .'')->
-            //limit($perPage, $page)->
             get_all();
             
        }
        else {
-           
            $where = array('cat_id' => $this->cats[$postFilter['cat']]);
+           
            // cat === 4 is promo cat
-           if($this->cats[$postFilter['cat']] === 4) {
+           $cat = $this->cats[$postFilter['cat']];
+           if($cat === 4) {
                $where = array('is_sale' =>  1);
            }
+           else if($cat === 1 || $cat === 2) {
+               $where = "cat_id = 3 OR cat_id = $cat";
+           }
+           
            
            $products = $this->relation_product_model->
-            where($where)->
+            where($where, NULL, NULL, FALSE, FALSE, true)->
             with_pictures('where:`pictures`.`is_cover`=\'1\'')->
             with_options('where:`product_options`.`price`>='. (int)$fromValue .' AND `product_options`.`price`<='. (int)$toValue .'')->
-            //limit($perPage, $page)->
             get_all();
            
        }
-
-        /*$nextPage = 1;*/
         
         $filteredProductsData = array();
         
@@ -401,7 +454,7 @@ class MainModel extends myModel {
             return false;
         }
     }
-    
+
     public function sortArray($array) {
         foreach($array as $ar) {
          // Sort the multidimensional array
