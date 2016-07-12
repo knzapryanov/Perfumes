@@ -1192,5 +1192,52 @@ $(document).ready(function() {
         });
     }
 
+
+    // ------------------ CART ---------------------
+
+    var cartItems = [];
+
+    if(localStorage.getItem("currentShoppingCarTotal") != null) {
+
+        $('.simpleCart_total').text(' €' + localStorage.getItem("currentShoppingCarTotal") + ' ');
+    }
+
+    $('body').on('click', '.single-page-add', function() {
+
+        var currentShoppingCarTotal = $('.simpleCart_total').text();
+        currentShoppingCarTotal = parseFloat(currentShoppingCarTotal.replace(/[^0-9\.]+/g,""));
+
+        var selectedOptionPrice = $('input[name=perfume_ml]:checked').val();
+        selectedOptionPrice = parseFloat(selectedOptionPrice);
+
+        // variables are stored as strings in localStorage no matter what data type they are before that
+        // remember to parse them after localStorage.getItem if needed
+        localStorage.setItem( "currentShoppingCarTotal", currentShoppingCarTotal + selectedOptionPrice );
+
+        $('.simpleCart_total').text(' €' + (currentShoppingCarTotal + selectedOptionPrice) + ' ');
+
+        var selectedProductObj = {
+            product: "Test",
+            qty: 1,
+            price: 2
+        };
+
+        addToCart(selectedProductObj);
+    });
+
+
+    function addToCart(productObj) {
+
+        cartItems.push(productObj);
+        var cartItemsString = JSON.stringify( cartItems );
+        //var cartItemsObj = JSON.parse( cartItemsString );
+
+        localStorage.setItem( "currentCart", cartItemsString );
+        console.log(cartItemsString);
+        console.log(cartItemsObj);
+    }
+
+    // ---------------- CART END -------------------
+
 }); 
 // ready end

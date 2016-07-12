@@ -36,7 +36,7 @@
 
 <!-- cart -->
 
-	<script src="<?= base_url('assets/js/simpleCart.min.js') ?>"> </script>
+	<!--<script src="<?= base_url('assets/js/simpleCart.min.js') ?>"> </script>-->
 
 <!-- cart -->
 
