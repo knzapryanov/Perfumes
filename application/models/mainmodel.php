@@ -310,12 +310,21 @@ class MainModel extends myModel {
          $products = $this->relation_product_model->
             where($like, NULL, NULL, FALSE, FALSE, true)->
             with_pictures('where:`pictures`.`is_cover`=\'1\'')->
-            with_options()->
+            with_options('where:`product_options`.`quantity`>\'0\'')->
             get_all();
          
+         
+         // remove the products which have no options with price in the selected range
+        $filtredProductsFinal = array();
+        foreach ($products as $product) {
+          
+            if(isset($product->options) || count($product->options) > 0) {
+                $filtredProductsFinal[] = $product;
+            }
+        }
             
          return array(
-                'sorted' => $products === false ? array() : $products,
+                'sorted' => $filtredProductsFinal === false ? array() : $filtredProductsFinal,
                 'nextPageProductsCount' => 1
             );
          
@@ -402,7 +411,7 @@ class MainModel extends myModel {
            $products = $this->relation_product_model->
             where($where, NULL, NULL, FALSE, FALSE, true)->
             with_pictures('where:`pictures`.`is_cover`=\'1\'')->
-            with_options('where:`product_options`.`price`>='. (int)$fromValue .' AND `product_options`.`price`<='. (int)$toValue .'')->
+            with_options('where:`product_options`.`price`>='. (int)$fromValue .' AND `product_options`.`price`<='. (int)$toValue .' AND `product_options`.`quantity`>\'0\'')->
             get_all();
            
        }
@@ -427,7 +436,8 @@ class MainModel extends myModel {
         // remove the products which have no options with price in the selected range
         $filtredProductsFinal = array();
         foreach ($filteredProductsData as $product) {
-            if(isset($product->options)) {
+          
+            if(isset($product->options) || count($product->options) > 0) {
                 $filtredProductsFinal[] = $product;
             }
         }
@@ -436,10 +446,7 @@ class MainModel extends myModel {
         $filteredProductsFinalNextPage = array_slice($filtredProductsFinal, $startingProductNextPage, $perPage);
         $productsNextPageCount = count($filteredProductsFinalNextPage);
 
-        /*echo '<pre>';
-        print_r($filtredProductsFinal);
-        echo '</pre>';
-        die;*/
+ 
 
         if(count($filtredProductsFinal) > 0) {
 
@@ -507,7 +514,7 @@ class MainModel extends myModel {
         $product = $this->relation_product_model->
                 where('slug', $slug)->
                 with_pictures()->
-                with_options()->
+                with_options('where:`product_options`.`quantity`>\'0\'')->
                 get();
         
         return $product;
@@ -522,12 +529,22 @@ class MainModel extends myModel {
         $relatedProducts = $this->relation_product_model->
             where('cat_id', $id)->
             with_pictures()->
-            with_options()->
+             with_options('where:`product_options`.`quantity`>\'0\'')->
             get_all();
 
-        shuffle($relatedProducts);
+        
+          // remove the products which have no options with price in the selected range
+        $filtredProductsFinal = array();
+        foreach ($relatedProducts as $product) {
+          
+            if(isset($product->options) || count($product->options) > 0) {
+                $filtredProductsFinal[] = $product;
+            }
+        }
+        
+        shuffle($filtredProductsFinal);
 
-        return $relatedProducts;
+        return $filtredProductsFinal;
     }
 
 }

@@ -28,11 +28,14 @@ class Main extends MyController {
             $regularPriceToView = '';
             $salePricetToView = '';
             $percentageToView = '';
-
+            $quantity = '';
+            $quantityArr = array();
+            
             foreach ($product->options as $option) {
                 $regularPriceArr[] = $option->price;
                 $salePriceArr[] = $option->sale_price;
                 $percentageArr[] = $option->off_percentage;
+                $quantityArr[] = $option->quantity;
             }
 
             $regularPriceMin = min($regularPriceArr);
@@ -50,6 +53,7 @@ class Main extends MyController {
 
                 if($option->sale_price == $salePriceMin){
                     $smallestOptionId = $option->id;
+                    $quantity = $option->quantity;
                 }
             }
 
@@ -69,6 +73,8 @@ class Main extends MyController {
             $product->salePrice = $salePricetToView;
             $product->percentage = $percentageToView;
             $product->smallestOptionId = $smallestOptionId;
+            $product->quantity = $quantity;
+            $product->quantityString = implode(',', $quantityArr);
         }
 
         return $products;
@@ -290,11 +296,7 @@ class Main extends MyController {
         $data['category'] = $this->mainModel->getCategoryById($data['product']->cat_id);
         $data['relatedProducts'] = $this->mainModel->getRelatedByCategory($data['product']->cat_id);
         $data['relatedProducts'] = $this->prepareOptionsToView($data['relatedProducts']);
-        
-        /*echo '<pre>';
-        print_r($data);
-        echo '<pre>';
-        die;*/
+
         
         $this->currentPage('product', $data);
     }

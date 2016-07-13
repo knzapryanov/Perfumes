@@ -9,7 +9,7 @@ $(document).ready(function() {
 //            console.info(key, value);
 //    });
 //    
-    console.info(JSON.parse(localStorage.getItem("simpleCart_items")));
+    console.info(JSON.parse(localStorage.getItem("currentCart")));
 
 
    $('.add-to-cart').on('click',function(){
@@ -696,8 +696,11 @@ $(document).ready(function() {
 
     $('input[name="perfume_ml"]').on('change', function(){
 
-        $('#quantity').val(1);
-        $('h5.item_price').text('Price: €' + $(this).val());
+        $('#quantity')
+                .attr('max', $(this).attr('quantity'))
+                .val(1);
+        
+        $('h5.item_price').html('Price: €<span id="finalPrice">' + $(this).val() + '</span>');
     });
 
 
@@ -705,21 +708,41 @@ $(document).ready(function() {
 
         var $radios = $('input:radio[name=perfume_ml]');
         $radios.eq(0).prop('checked', true);
-        $("h5.item_price").text('Price: €' + $radios.eq(0).val());
+        $("h5.item_price").html('Price: €<span id="finalPrice">' + $radios.eq(0).val() + '</span>');
     });
 
 
     $('#quantity').on('change', function(){
 
         var quantityVal = $(this).val();
+        
         var currentSelectedPrice = $('input[name="perfume_ml"]:checked').val();
-        $("h5.item_price").text('Price: €' + (quantityVal * currentSelectedPrice));
+        $("h5.item_price").html('Price: €<span id="finalPrice">' + (quantityVal * currentSelectedPrice) + '</span>');
     });
 
 
+    $('.qty_add_to_cart').on('focus', '#quantity', function() {
+        $(this).on('keyup', function() {
+            if(parseInt($(this).val()) > parseInt($(this).attr('max'))) {
+                $(this).val($(this).attr('max'));
+                alert('Max quantity on this item is ' + $(this).attr('max'));
+            }
+        });
+    });
+
     //$('select[name="perfum_available_ml"]').on('change',function(){
     $('.col-md-9, .product-model-sec').on('change', 'select[name="perfum_available_ml"]', function(){
+        
+        // change max by options index selected
+        var index = $(this).find('option:selected').index();
+        var target = $(this).parents('.ofr').next('.item_quantity');
 
+        var splitedAttr = target.attr('options-quantity').split(',');
+        target.attr('max', splitedAttr[index]);
+        
+        
+        
+        
         $(this).parents('.product-info-cust, .prt_name').find('.item_quantity').val(1);
         var optionPrice = $(this).val();
 
@@ -832,6 +855,19 @@ $(document).ready(function() {
         
     }
     
+    
+    $('body').on('focus', '.prt_name', function() {
+        var itemQuantity = $(this).find('.item_quantity');
+        
+        itemQuantity.on('keyup', function() {
+            console.info($(this).val(), $(this).attr('max'));
+            
+            if(parseInt($(this).val()) > parseInt($(this).attr('max'))) {
+                $(this).val($(this).attr('max'));
+                alert('Max quantity on this item is ' + $(this).attr('max'));
+            }
+        });
+    });
      
     $('.left_side_categories').on('click', 'a', function() {
          
@@ -861,7 +897,6 @@ $(document).ready(function() {
        var currentCat = $.urlParam('cat');
 
        counterPage = 0;
-        console.log('clenfiler click' + counterPage);
        loadFilteredProducts(currentCat, '',  0, 500, '');
     });
     
@@ -1098,7 +1133,7 @@ $(document).ready(function() {
                                 '</div>' +
                                 '<div class="clearfix"> </div>' +
                                 '</div>' +
-                                '<input type="number" class="item_quantity" min="1" value="1">' +
+                                '<input type="number" class="item_quantity" min="1" max="' + jsonData.sorted[i].quantity + '" options-quantity="" value="1">' +
                                 '<button href="javascript:void(0);" class="item_add add-to-cart">' +
                                 '<span class="glyphicon glyphicon-shopping-cart"></span>' +
                                 '<div style="display:none;">' +
@@ -1109,10 +1144,11 @@ $(document).ready(function() {
                                 '</div>' +
                             '</div>';
 
-
+                        var quantityArr = [];
                         var isSaleOptionAvailable = false;
                         var select = $("<select name=\"perfum_available_ml\" />");
                         for(var j in jsonData.sorted[i].options) {
+                            quantityArr.push(jsonData.sorted[i].options[j].quantity);
                             $("<option />", {value: 
                                                 jsonData.sorted[i].options[j].sale_price != 0 
                                                      ? jsonData.sorted[i].options[j].price + '-' +
@@ -1128,7 +1164,9 @@ $(document).ready(function() {
                                 isSaleOptionAvailable = true;
                             }
                         }
- 
+                        
+                        
+                       
                         var child = '';
 
                         // additional check for is sale option remaining after filter some of the options
@@ -1162,6 +1200,10 @@ $(document).ready(function() {
                         
                         productDiv.append(productDivContents);
                         
+                        var optionsQuantity = quantityArr.join(',');
+                        productDiv.find('.item_quantity').attr('options-quantity', optionsQuantity); 
+
+ 
                         productDiv.find('.product-img.b-link-stripe.b-animate-go.thickbox').prepend(child);
                         productDiv.find('.perfum_available_ml').prepend(select);
                         $('.col-md-9, .product-model-sec').append(productDiv);
@@ -1215,12 +1257,37 @@ $(document).ready(function() {
         localStorage.setItem( "currentShoppingCarTotal", currentShoppingCarTotal + selectedOptionPrice );
 
         $('.simpleCart_total').text(' €' + (currentShoppingCarTotal + selectedOptionPrice) + ' ');
-
+          
+        var productId =  $('#productAttrId').attr('attr-id');
+        var productName =  $('.simpleCart_shelfItem h3:first').text();
+        var orderml =  $('.available_options input:checked').next().text();
+        var label =  $('.available_options input:checked').parent();
+        var optionPrice = '';
+        
+        if(label.find('.salePrice').length > 0) {
+            optionPrice = label.find('.salePrice').text();
+        }
+        else {
+            optionPrice = label.find('.originalPrice').text();
+        }
+        
+        var totalPriceMl = $('#finalPrice').text();
+        var qty = $('.qty_add_to_cart #quantity').val();
+        var imageSrc = $('.flexslider ol').find('li img').attr('src').split('/').pop();
+        
         var selectedProductObj = {
-            product: "Test",
-            qty: 1,
-            price: 2
+            user_id: 0,
+            product_id: productId,
+            product_name: productName,
+            order_ml: orderml,
+            option_price: optionPrice,
+            order_date: 0,
+            total_price_ml: totalPriceMl,
+            qty: qty,
+            image_src: imageSrc
         };
+        
+        console.info('selectedProductObj', selectedProductObj);
 
         addToCart(selectedProductObj);
     });
@@ -1233,8 +1300,8 @@ $(document).ready(function() {
         //var cartItemsObj = JSON.parse( cartItemsString );
 
         localStorage.setItem( "currentCart", cartItemsString );
-        console.log(cartItemsString);
-        console.log(cartItemsObj);
+//        console.log(cartItemsString);
+//        console.log(cartItemsObj, cartItems);
     }
 
     // ---------------- CART END -------------------
