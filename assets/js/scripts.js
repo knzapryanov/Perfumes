@@ -4,13 +4,6 @@ $(document).ready(function() {
            $('#successRegister').slideUp();
        }, 5000);
    } 
-   
-//    $.each(localStorage, function(key, value){
-//            console.info(key, value);
-//    });
-//    
-    console.info(JSON.parse(localStorage.getItem("currentCart")));
-
 
    $('.add-to-cart').on('click',function(){
 
@@ -1237,11 +1230,30 @@ $(document).ready(function() {
 
     // ------------------ CART ---------------------
 
-    var cartItems = [];
+    if(localStorage.getItem("currentCar") == null) {
+        
+        var cartItems = [];
+    }
+    else {
+        var cartItems = JSON.parse(localStorage.getItem("currentCart"));
+    }
+    
+    if(localStorage.getItem("itemQuantity") == null) {
+        
+        var itemCountity = 0;
+    }
+    else {
+        var itemCountity = parseInt(localStorage.getItem("itemQuantity"));
+    }
 
     if(localStorage.getItem("currentShoppingCarTotal") != null) {
 
         $('.simpleCart_total').text(' €' + localStorage.getItem("currentShoppingCarTotal") + ' ');
+    }
+    
+    if(localStorage.getItem("itemQuantity") != null) {
+
+        $('#simpleCart_quantity').text(' ' + localStorage.getItem("itemQuantity") + ' ');
     }
 
     $('body').on('click', '.single-page-add', function() {
@@ -1252,12 +1264,6 @@ $(document).ready(function() {
         var selectedOptionPrice = $('input[name=perfume_ml]:checked').val();
         selectedOptionPrice = parseFloat(selectedOptionPrice);
 
-        // variables are stored as strings in localStorage no matter what data type they are before that
-        // remember to parse them after localStorage.getItem if needed
-        localStorage.setItem( "currentShoppingCarTotal", currentShoppingCarTotal + selectedOptionPrice );
-
-        $('.simpleCart_total').text(' €' + (currentShoppingCarTotal + selectedOptionPrice) + ' ');
-          
         var productId =  $('#productAttrId').attr('attr-id');
         var productName =  $('.simpleCart_shelfItem h3:first').text();
         var orderml =  $('.available_options input:checked').next().text();
@@ -1274,6 +1280,7 @@ $(document).ready(function() {
         var totalPriceMl = $('#finalPrice').text();
         var qty = $('.qty_add_to_cart #quantity').val();
         var imageSrc = $('.flexslider ol').find('li img').attr('src').split('/').pop();
+        var productLink = document.URL;
         
         var selectedProductObj = {
             user_id: 0,
@@ -1284,25 +1291,118 @@ $(document).ready(function() {
             order_date: 0,
             total_price_ml: totalPriceMl,
             qty: qty,
-            image_src: imageSrc
+            image_src: imageSrc,
+            product_link: productLink
         };
         
-        console.info('selectedProductObj', selectedProductObj);
+        //console.info('selectedProductObj', selectedProductObj);
 
-        addToCart(selectedProductObj);
-    });
+        var intQty = parseInt(qty);
+        addToCart(selectedProductObj, intQty);
+        
+        // variables are stored as strings in localStorage no matter what data type they are before that
+        // remember to parse them after localStorage.getItem if needed
+        localStorage.setItem( "currentShoppingCarTotal", currentShoppingCarTotal + (selectedOptionPrice * intQty) );
+        
+        $('.simpleCart_total').text(' €' + (currentShoppingCarTotal + (selectedOptionPrice * intQty)) + ' ');
+        
+        localStorage.setItem( "itemQuantity", itemCountity );
+        
+        $('#simpleCart_quantity').text(' ' + itemCountity + ' ');
 
-
-    function addToCart(productObj) {
+    });    
+    
+    function addToCart(productObj, productQty) {
+        
+        itemCountity += productQty;
 
         cartItems.push(productObj);
         var cartItemsString = JSON.stringify( cartItems );
-        //var cartItemsObj = JSON.parse( cartItemsString );
 
         localStorage.setItem( "currentCart", cartItemsString );
-//        console.log(cartItemsString);
-//        console.log(cartItemsObj, cartItems);
     }
+    
+    $('body').on('click', '.simpleCart_empty', function() {
+        
+        $('.simpleCart_total').text(' €0.00 ');
+        $('#simpleCart_quantity').text(' 0 ');
+        
+        itemCountity = 0;
+        localStorage.removeItem("currentCart");
+        localStorage.removeItem("currentShoppingCarTotal");
+        localStorage.removeItem("itemQuantity");
+    });
+    
+    $('.close1').on('click', function(c){
+
+        $('.cart-header').fadeOut('slow', function(c){
+
+            $('.cart-header').remove();
+
+        });
+
+    });
+    
+    
+    if(document.URL.indexOf('checkout') > - 1) {
+        
+        var carItemQty = parseInt(localStorage.getItem("itemQuantity"));
+        var currentShoppingCarTotal = parseFloat(localStorage.getItem("currentShoppingCarTotal"));
+        var currentCarArr = JSON.parse(localStorage.getItem("currentCart"));
+        
+        console.log('checkout' + carItemQty, currentShoppingCarTotal, currentCarArr);       
+        
+        for(var i in currentCarArr) {
+            
+            var productDiv =                
+                    '<div class="cart-header">' +
+                    '<div class="close1"> </div>' +
+                    '<div class="cart-sec simpleCart_shelfItem">' +
+                        '<div class="cart-item cyc">' +
+                            '<img src="'+ thumbsPath + '/' +  currentCarArr[i].image_src +'" class="img-responsive" alt="">' +
+                        '</div>' +
+                        '<div class="cart-item-info">' +
+                            '<h3><a href="' + currentCarArr[i].product_link + '"><span class="selectedProductName">' + currentCarArr[i].product_name + '</span></a><!-- span>Pickup time:</span --></h3>' +
+                            '<div class="delivery delivery_details" style="background:yello;">' +
+                                '<div>' +
+                                    '<span>Quantity :</span> <span class="selectedQtyOption">' + currentCarArr[i].qty + '</span>' +
+                                    '<div class="clearfix"></div>' +
+                                '</div>' +
+                                '<div>' +
+                                    '<span>ML :</span>' +
+                                    '<span class="selectedMlOption">' + currentCarArr[i].order_ml + '</span>' +
+                                    '<div class="clearfix"></div>' +
+                                '</div>' +
+                                '<div>' +
+                                    '<span>Single Price :</span> <span class="selectedProductPrice">' + currentCarArr[i].option_price + '</span>' +
+                                    '<div class="clearfix"></div>' +
+                                '</div>' +
+                                '<div class="clearfix"></div>' +
+                                '<div>' +
+                                    '<span>Total product price :</span> <span class="selectedProductTotal">' + currentCarArr[i].total_price_ml + '</span>' +
+                                    '<div class="clearfix"></div>' +
+                                '</div>' +
+                                '<div class="clearfix"></div>' +
+                            '</div>' +
+                        '</div>' +
+                        '<div class="clearfix"></div>' +
+                    '</div>' +
+                '</div>';
+        
+            $('#checkoutForm').prepend(productDiv);
+        }
+        
+        $('#checkoutCarQty').text(carItemQty);
+        $('#checkoutProductsPrice').text('€' + currentShoppingCarTotal);
+        $('#checkoutDeliveryPrice').text('hardcoded €10');
+        $('#checkoutTotalPrice').text('€' + (currentShoppingCarTotal + 10));
+    }
+    
+    
+    $('#continueShoppingBtn').on('click', function(){
+        
+        window.location = baseUrlJS + '/products';
+    });
 
     // ---------------- CART END -------------------
 

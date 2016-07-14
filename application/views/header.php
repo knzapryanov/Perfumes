@@ -23,6 +23,7 @@
 	baseUrlJS = '<?= base_url(); ?>';
         publicPath = '<?= base_url('main'); ?>';
         uploadsPath = '<?= base_url('assets/uploads') ?>';
+        thumbsPath = '<?= base_url('assets/uploads/thumbs') ?>';
 </script>
 
 <script type="text/javascript" src="<?= base_url('assets/js/bootstrap-3.1.1.min.js') ?>"></script>
