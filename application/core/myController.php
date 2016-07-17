@@ -77,5 +77,9 @@ class MyController extends CI_Controller
         $this->load->view($page, $message);
     }
     
+    public function flashData($dataName, $message) {
+        $this->session->set_flashdata($dataName, $message);
+    }
+    
 }
     

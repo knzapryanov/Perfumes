@@ -1,4 +1,28 @@
 $(document).ready(function() {
+    
+    $('.shipping_information_table').on('click', 'input[type="button"]', function() {
+        var elementClass = $(this).attr('class');
+        
+        if($(this).hasClass('activeTab')) {
+            return false;
+            // fuck you!
+        }
+        
+        $('input[type="button"]').removeClass('activeTab');
+        $('.effect_container').fadeOut();
+        
+        $('#' + elementClass).show(500);
+        $(this).addClass('activeTab');
+
+    });
+    // profile animation tabs
+    
+    if($('#flashDataMessage').length > 0) {
+        $('#flashDataMessage').delay(5000).fadeOut(500);
+    }
+    
+    
+    
    if($('#successRegister').length > 0) {
        setTimeout(function() {
            $('#successRegister').slideUp();
@@ -19,7 +43,7 @@ $(document).ready(function() {
 
         var itemImg = $(this).parent().find('img').eq(0);
 
-        flyToElement($(itemImg), $('.cart_anchor'));
+        //flyToElement($(itemImg), $('.cart_anchor'));
 
     });
 // cart animation
@@ -716,6 +740,14 @@ $(document).ready(function() {
 
     $('.qty_add_to_cart').on('focus', '#quantity', function() {
         $(this).on('keyup', function() {
+            
+            if($(this).val().indexOf('.') > -1) {
+                $(this).val(1);
+                alert('This is not allowed number!');
+                return false;
+            }
+            
+            
             if(parseInt($(this).val()) > parseInt($(this).attr('max'))) {
                 $(this).val($(this).attr('max'));
                 alert('Max quantity on this item is ' + $(this).attr('max'));
@@ -1093,7 +1125,7 @@ $(document).ready(function() {
                     
                     for(var i in jsonData.sorted) {
 
-                        var productDiv = $('<div class="product-grid"></div>');
+                        var productDiv = $('<div class="product-grid" attr-id="' + jsonData.sorted[i].id + '"></div>');
                         var productDivContents =
                             '<a href="' + baseUrlJS + 'product/' + jsonData.sorted[i].slug + '">' +
                                 '<div class="more-product"><span> </span></div>' +
@@ -1230,7 +1262,7 @@ $(document).ready(function() {
 
     // ------------------ CART ---------------------
 
-    if(localStorage.getItem("currentCar") == null) {
+    if(localStorage.getItem("currentCart") == null) {
         
         var cartItems = [];
     }
@@ -1246,9 +1278,10 @@ $(document).ready(function() {
         var itemCountity = parseInt(localStorage.getItem("itemQuantity"));
     }
 
-    if(localStorage.getItem("currentShoppingCarTotal") != null) {
-
-        $('.simpleCart_total').text(' €' + localStorage.getItem("currentShoppingCarTotal") + ' ');
+    var cartTotal = localStorage.getItem("currentShoppingCarTotal");
+    
+    if(cartTotal != null && cartTotal != 0 ) {
+        $('.simpleCart_total').text(' €' + cartTotal + '.00 ');
     }
     
     if(localStorage.getItem("itemQuantity") != null) {
@@ -1257,13 +1290,9 @@ $(document).ready(function() {
     }
 
     $('body').on('click', '.single-page-add', function() {
-
-        var currentShoppingCarTotal = $('.simpleCart_total').text();
-        currentShoppingCarTotal = parseFloat(currentShoppingCarTotal.replace(/[^0-9\.]+/g,""));
-
         var selectedOptionPrice = $('input[name=perfume_ml]:checked').val();
         selectedOptionPrice = parseFloat(selectedOptionPrice);
-
+        
         var productId =  $('#productAttrId').attr('attr-id');
         var productName =  $('.simpleCart_shelfItem h3:first').text();
         var orderml =  $('.available_options input:checked').next().text();
@@ -1295,11 +1324,64 @@ $(document).ready(function() {
             product_link: productLink
         };
         
-        //console.info('selectedProductObj', selectedProductObj);
+         addToCart(selectedProductObj, qty, selectedOptionPrice);
 
-        var intQty = parseInt(qty);
-        addToCart(selectedProductObj, intQty);
+    });    
+    
+    $('body').on('click', '.products-page-add', function() {
+        var selectedOptionPrice = $(this).parent().find('select[name=perfum_available_ml] option:selected').val();
         
+        var selectedOptionPriceSplited = selectedOptionPrice.split('-')[1];
+        
+        if(typeof selectedOptionPriceSplited !== 'undefined') {
+            selectedOptionPrice = selectedOptionPriceSplited;
+        }       
+      
+        selectedOptionPrice = parseFloat(selectedOptionPrice);
+        
+        var productGrid =  $(this).parents('.product-grid');
+        
+        var productId =  productGrid.attr('attr-id');
+        var productName =  productGrid.find('.prt_name h4:first').text();
+        var orderml = productGrid.find('select[name=perfum_available_ml] option:selected').text();
+            orderml = orderml.replace(/[^0-9\.]+/g, '');
+        var optionPrice = selectedOptionPrice;
+        var qty = productGrid.find('.item_quantity').val();
+        var totalPriceMl = optionPrice * parseInt(qty);
+        
+        var imageSrc = productGrid.find('.img-responsive').attr('src').split('/').pop();
+        var productLink = productGrid.find('a').attr('href');
+        
+        var selectedProductObj = {
+            user_id: 0,
+            product_id: productId,
+            product_name: productName,
+            order_ml: orderml,
+            option_price: optionPrice,
+            order_date: 0,
+            total_price_ml: totalPriceMl,
+            qty: qty,
+            image_src: imageSrc,
+            product_link: productLink
+        };
+        
+        console.log(selectedProductObj);
+        addToCart(selectedProductObj, qty, selectedOptionPrice);
+    });    
+    
+    function addToCart(productObj, productQty, selectedOptionPrice) {
+        var intQty = parseInt(productQty);
+
+        itemCountity += intQty;
+        
+        
+        // check if exist product with same ml just ++ qty and calc price
+        updateExistIsSameProduct(productObj);
+        
+       
+        var currentShoppingCarTotal = $('.simpleCart_total').text();
+        currentShoppingCarTotal = parseFloat(currentShoppingCarTotal.replace(/[^0-9\.]+/g,""));
+
         // variables are stored as strings in localStorage no matter what data type they are before that
         // remember to parse them after localStorage.getItem if needed
         localStorage.setItem( "currentShoppingCarTotal", currentShoppingCarTotal + (selectedOptionPrice * intQty) );
@@ -1309,38 +1391,77 @@ $(document).ready(function() {
         localStorage.setItem( "itemQuantity", itemCountity );
         
         $('#simpleCart_quantity').text(' ' + itemCountity + ' ');
-
-    });    
-    
-    function addToCart(productObj, productQty) {
         
-        itemCountity += productQty;
-
-        cartItems.push(productObj);
         var cartItemsString = JSON.stringify( cartItems );
 
         localStorage.setItem( "currentCart", cartItemsString );
     }
     
+    function updateExistIsSameProduct(productObj) {
+        var storage = JSON.parse(localStorage.getItem('currentCart'));
+        var isExisting = false; 
+        
+        for(var i in storage) {
+            if(productObj.order_ml === storage[i].order_ml &&
+               productObj.product_id === storage[i].product_id ) {
+                  isExisting = true;
+                  
+                  storage[i].total_price_ml = 
+                          parseFloat(storage[i].total_price_ml) + ( parseFloat(productObj.option_price ) * parseInt(productObj.qty ));
+                 storage[i].qty = parseInt(storage[i].qty) + parseInt(productObj.qty);
+                // we have match
+               }
+        }
+        
+       
+        
+        if(!isExisting) {
+            cartItems.push(productObj);
+        }
+        else {
+            cartItems = storage;
+        }
+    }
+    
     $('body').on('click', '.simpleCart_empty', function() {
-        
-        $('.simpleCart_total').text(' €0.00 ');
-        $('#simpleCart_quantity').text(' 0 ');
-        
         itemCountity = 0;
         localStorage.removeItem("currentCart");
         localStorage.removeItem("currentShoppingCarTotal");
         localStorage.removeItem("itemQuantity");
+        
+        $('.cart-header').fadeOut('slow', function(){
+            $('.cart-header').remove();
+        });
+        
+        updateChekoutInfo(0, 0, 10);
+        
     });
     
-    $('.close1').on('click', function(c){
+    $('.container').on('click', '.removeCartProduct', function(){
+        var position = $(this).attr('cart-position');
+        var localStorageCart= JSON.parse(localStorage.getItem('currentCart'));
+        
+        var deletedObject = localStorageCart.splice(position, 1);
+        
+        
+        $(this).parent().fadeOut('slow', function(){
+            $(this).remove();
+            
+            
+            var cartItemQty = parseInt(localStorage.getItem('itemQuantity')) - parseInt(deletedObject[0].qty);
+            var currentShoppingCarTotal = parseFloat(localStorage.getItem('currentShoppingCarTotal')) - parseFloat(deletedObject[0].total_price_ml);
+                    
+                    
+            console.info(cartItemQty, currentShoppingCarTotal);
+            updateChekoutInfo(cartItemQty, currentShoppingCarTotal, 10);
 
-        $('.cart-header').fadeOut('slow', function(c){
-
-            $('.cart-header').remove();
+            localStorage.setItem('currentCart', JSON.stringify( localStorageCart ));
+            localStorage.setItem('itemQuantity', cartItemQty);
+            localStorage.setItem('currentShoppingCarTotal', currentShoppingCarTotal);
+            
+            console.info('localStorage', localStorageCart);
 
         });
-
     });
     
     
@@ -1356,13 +1477,13 @@ $(document).ready(function() {
             
             var productDiv =                
                     '<div class="cart-header">' +
-                    '<div class="close1"> </div>' +
+                    '<div class="removeCartProduct" cart-position="' + i + '"> </div>' +
                     '<div class="cart-sec simpleCart_shelfItem">' +
                         '<div class="cart-item cyc">' +
                             '<img src="'+ thumbsPath + '/' +  currentCarArr[i].image_src +'" class="img-responsive" alt="">' +
                         '</div>' +
                         '<div class="cart-item-info">' +
-                            '<h3><a href="' + currentCarArr[i].product_link + '"><span class="selectedProductName">' + currentCarArr[i].product_name + '</span></a><!-- span>Pickup time:</span --></h3>' +
+                            '<h3><a target="_blank" href="' + currentCarArr[i].product_link + '"><span class="selectedProductName">' + currentCarArr[i].product_name + '</span></a><!-- span>Pickup time:</span --></h3>' +
                             '<div class="delivery delivery_details" style="background:yello;">' +
                                 '<div>' +
                                     '<span>Quantity :</span> <span class="selectedQtyOption">' + currentCarArr[i].qty + '</span>' +
@@ -1392,10 +1513,29 @@ $(document).ready(function() {
             $('#checkoutForm').prepend(productDiv);
         }
         
+        carItemQty = isNaN(carItemQty) ? 0 : carItemQty;
+        currentShoppingCarTotal = isNaN(currentShoppingCarTotal) ? 0 : currentShoppingCarTotal;
+        
+        updateChekoutInfo(carItemQty, currentShoppingCarTotal, 10);
+    }
+    
+    function updateChekoutInfo(carItemQty, currentShoppingCarTotal, delivery) {
+        
+        currentShoppingCarTotal = currentShoppingCarTotal === 0 ? currentShoppingCarTotal + '.00' : currentShoppingCarTotal;
+        $('.simpleCart_total').text('€' + currentShoppingCarTotal);
+        currentShoppingCarTotal = parseFloat(currentShoppingCarTotal);
+        
+        console.info(currentShoppingCarTotal);
+        // update header cart info
+        
+        $('#simpleCart_quantity').text(' ' + carItemQty + ' ');
+        
+        
         $('#checkoutCarQty').text(carItemQty);
         $('#checkoutProductsPrice').text('€' + currentShoppingCarTotal);
-        $('#checkoutDeliveryPrice').text('hardcoded €10');
+        $('#checkoutDeliveryPrice').text('hardcoded €' + delivery);
         $('#checkoutTotalPrice').text('€' + (currentShoppingCarTotal + 10));
+        // update info order
     }
     
     

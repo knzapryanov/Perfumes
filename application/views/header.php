@@ -137,9 +137,20 @@ echo '</pre>';
 					<option value="3">German</option>
 
 				</select>
+</div -->
 
-			</div -->
+                                  <?php if(isset($_SESSION['id'])) : ?> 
+                                     <div class="top-left">
+                                            <ul>
+                                                <li>
+                                                    <a href="<?= base_url('profile') ?>">Profile</a>
+                                                </li>
+                                            </ul>
+                                     </div>
+                                  <?php endif;?>
 
+                      
+                         
 			<div class="top-right">
 
 				<ul>

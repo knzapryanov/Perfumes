@@ -13,7 +13,7 @@ class Main extends MyController {
         
         $this->currentPage('index', $data);
     }
-    
+
     public function prepareOptionsToView($products) {
         if(empty($products)) {
             return array();
@@ -94,6 +94,46 @@ class Main extends MyController {
 
     public function login(){
         $this->currentPage('login');
+    }
+    
+    public function profile() {
+        $sessionInfo = $this->session->all_userdata();
+        
+        if($sessionInfo['id']) {
+            
+            $data['address'] = $this->mainModel->getUserAddress($sessionInfo);
+     
+            $this->currentPage('profile', $data);
+        }
+        else {
+            redirect('index');
+        } 
+    }
+    
+    public function saveProfileInfo() {
+        if($this->input->post('saveProfile')) {
+            self::returnMessageProfile();
+        }
+        else {
+            redirect('profile');
+        }
+    }
+    
+    public function returnMessageProfile() {
+        if($this->mainModel->saveProfileInfoDatabase()) {
+             $this->flashData('message','Your address information has been saved successfully');
+        }
+        else {
+            $this->flashData('message','Your address information has been saved successfully');
+        }
+
+       redirect('profile');
+    }
+    
+    public function confirmAddress() {
+//        $data['address'] = $this->mainModel->getUserAddress($sessionInfo);
+        
+        $this->currentPage('set_address');
     }
     
     public function register(){

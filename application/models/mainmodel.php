@@ -547,6 +547,69 @@ class MainModel extends myModel {
         return $filtredProductsFinal;
     }
 
+    public function getUserAddress($sessionInfo) {
+            $this->db->select('*');
+            $this->db->from('user_address');
+            $this->db->join('users', 'users.id = user_address.user_id', 'LEFT');
+            $this->db->where('user_address.user_id',$sessionInfo['id']);
+            $query = $this->db->get();
+            $address = $query->result_array();
+            $address = $address[0];
+         
+       if(empty($address)) {
+           // buil empty elements for array
+           $address = array(
+             'first_name' => $sessionInfo['first_name'],
+             'last_name' => $sessionInfo['last_name'],
+             'email' => $sessionInfo['email'],
+             'street' => '',  
+             'city' => '',  
+             'country' => '',  
+             'zip' => '',  
+             'phone' => '',
+           );
+            
+       }
+ 
+       return $address;
+    }
+    
+    public function saveProfileInfoDatabase() {
+        $post = $this->input->post();
+        $userId = $this->session->userdata('id');
+        
+        $data = array(
+               'street' => $post['street_address'],  
+               'city' => $post['city'],  
+               'country' => $post['country'],  
+               'zip' => $post['postcode'],  
+               'phone' => $post['mobile_number'],
+            );
+        // prepare data for update/insert
+        
+        $isUpdate = $this->db 
+                ->where('user_id', $userId)
+                ->get('user_address')
+                ->num_rows();
+        
+        
+        if(count($isUpdate) > 0) {
+            
+          return  $this->db
+                    ->where('user_id', $userId)
+                    ->update('user_address', $data);
+          // update
+
+        }
+
+        $data['user_id'] = $userId;
+        
+        return  $this->db->insert('user_address', $data);
+        // insert
+        
+    }
+    
+    
 }
     
     
