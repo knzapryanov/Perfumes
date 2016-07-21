@@ -1,7 +1,12 @@
+<?php
+	/*echo '<pre>';
+	print_r($address);
+	echo '</pre>';*/
+?>
 <div class="container">
 
+	<?php if(isset($_SESSION['id'])): ?>
 	<h2>Address</h2><BR/><BR/>
-
 
 	<div class="shipping_information_table">
 
@@ -11,7 +16,7 @@
 
 				<td><i class="glyphicon glyphicon-user"></i></td>
 
-				<td>Georg Muraffi</td>
+				<td><?= $address['first_name']. ' ' . $address['last_name'] ?></td>
 
 			</tr>
 
@@ -21,11 +26,11 @@
 
 				<td>
 
-					<span class="addreess">Schreiber Street 12</span><BR>
+					<span class="addreess"><?= $address['street'] ?></span><BR>
 
-					<span class="city">Paceville</span> <span class="postcode">STJ</span><BR>
+					<span class="city"><?= $address['city'] ?></span> <span class="postcode"><?= $address['zip'] ?></span><BR>
 
-					<span class="country">Malta</span>
+					<span class="country"><?= $address['country'] ?></span>
 
 				</td>
 
@@ -35,7 +40,7 @@
 
 				<td><i class="glyphicon glyphicon-envelope"></i></td>
 
-				<td>example@user.com</td>
+				<td><?= $address['email'] ?></td>
 
 			</tr>
 
@@ -43,7 +48,7 @@
 
 				<td><i class="glyphicon glyphicon-phone"></i></td>
 
-				<td>+35699805637</td>
+				<td><?= $address['phone'] ?></td>
 
 			</tr>
 
@@ -51,21 +56,22 @@
 
 				<td><i class="glyphicon glyphicon-pencil"></i></td>
 
-				<td><a href="">EDIT</a></td>
+				<td><a href="<?= base_url('profile') ?>">EDIT</a></td>
 
 			</tr>
 
 		</table>
 
-	</div><!-- END shipping_information_table -->
-
+	</div><!-- END address table -->
+	<?php endif; ?>
 	
 
 
-
+	<?php if(!isset($_SESSION['id'])): ?>
 	<div class="shipping_information_table" style="background:yello;">
 
-		<input type="button" value="REGISTER" onclick="javascript:location.href='login.php'"/><input type="button" value="PAY AS GUEST"/>
+		<input type="button" value="LOGIN / REGISTER" class="registerBtn"/>
+		<input type="button" value="PAY AS GUEST" id="payAsGuestTab"/>
 
 		<div class="clearfix"></div><BR><BR>
 
@@ -127,16 +133,10 @@
 
 			</div>
 
-			<div>
-
-				<label><input type="checkbox" name="remember_shipping_information" class="remember_shipping_information" checked/> Remember this information</label>
-
-			</div>
-
 		</div><BR/><BR/>
 
-	</div><!-- END shipping_information_table -->
-
+	</div><!-- END pay as guest table -->
+	<?php endif; ?>
 
 
 
@@ -147,7 +147,7 @@
 
 	<div class="confirm_products">
 
-		<div class="confirm_products_single">
+		<!--<div class="confirm_products_single">
 
 			<div class="confirm_order_single_pr_number float_left">#: <b>1</b><span class="devider_vertical_line">|</span></div>
 
@@ -163,29 +163,7 @@
 
 			<div class="clearfix"></div>
 
-		</div>
-
-
-
-		<div class="confirm_products_single">
-
-			<div class="confirm_order_single_pr_number float_left">#: <b>2</b><span class="devider_vertical_line">|</span></div>
-
-			<div class="confirm_order_single_pr_image float_left"><img src="/images/g1.png"><span class="devider_vertical_line">|</span></div>
-
-			<div class="confirm_order_single_pr_name float_left">PRODDUCT: <b><span>Bulgari Omnia pink</span></b><span class="devider_vertical_line">|</span></div>
-
-			<div class="confirm_order_single_pr_ml float_left">ML: <b>30ml</b><span class="devider_vertical_line">|</span></div>
-
-			<div class="confirm_order_single_pr_quantity float_left">QUANTITY: <b>2</b><span class="devider_vertical_line">|</span></div>
-
-			<div class="confirm_order_single_pr_singlr_price float_left">SINGLE PRICE: <b>€55</b></div>
-
-			<div class="clearfix"></div>
-
-		</div>
-
-
+		</div>-->
 
 	</div>	
 

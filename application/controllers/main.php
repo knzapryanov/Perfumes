@@ -5,10 +5,14 @@ class Main extends MyController {
     public function index(){
         $data['manualNewest'] = $this->mainModel->indexRelation(12, '', 'is_newest');
         $data['promotions'] = $this->mainModel->indexRelation(12, '', 'is_sale');
-        
-        
+
+        /*echo '<pre>';
+        print_r($data);
+        echo '</pre>';
+        die;*/
         foreach($data as $var) {
-         $var = $this->prepareOptionsToView($var);
+
+            $var = $this->prepareOptionsToView($var);
         }
         
         $this->currentPage('index', $data);
@@ -102,7 +106,29 @@ class Main extends MyController {
         if($sessionInfo['id']) {
             
             $data['address'] = $this->mainModel->getUserAddress($sessionInfo);
-     
+            $orderedProducts = $this->mainModel->getUserOrderedProducts($sessionInfo);
+
+            // get the unique order id's among all ordered products
+            $userOrdersIDs = array();
+            foreach ($orderedProducts as $product) {
+
+                $userOrdersIDs[] = $product->order_id;
+            }
+            $userOrdersIDs = array_unique($userOrdersIDs);
+
+            // fill the array with orders containing all products from current order_id
+            $data['orders'] = array();
+            foreach ($userOrdersIDs as $orderID) {
+
+                foreach ($orderedProducts as $product) {
+
+                    if($product->order_id == $orderID) {
+
+                        $data['orders'][$orderID][] = $product;
+                    }
+                }
+            }
+
             $this->currentPage('profile', $data);
         }
         else {
@@ -111,6 +137,7 @@ class Main extends MyController {
     }
     
     public function saveProfileInfo() {
+
         if($this->input->post('saveProfile')) {
             self::returnMessageProfile();
         }
@@ -120,20 +147,26 @@ class Main extends MyController {
     }
     
     public function returnMessageProfile() {
+
         if($this->mainModel->saveProfileInfoDatabase()) {
              $this->flashData('message','Your address information has been saved successfully');
         }
         else {
-            $this->flashData('message','Your address information has been saved successfully');
+            $this->flashData('message','Your address information has not been saved successfully');
         }
 
        redirect('profile');
     }
     
     public function confirmAddress() {
-//        $data['address'] = $this->mainModel->getUserAddress($sessionInfo);
-        
-        $this->currentPage('set_address');
+
+        $data = array();
+        if(isset($_SESSION['id'])) {
+
+            $sessionInfo = $this->session->all_userdata();
+            $data['address'] = $this->mainModel->getUserAddress($sessionInfo);
+        }
+        $this->currentPage('set_address', $data);
     }
     
     public function register(){
@@ -307,7 +340,7 @@ class Main extends MyController {
     public function loadManual() {
         if($this->input->is_ajax_request()) {
             $return = $this->mainModel->getIndexProducts($this->input->post('page'));
-            
+
             if(!$return) {
                 echo false;
             }

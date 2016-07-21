@@ -287,8 +287,6 @@ class MainModel extends myModel {
             'nextPage' => $this->db->where($paramWhere, 1)->get('products', $perPage, $page + $perPage)->num_rows()
          );
         
-        shuffle($data['products']);
-        
         return $data;
     }
 
@@ -352,27 +350,27 @@ class MainModel extends myModel {
         return $result;
     }
     
-    public function getFilteredProducts() {
-        
+    public function getFilteredProducts()
+    {
+
         $perPage = 6;
         $get = $_GET;
-        
-        if(empty($get)) {
-             $postFilter = $this->input->post();
-             
-            $postFilter['cat']   =  isset($postFilter['cat']) ? $postFilter['cat'] : 'man';
-            $postFilter['brand'] =  isset($postFilter['brand']) ? $postFilter['brand'] : '';
-            $postFilter['min']   =  isset($postFilter['min']) ? $postFilter['min'] : 0;
-            $postFilter['max']   =  isset($postFilter['max']) ? $postFilter['max'] : 500;
-            $postFilter['search']   =  isset($postFilter['search']) ? $postFilter['search'] : '';
-        }
-        else {
-           $postFilter = array(
-                'cat'   => isset($get['cat']) ? $get['cat'] : 'man',
+
+        if (empty($get)) {
+            $postFilter = $this->input->post();
+
+            $postFilter['cat'] = isset($postFilter['cat']) ? $postFilter['cat'] : 'man';
+            $postFilter['brand'] = isset($postFilter['brand']) ? $postFilter['brand'] : '';
+            $postFilter['min'] = isset($postFilter['min']) ? $postFilter['min'] : 0;
+            $postFilter['max'] = isset($postFilter['max']) ? $postFilter['max'] : 500;
+            $postFilter['search'] = isset($postFilter['search']) ? $postFilter['search'] : '';
+        } else {
+            $postFilter = array(
+                'cat' => isset($get['cat']) ? $get['cat'] : 'man',
                 'brand' => isset($get['brand']) ? $get['brand'] : '',
-                'min'   => isset($get['min']) ? $get['min'] : 0,
-                'max'   => isset($get['max']) ? $get['max'] : 500,
-                'search'   => isset($get['search']) ? $get['search'] : '',
+                'min' => isset($get['min']) ? $get['min'] : 0,
+                'max' => isset($get['max']) ? $get['max'] : 500,
+                'search' => isset($get['search']) ? $get['search'] : '',
             );
         }
 
@@ -382,65 +380,61 @@ class MainModel extends myModel {
 
         $fromValue = $postFilter['min'];
         $toValue = $postFilter['max'];
-        
-        
-        
-        
-       if($this->cats[$postFilter['cat']] === 5) {
-           // we have newest product search
+
+        if ($this->cats[$postFilter['cat']] === 5) {
+            // we have newest product search
             $products = $this->relation_product_model->
             order_by('created_time', 'ASC')->
             with_pictures('where:`pictures`.`is_cover`=\'1\'')->
-            with_options('where:`product_options`.`price`>='. (int)$fromValue .' AND `product_options`.`price`<='. (int)$toValue .'')->
+            with_options('where:`product_options`.`price`>=' . (int)$fromValue . ' AND `product_options`.`price`<=' . (int)$toValue . ' AND `product_options`.`quantity`>\'0\'')->
             get_all();
-            
-       }
-       else {
-           $where = array('cat_id' => $this->cats[$postFilter['cat']]);
-           
-           // cat === 4 is promo cat
-           $cat = $this->cats[$postFilter['cat']];
-           if($cat === 4) {
-               $where = array('is_sale' =>  1);
-           }
-           else if($cat === 1 || $cat === 2) {
-               $where = "cat_id = 3 OR cat_id = $cat";
-           }
-           
-           
-           $products = $this->relation_product_model->
+
+        } else {
+            $where = array('cat_id' => $this->cats[$postFilter['cat']]);
+
+            // cat === 4 is promo cat
+            $cat = $this->cats[$postFilter['cat']];
+            if ($cat === 4) {
+                $where = array('is_sale' => 1);
+            } else if ($cat === 1 || $cat === 2) {
+                $where = "cat_id = 3 OR cat_id = $cat";
+            }
+
+
+            $products = $this->relation_product_model->
             where($where, NULL, NULL, FALSE, FALSE, true)->
             with_pictures('where:`pictures`.`is_cover`=\'1\'')->
-            with_options('where:`product_options`.`price`>='. (int)$fromValue .' AND `product_options`.`price`<='. (int)$toValue .' AND `product_options`.`quantity`>\'0\'')->
+            with_options('where:`product_options`.`price`>=' . (int)$fromValue . ' AND `product_options`.`price`<=' . (int)$toValue . ' AND `product_options`.`quantity`>\'0\'')->
             get_all();
-           
-       }
-        
-        $filteredProductsData = array();
-        
-        if($postFilter['brand'] === '') {
-            $brands = $this->getAllBrandIds();
+
         }
-        else {
-            $brands =  explode(';', $postFilter['brand']);
-        }  
- 
+
+        $filteredProductsData = array();
+
+        if ($postFilter['brand'] === '') {
+            $brands = $this->getAllBrandIds();
+        } else {
+            $brands = explode(';', $postFilter['brand']);
+        }
+
         // filter further by brands fuck!
-        foreach($products as $product) {
-            if(array_search($product->brand_id, $brands) !== false) {
+        foreach ($products as $product) {
+            if (array_search($product->brand_id, $brands) !== false) {
                 $filteredProductsData[] = $product;
             }
         }
-       
 
         // remove the products which have no options with price in the selected range
         $filtredProductsFinal = array();
-        foreach ($filteredProductsData as $product) {
-          
-            if(isset($product->options) || count($product->options) > 0) {
-                $filtredProductsFinal[] = $product;
+            foreach ($filteredProductsData as $product) {
+
+                if (isset($product->options)) {
+                    // only if we have options set check their count else you have nice bug :D
+                    if(count($product->options) > 0) {
+                        $filtredProductsFinal[] = $product;
+                    }
+                }
             }
-        }
 
         $filtredProductsFinalPagePart = array_slice($filtredProductsFinal, $startingProductForCurrentPage, $perPage);
         $filteredProductsFinalNextPage = array_slice($filtredProductsFinal, $startingProductNextPage, $perPage);
@@ -498,15 +492,32 @@ class MainModel extends myModel {
     
     
      public function indexRelation($limit = 12, $offset = '', $param = false) {
+
+        //$perPage = 12;
+
+        // not sure ! this returns object when the provided limit is not reached(in this example returned products are below 12)
+        // and return array when the limit is reached fuck fuck fuck!
         $data = $this->relation_product_model->
                 where($param, 1)->
                 with_pictures('where:`pictures`.`is_cover`=\'1\'')->
-                with_options()->
+                with_options('where:`product_options`.`quantity`>\'0\'')->
                 limit($limit, $offset)->
                 get_all();
-  
+
+
+        // cast the returned data to array in order to use shuffle and array_alice
+        //$dataArr = get_object_vars($data);
+
+        //$startPageProducts = array_slice($dataArr, 0, $perPage);
+        //$startPageNext = array_slice($dataArr, 12, $perPage);
+        //$productsNextPageCount = count($startPageNext);
+
         shuffle($data);
-        
+
+        // cast the shuffled array to object again since the controller is expecting object
+        //$dataObj = (object)$dataArr;
+        //$dataObj->nextPageProductsCount = $productsNextPageCount;
+
         return $data;
     }
     
@@ -554,30 +565,40 @@ class MainModel extends myModel {
             $this->db->where('user_address.user_id',$sessionInfo['id']);
             $query = $this->db->get();
             $address = $query->result_array();
-            $address = $address[0];
-         
+            //$address = $address[0];
+
        if(empty($address)) {
-           // buil empty elements for array
+           // build empty elements for array
            $address = array(
              'first_name' => $sessionInfo['first_name'],
              'last_name' => $sessionInfo['last_name'],
              'email' => $sessionInfo['email'],
-             'street' => '',  
-             'city' => '',  
+             'street' => '',
+             'city' => '',
              'country' => '',  
              'zip' => '',  
              'phone' => '',
            );
-            
+
+           return $address;
        }
  
-       return $address;
+       return $address[0];
+    }
+
+    public function getUserOrderedProducts($sessionInfo) {
+
+        $userId = $sessionInfo['id'];
+        $userOrders = $this->db->get_where('orders', array('user_id =' => $userId))->result();
+
+        return $userOrders;
     }
     
     public function saveProfileInfoDatabase() {
         $post = $this->input->post();
         $userId = $this->session->userdata('id');
-        
+
+        // prepare data for update/insert
         $data = array(
                'street' => $post['street_address'],  
                'city' => $post['city'],  
@@ -585,28 +606,26 @@ class MainModel extends myModel {
                'zip' => $post['postcode'],  
                'phone' => $post['mobile_number'],
             );
-        // prepare data for update/insert
         
         $isUpdate = $this->db 
                 ->where('user_id', $userId)
                 ->get('user_address')
                 ->num_rows();
-        
-        
-        if(count($isUpdate) > 0) {
+
+        // update if user address exist
+        if($isUpdate > 0) {
             
           return  $this->db
                     ->where('user_id', $userId)
                     ->update('user_address', $data);
-          // update
+
 
         }
 
         $data['user_id'] = $userId;
-        
-        return  $this->db->insert('user_address', $data);
-        // insert
-        
+
+        // insert if user address do not exist
+        return $this->db->insert('user_address', $data);
     }
     
     

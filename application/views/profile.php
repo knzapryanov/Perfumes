@@ -87,46 +87,48 @@
         
 	<div id="orders_container" class="effect_container" style="display:none">
 
-		<div class="confirm_products_single">
+		<?php
+		if(count($orders) > 0) {
+			foreach ($orders as $orderIndex => $order) :
+				$orderNum = $orderIndex + 1;
+				$orderDate = gmdate("Y-m-d", $order[0]->order_date);
+		?>
+			<div class="currentOrderContainer">
 
-			<div class="confirm_order_single_pr_number float_left">#: <b>1</b><span class="devider_vertical_line">|</span></div>
+				Order &#35: <span class="orderNumDate"><?= $orderNum .' Date: '. $orderDate ?></span>
 
-			<div class="confirm_order_single_pr_image float_left"><img src="/images/g1.png"><span class="devider_vertical_line">|</span></div>
+				<?php
+					$totalOrderPrice = 0;
+					foreach ($order as $productIndex => $product) :
+						$productNum = $productIndex + 1;
+						$totalOrderPrice += (int)$product->total_price_ml;
+				?>
+					<div class="confirm_products_single">
 
-			<div class="confirm_order_single_pr_name float_left">PRODDUCT: <b><span>Bulgari Omnia pink</span></b><span class="devider_vertical_line">|</span></div>
+						<div class="confirm_order_single_pr_number float_left">#: <b><?= $productNum ?></b><span class="devider_vertical_line">|</span></div>
 
-			<div class="confirm_order_single_pr_ml float_left">ML: <b>30ml</b><span class="devider_vertical_line">|</span></div>
+						<div class="confirm_order_single_pr_image float_left"><img src="<?= base_url('assets/uploads/thumbs').'/'.$product->image_src ?>"><span class="devider_vertical_line">|</span></div>
 
-			<div class="confirm_order_single_pr_quantity float_left">QUANTITY: <b>2</b><span class="devider_vertical_line">|</span></div>
+						<div class="confirm_order_single_pr_name float_left">PRODUCT: <b><span><?= $product->product_name ?></span></b><span class="devider_vertical_line">|</span></div>
 
-			<div class="confirm_order_single_pr_singlr_price float_left">SINGLE PRICE: <b>€55</b></div>
+						<div class="confirm_order_single_pr_ml float_left">ML: <b><?= $product->order_ml ?></b><span class="devider_vertical_line">|</span></div>
 
-			<div class="clearfix"></div>
+						<div class="confirm_order_single_pr_quantity float_left">QUANTITY: <b><?= $product->qty ?></b><span class="devider_vertical_line">|</span></div>
 
-		</div>
+						<div class="confirm_order_single_pr_singlr_price float_left">SINGLE PRICE: <b>€<?= $product->option_price ?></b></div>
 
+						<div class="clearfix"></div>
 
+					</div>
+					<?php endforeach; ?>
 
-		<div class="confirm_products_single">
-
-			<div class="confirm_order_single_pr_number float_left">#: <b>2</b><span class="devider_vertical_line">|</span></div>
-
-			<div class="confirm_order_single_pr_image float_left"><img src="/images/g1.png"><span class="devider_vertical_line">|</span></div>
-
-			<div class="confirm_order_single_pr_name float_left">PRODDUCT: <b><span>Bulgari Omnia pink</span></b><span class="devider_vertical_line">|</span></div>
-
-			<div class="confirm_order_single_pr_ml float_left">ML: <b>30ml</b><span class="devider_vertical_line">|</span></div>
-
-			<div class="confirm_order_single_pr_quantity float_left">QUANTITY: <b>2</b><span class="devider_vertical_line">|</span></div>
-
-			<div class="confirm_order_single_pr_singlr_price float_left">SINGLE PRICE: <b>€55</b></div>
-
-			<div class="clearfix"></div>
-
-		</div>
-
-
-
+					Total order price: &euro;<span class="totalOrderPrice"><?= $totalOrderPrice ?></span>
+				</div>
+			<?php endforeach;
+		}
+		else {?>
+			<div class="noPreviousOrders">There is no previous orders info!</div>
+		<?php } ?>
 	</div>	
         
       <input type="submit" value="Save" name="saveProfile"  class="save_profile_info"/>

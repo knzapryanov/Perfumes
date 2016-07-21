@@ -10,8 +10,13 @@ $(document).ready(function() {
         
         $('input[type="button"]').removeClass('activeTab');
         $('.effect_container').fadeOut();
+        $('.save_profile_info').fadeOut();
         
         $('#' + elementClass).show(500);
+        if(elementClass == 'address_container') {
+
+            $('.save_profile_info').show(500);
+        }
         $(this).addClass('activeTab');
 
     });
@@ -1546,5 +1551,48 @@ $(document).ready(function() {
 
     // ---------------- CART END -------------------
 
+    if(document.URL.indexOf('confirmAddress') > - 1) {
+
+        var carItemQty = parseInt(localStorage.getItem("itemQuantity"));
+        var currentShoppingCarTotal = parseFloat(localStorage.getItem("currentShoppingCarTotal"));
+        var currentCarArr = JSON.parse(localStorage.getItem("currentCart"));
+
+        for(var i in currentCarArr) {
+
+            var productNum = parseInt(i) + 1;
+            var productOrderDiv =
+            '<div class="confirm_products_single">' +
+
+                '<div class="confirm_order_single_pr_number float_left">#: <b>' + productNum + '</b><span class="devider_vertical_line">|</span></div>' +
+
+                '<div class="confirm_order_single_pr_image float_left"><img src="'+ thumbsPath + '/' +  currentCarArr[i].image_src +'"><span class="devider_vertical_line">|</span></div>' +
+
+                '<div class="confirm_order_single_pr_name float_left">PRODDUCT: <b><span>' + currentCarArr[i].product_name + '</span></b><span class="devider_vertical_line">|</span></div>' +
+
+                '<div class="confirm_order_single_pr_ml float_left">ML: <b>' + currentCarArr[i].order_ml + '</b><span class="devider_vertical_line">|</span></div>' +
+
+                '<div class="confirm_order_single_pr_quantity float_left">QUANTITY: <b>' + currentCarArr[i].qty + '</b><span class="devider_vertical_line">|</span></div>' +
+
+                '<div class="confirm_order_single_pr_singlr_price float_left">SINGLE PRICE: <b>€' + currentCarArr[i].option_price + '</b></div>' +
+
+                '<div class="clearfix"></div>' +
+
+            '</div>';
+
+            $('.confirm_products').append(productOrderDiv);
+        }
+
+        carItemQty = isNaN(carItemQty) ? 0 : carItemQty;
+        currentShoppingCarTotal = isNaN(currentShoppingCarTotal) ? 0 : currentShoppingCarTotal;
+
+        updateChekoutInfo(carItemQty, currentShoppingCarTotal, 10);
+
+        $('.registerBtn').on('click', function(){
+
+            window.location = baseUrlJS + '/login';
+        });
+
+        $('#payAsGuestTab').addClass('activeTab');
+    }
 }); 
 // ready end

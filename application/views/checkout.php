@@ -20,7 +20,7 @@
 
                     <input type="button" value="CONTINUE SHOPPING" id="continueShoppingBtn" /><BR/><BR/><BR/>
 
-                    <input type="submit" value="Confirm Address" />
+                    <input type="submit" value="CONFIRM ORDER" />
 
                     <div class="clearfix"></div>
 
