@@ -11,7 +11,7 @@
 <link href="<?= base_url('assets/css/owl.carousel.css') ?>" rel="stylesheet">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta http-equiv="Content-Type" content ="text/html; charset=utf-8" />
 
 <meta name="keywords" content="" />
 

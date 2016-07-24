@@ -490,13 +490,12 @@ class MainModel extends myModel {
        return $arr;
    }
     
-    
      public function indexRelation($limit = 12, $offset = '', $param = false) {
 
         //$perPage = 12;
 
         // not sure ! this returns object when the provided limit is not reached(in this example returned products are below 12)
-        // and return array when the limit is reached fuck fuck fuck!
+        // and return array when the limit is reached fuck fuck fuck tha pussy :D!
         $data = $this->relation_product_model->
                 where($param, 1)->
                 with_pictures('where:`pictures`.`is_cover`=\'1\'')->
@@ -504,7 +503,12 @@ class MainModel extends myModel {
                 limit($limit, $offset)->
                 get_all();
 
-
+//        
+//        echo '<pre>';
+//        print_r($data);
+//        echo '<pre>';
+//        die;
+        
         // cast the returned data to array in order to use shuffle and array_alice
         //$dataArr = get_object_vars($data);
 
@@ -512,7 +516,7 @@ class MainModel extends myModel {
         //$startPageNext = array_slice($dataArr, 12, $perPage);
         //$productsNextPageCount = count($startPageNext);
 
-        shuffle($data);
+//        shuffle($data);
 
         // cast the shuffled array to object again since the controller is expecting object
         //$dataObj = (object)$dataArr;

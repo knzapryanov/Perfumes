@@ -141,49 +141,52 @@
 
 
 
-	<h2>ORDER CONFORMATION</h2><BR/><BR/>
+	<h2>ORDER CONFIRMATION</h2><BR/><BR/>
+        
+        <div class="confirm_products">
+           
+        </div>
+        
+        <div id="paymentMethods">
+            <div class="paymentCont">
+                <input type="radio" name="payment" value="1" />
+                <label class="labelP">Pay via Paypal</label>
+            </div>
+            <div class="paymentCont">
+                <input type="radio"name="payment" value="2" />
+                <label class="labelP">Pay via credit/debit cart through Paypal</label>
+            </div>
+        </div>
+        
+       
+        
+        
 
-
-
-	<div class="confirm_products">
-
-		<!--<div class="confirm_products_single">
-
-			<div class="confirm_order_single_pr_number float_left">#: <b>1</b><span class="devider_vertical_line">|</span></div>
-
-			<div class="confirm_order_single_pr_image float_left"><img src="/images/g1.png"><span class="devider_vertical_line">|</span></div>
-
-			<div class="confirm_order_single_pr_name float_left">PRODDUCT: <b><span>Bulgari Omnia pink</span></b><span class="devider_vertical_line">|</span></div>
-
-			<div class="confirm_order_single_pr_ml float_left">ML: <b>30ml</b><span class="devider_vertical_line">|</span></div>
-
-			<div class="confirm_order_single_pr_quantity float_left">QUANTITY: <b>2</b><span class="devider_vertical_line">|</span></div>
-
-			<div class="confirm_order_single_pr_singlr_price float_left">SINGLE PRICE: <b>€55</b></div>
-
-			<div class="clearfix"></div>
-
-		</div>-->
-
-	</div>	
-
-
-
-	<div class="confitm_order">
+        <div class="confitm_order">
 
                     <div>Products Price: <span id="checkoutProductsPrice"></span></div>
 
                     <div>Delivery: <span id="checkoutDeliveryPrice"></span></div>
 
                     <div>Total: <span id="checkoutTotalPrice"></span></div><BR/>
-
+                        
                     <input type="button" value="CONTINUE SHOPPING" id="continueShoppingBtn" /><BR/><BR/><BR/>
-
-                    <input type="submit" value="PAYMENT" />
-
                     <div class="clearfix"></div>
 
 	</div>
+        
+        
+        	
+            <form id="formPaypal" action="<?= base_url('payments') ?>" method="POST">
+                <input type="hidden" name="cmd" value="_cart" />
+                <input type="hidden" name="upload" value="1">
+		<input type="hidden" name="no_note" value="1" />
+		<input type="hidden" name="currency_code" value="EUR" />
+                
+                <input type="submit" name="submit" value="PAYMENT" />
+                
+            </form>    
+	
 
 
 </div><!-- END container -->
