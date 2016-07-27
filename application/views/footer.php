@@ -14,9 +14,18 @@
 
 			<form id="emailSubscription" action="javascript:void(0);" method="POST">
 
-				<input type="text" class="text" name="sign_email" value="Email" onfocus="this.value = '';" onblur="if (this.value == '') {this.value = 'Email';}">
+                            <input
+                                id="subscriptionInput"
+                                type="text" 
+                                required 
+                                type="email" 
+                                class="text" 
+                                name="sign_email" 
+                                placeholder="Email..."
+                                autocomplete="off"
+                                >
 
-				<input type="submit" value="JOIN">
+				<input id="submitEmail" type="submit" value="JOIN">
 
 			</form>
 

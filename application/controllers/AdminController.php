@@ -280,5 +280,10 @@ class AdminController extends MyController {
             $this->adminPage('admin/all_products', $data);
         }
     }
+    
+     public function newsletter() {
+        $data = $this->mainModel->getProducts();
+        $this->adminPage('admin/newsletter', $data);
+    }
  
 }

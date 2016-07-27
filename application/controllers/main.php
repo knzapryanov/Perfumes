@@ -108,11 +108,15 @@ class Main extends MyController {
     }
     
     public function logout(){
+             unset($_SESSION['token'], $_SESSION['tokenPayment']);
+             
              $this->session->sess_destroy();
 	     redirect('');
     }
 
     public function login(){
+        unset($_SESSION['token'], $_SESSION['tokenPayment']);
+        
         $this->currentPage('login');
     }
     
@@ -182,6 +186,10 @@ class Main extends MyController {
             $sessionInfo = $this->session->all_userdata();
             $data['address'] = $this->mainModel->getUserAddress($sessionInfo);
         }
+        
+        $data['token'] = $this->generateEncryptStr();
+        $_SESSION['tokenPayment'] = $data['token'];
+        
         $this->currentPage('set_address', $data);
     }
     
@@ -240,6 +248,7 @@ class Main extends MyController {
             else {
 
                 if($this->mainModel->signNewsEmail()) {
+                    
 
                     echo true;
                 }
@@ -430,10 +439,16 @@ class Main extends MyController {
 
         $this->currentPage('checkout');
     }
-    
-    public function payment() {
 
-        $this->currentPage('payment');
+    public function payment() {
+        $token = isset($_SESSION['tokenPayment']) ? $_SESSION['tokenPayment'] : false;
+      
+        if($this->input->post('token') !== $token) {
+            redirect('index');
+        }
+        else {
+         $this->currentPage('payment');
+        }
     }
     
     // PAYPAL METHODS

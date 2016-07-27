@@ -522,26 +522,49 @@ $(document).ready(function() {
        });
     });
 
+   function appendMessage(that, element , message) {
+       var selector = '#' + element;
+       
+       if($(selector).length === 0) {
+         that.append('<div id="' + element + '">' + message + '</div>');
+         setTimeout(function() {
+                  $(selector).fadeOut('', function(){
+                      $(this).remove();
+                  });
+         }, 4000);
+       }
+   }
+   
    $('#emailSubscription').on('submit', function () {
-
-        var enteredEmail = $("[name='sign_email']").val();
-
+        var val = $("#subscriptionInput").val();
+        var patern =  /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        var that = $(this);
+        
+        if(!patern.test(val)) {
+          appendMessage(that, 'errorMessage', 'Please enter valid email address!'); 
+          
+          return false;
+        }
+        
+        $('#submitEmail').attr('disabled', 'disabled');
+        
         $.ajax({
             url: publicPath+"/signEmail",
             type: 'POST',
             data: {
-                sign_email: enteredEmail
+                sign_email: val
             },
             success: function(response) {
-
+                $('#submitEmail').removeAttr('disabled');
                 if(!response) {
-
-                    alert('Subscription failed. Check the entered email.');
+                    
+                   appendMessage(that, 'errorMessage', 'Please enter valid email address!'); 
+                   
+                   return false;   
                 }
-                else {
-
-                    alert('Subscription successful.');
-                }
+                
+                appendMessage(that, 'successMessage', 'Thanks for the subscription!');
+                $('#subscriptionInput').val('');
             }
         });
     });
@@ -1593,7 +1616,6 @@ $(document).ready(function() {
         var currentCarArr = JSON.parse(localStorage.getItem("currentCart"));
 
         for(var i in currentCarArr) {
-            console.info(i);     
             var productNum = parseInt(i) + 1;
             var productOrderDiv = createProductContainer(currentCarArr, productNum);
             var hiddenProduct = crateHiddenProduct(currentCarArr, productNum);
@@ -1647,13 +1669,117 @@ $(document).ready(function() {
     
     return product;
     }
+    
+    function letsCheckAddress() {
+        if($('#payAsGuestTab').length > 0) {
+            return loopCheck('.show_shipping_info input');
+          
+            // not logged check
+        }
+        
+        var errors = [];
+        
+        $('.shipping_information_table tr').each(function() {
+            
+            var isExists = $(this).find('.tableInformation').length > 0;
+            
+            if($(this).find('.tableInformation').text() === '' && isExists) {
+                errors.push(1);
+            }
+        });
+        
+        if(errors.length > 0) {
+                if($('.overMessage').length === 0) {
+                    $('.shipping_information_table table').addClass('inputError');
+                    $('body').prepend('<div class="overMessage">Please fill all address data!</div>');
+                    setTimeout(function() {
+                       $('.overMessage').remove(); 
+                    }, 4000);
+                }
+                
+               return false;
 
-    $('#paymentBtn').on('click', function(){
+            }
+            
+         return true;
+        
+        
+        // logged check
+        
+    }
+    
+    function loopCheck(selector) {
+        var errors = [];
+        
+        $(selector).each(function() {
+                errors = deepCheck(errors, $(this));
+                // check curent error field
+        });
+            
+        if(errors.length > 0) {
+            $('input').removeClass('inputError');
+            $('input[name="' + errors[0] + '"]').addClass('inputError');
 
-        window.location = baseUrlJS + 'payment';
+            return false;
+        }
+
+        return true;
+    }
+    
+    function deepCheck(errors, that) {
+         var patern =  /^[^\s@]+@[^\s@]+\.[^\s@]+$/; // email patern
+         var statment = true;
+         
+         if(that.attr('type') === 'email') {
+            statment = patern.test(that.val());
+            // check if valid email
+         }
+        
+         if(that.val() === '' || !statment) {
+              errors.push(that.attr('name'));
+         }
+         
+         
+         return errors;
+    }
+    
+    function localStorageCheck() {
+       var isAllow =  localStorage.getItem("currentCart") &&
+                      localStorage.getItem("itemQuantity") && 
+                      localStorage.getItem("currentShoppingCarTotal");
+              
+      return isAllow;
+    }
+    
+    function isAllowedPayment() {
+        var isAllow = localStorageCheck();
+
+        if(isAllow != null && letsCheckAddress()) {
+
+            $('input').removeClass('inputError');
+            
+            return true;
+        }
+
+        return false;
+        
+    }
+    
+    $('.container').on('submit', '#goToPaymentsForm', function(e){
+        if(!isAllowedPayment()) {
+            e.preventDefault();
+        }
+
     });
 
     if(document.URL.indexOf('payment') > - 1) {
+        
+        if(localStorageCheck() == null) {
+            window.open(baseUrlJS, '_self');
+            
+            // fuck you dude, I ain't your mama :D
+            return false;
+        }
 
         var currentShoppingCarTotal = parseFloat(localStorage.getItem("currentShoppingCarTotal"));
         currentShoppingCarTotal = isNaN(currentShoppingCarTotal) ? 0 : currentShoppingCarTotal;
@@ -1663,12 +1789,15 @@ $(document).ready(function() {
         var currentCarArr = JSON.parse(localStorage.getItem("currentCart"));
 
         for(var i in currentCarArr) {
-            console.info(i);
             var productNum = parseInt(i) + 1;
             var hiddenProduct = crateHiddenProduct(currentCarArr, productNum);
 
             $('#formPaypal').append(hiddenProduct);
         }
     }
+    
+    
+    
+    // subscription email
 }); 
 // ready end

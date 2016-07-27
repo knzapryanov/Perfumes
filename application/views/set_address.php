@@ -16,7 +16,7 @@
 
 				<td><i class="glyphicon glyphicon-user"></i></td>
 
-				<td><?= $address['first_name']. ' ' . $address['last_name'] ?></td>
+				<td><?php echo '<span class="tableInformation" name="first_name" id="firstName_table">'.$address['first_name']. '</span> <span name="last_name" class="tableInformation" id="lastName_table">' . $address['last_name'].'</span>' ?></td>
 
 			</tr>
 
@@ -26,11 +26,11 @@
 
 				<td>
 
-					<span class="addreess"><?= $address['street'] ?></span><BR>
+					<span name="street" class="addreess tableInformation"><?= $address['street'] ?></span><BR>
 
-					<span class="city"><?= $address['city'] ?></span> <span class="postcode"><?= $address['zip'] ?></span><BR>
+					<span name="city" class="city tableInformation"><?= $address['city'] ?></span> <span class="postcode"><?= $address['zip'] ?></span><BR>
 
-					<span class="country"><?= $address['country'] ?></span>
+					<span name="country" class="country tableInformation"><?= $address['country'] ?></span>
 
 				</td>
 
@@ -40,7 +40,7 @@
 
 				<td><i class="glyphicon glyphicon-envelope"></i></td>
 
-				<td><?= $address['email'] ?></td>
+				<td><?php echo '<span name="email" class="tableInformation" id="emailName_table">'.$address['email'].'</span>' ?></td>
 
 			</tr>
 
@@ -48,12 +48,11 @@
 
 				<td><i class="glyphicon glyphicon-phone"></i></td>
 
-				<td><?= $address['phone'] ?></td>
+				<td class="tableInformation"><?= $address['phone'] ?></td>
 
 			</tr>
 
 			<tr>
-
 				<td><i class="glyphicon glyphicon-pencil"></i></td>
 
 				<td><a href="<?= base_url('profile') ?>">EDIT</a></td>
@@ -147,45 +146,21 @@
            
         </div>
 
-		<!--
-        <div id="paymentMethods">
-            <div class="paymentCont">
-                <input type="radio" name="payment" value="1" />
-                <label class="labelP">Pay via Paypal</label>
+        <form action="<?= base_url('payment')?>" id="goToPaymentsForm" method="POST">    
+            <div class="confitm_order">
+                <input type="hidden" name="token" value="<?= $token; ?>" />        
+                <div>Products Price: <span id="checkoutProductsPrice"></span></div>
+
+                <div>Delivery: <span id="checkoutDeliveryPrice"></span></div>
+
+                <div>Total: <span id="checkoutTotalPrice"></span></div><BR/>
+
+                <input type="button" value="CONTINUE SHOPPING" id="continueShoppingBtn" /><BR/><BR/><BR/>
+                <input type="submit" value="PAYMENT" id="paymentBtn" /><BR/><BR/><BR/>
+                <div class="clearfix"></div>
+
             </div>
-            <div class="paymentCont">
-                <input type="radio"name="payment" value="2" />
-                <label class="labelP">Pay via credit/debit cart through Paypal</label>
-            </div>
-        </div>
-		-->
-
-        <div class="confitm_order">
-
-                    <div>Products Price: <span id="checkoutProductsPrice"></span></div>
-
-                    <div>Delivery: <span id="checkoutDeliveryPrice"></span></div>
-
-                    <div>Total: <span id="checkoutTotalPrice"></span></div><BR/>
-                        
-                    <input type="button" value="CONTINUE SHOPPING" id="continueShoppingBtn" /><BR/><BR/><BR/>
-					<input type="button" value="PAYMENT" id="paymentBtn" /><BR/><BR/><BR/>
-                    <div class="clearfix"></div>
-
-	</div>
-        
-        
-        	<!--paypal payment form
-            <form id="formPaypal" action="<?= base_url('payments') ?>" method="POST">
-                <input type="hidden" name="cmd" value="_cart" />
-                <input type="hidden" name="upload" value="1">
-		<input type="hidden" name="no_note" value="1" />
-		<input type="hidden" name="currency_code" value="EUR" />
-                
-                <input type="submit" name="submit" value="PAYMENT" />
-                
-            </form>    
-			-->
+       </form>     
 
 
 </div><!-- END container -->

@@ -51,6 +51,9 @@ echo '</pre>';
 
                     <li><a href="<?= base_url('admin/addBrand') ?>"><span class="responsive_size">Add Brand</a></span></li>
                     <li><a href="<?= base_url('admin/allProducts') ?>"><span class="responsive_size">All Products</a></span></li>
+                    <li><a href="<?= base_url('admin/newsletter') ?>"><span class="responsive_size">Newsletter</a></span></li>
+                    
+                    
                     <li class="toRight"><a target="_blank" href="<?= base_url() ?>"><span class="responsive_size">To Site</a></span></li>
                     <li class="toRight"><a href="<?= base_url('logout') ?>"><span class="responsive_size">Logout</a></span></li>
                    
