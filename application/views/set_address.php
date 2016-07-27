@@ -146,7 +146,8 @@
         <div class="confirm_products">
            
         </div>
-        
+
+		<!--
         <div id="paymentMethods">
             <div class="paymentCont">
                 <input type="radio" name="payment" value="1" />
@@ -157,10 +158,7 @@
                 <label class="labelP">Pay via credit/debit cart through Paypal</label>
             </div>
         </div>
-        
-       
-        
-        
+		-->
 
         <div class="confitm_order">
 
@@ -171,12 +169,13 @@
                     <div>Total: <span id="checkoutTotalPrice"></span></div><BR/>
                         
                     <input type="button" value="CONTINUE SHOPPING" id="continueShoppingBtn" /><BR/><BR/><BR/>
+					<input type="button" value="PAYMENT" id="paymentBtn" /><BR/><BR/><BR/>
                     <div class="clearfix"></div>
 
 	</div>
         
         
-        	
+        	<!--paypal payment form
             <form id="formPaypal" action="<?= base_url('payments') ?>" method="POST">
                 <input type="hidden" name="cmd" value="_cart" />
                 <input type="hidden" name="upload" value="1">
@@ -186,7 +185,7 @@
                 <input type="submit" name="submit" value="PAYMENT" />
                 
             </form>    
-	
+			-->
 
 
 </div><!-- END container -->

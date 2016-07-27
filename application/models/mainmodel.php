@@ -28,7 +28,13 @@ class MainModel extends myModel {
        unset($_POST['password_confirm']);
         
        if(isset($_POST['is_newsletter'])) {
-          $_POST['is_newsletter'] = true; 
+
+          $_POST['is_newsletter'] = true;
+
+          $data = array(
+              'email' => $_POST['email']
+          );
+          $this->db->insert('newsletter_signed', $data);
        }
        else {
            $_POST['is_newsletter'] = false; 
@@ -44,6 +50,24 @@ class MainModel extends myModel {
        }
        
        return false;
+   }
+
+   public function signNewsEmail() {
+
+       $data = array(
+           'email' => $_POST['sign_email']
+       );
+
+       $isSuccess = $this->db->insert('newsletter_signed', $data);
+
+       if($isSuccess) {
+
+           return true;
+       }
+       else{
+
+           return false;
+       }
    }
    
    public function checkEmailExist() {

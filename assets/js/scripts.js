@@ -521,6 +521,30 @@ $(document).ready(function() {
          }
        });
     });
+
+   $('#emailSubscription').on('submit', function () {
+
+        var enteredEmail = $("[name='sign_email']").val();
+
+        $.ajax({
+            url: publicPath+"/signEmail",
+            type: 'POST',
+            data: {
+                sign_email: enteredEmail
+            },
+            success: function(response) {
+
+                if(!response) {
+
+                    alert('Subscription failed. Check the entered email.');
+                }
+                else {
+
+                    alert('Subscription successful.');
+                }
+            }
+        });
+    });
     
     $('body').on('click', '.showSingle', function() {
         var productName = $.urlParam('product_name');
@@ -1123,7 +1147,7 @@ $(document).ready(function() {
                     //console.log(response);
                     var jsonData = JSON.parse(response);
                     
-                    console.info(jsonData);
+                    //console.log(jsonData);
 
 
                     if(counterPage == 0) {
@@ -1168,7 +1192,7 @@ $(document).ready(function() {
                                 '<div class="clearfix"> </div>' +
                                 '</div>' +
                                 '<input type="number" class="item_quantity" min="1" max="' + jsonData.sorted[i].quantity + '" options-quantity="" value="1">' +
-                                '<button href="javascript:void(0);" class="item_add add-to-cart">' +
+                                '<button href="javascript:void(0);" class="item_add add-to-cart products-page-add">' +
                                 '<span class="glyphicon glyphicon-shopping-cart"></span>' +
                                 '<div style="display:none;">' +
                                 '<!--<img src="images/m1.jpg" class="img-responsive" alt="">-->' +
@@ -1480,7 +1504,7 @@ $(document).ready(function() {
         var currentShoppingCarTotal = parseFloat(localStorage.getItem("currentShoppingCarTotal"));
         var currentCarArr = JSON.parse(localStorage.getItem("currentCart"));
         
-        console.log('checkout' + carItemQty, currentShoppingCarTotal, currentCarArr);       
+        //console.log('checkout' + carItemQty, currentShoppingCarTotal, currentCarArr);
         
         for(var i in currentCarArr) {
             
@@ -1526,6 +1550,13 @@ $(document).ready(function() {
         currentShoppingCarTotal = isNaN(currentShoppingCarTotal) ? 0 : currentShoppingCarTotal;
         
         updateChekoutInfo(carItemQty, currentShoppingCarTotal, 10);
+
+        if(currentShoppingCarTotal > 0 == false) {
+
+            $('#confirmOrderSubmit').prop({
+                disabled: true
+            });
+        }
     }
     
     function updateChekoutInfo(carItemQty, currentShoppingCarTotal, delivery) {
@@ -1534,7 +1565,7 @@ $(document).ready(function() {
         $('.simpleCart_total').text('€' + currentShoppingCarTotal);
         currentShoppingCarTotal = parseFloat(currentShoppingCarTotal);
         
-        console.info(currentShoppingCarTotal);
+        //console.info(currentShoppingCarTotal);
         // update header cart info
         
         $('#simpleCart_quantity').text(' ' + carItemQty + ' ');
@@ -1615,6 +1646,29 @@ $(document).ready(function() {
             '</div>';
     
     return product;
+    }
+
+    $('#paymentBtn').on('click', function(){
+
+        window.location = baseUrlJS + 'payment';
+    });
+
+    if(document.URL.indexOf('payment') > - 1) {
+
+        var currentShoppingCarTotal = parseFloat(localStorage.getItem("currentShoppingCarTotal"));
+        currentShoppingCarTotal = isNaN(currentShoppingCarTotal) ? 0 : currentShoppingCarTotal;
+
+        $('#paymentTotal').text(currentShoppingCarTotal);
+
+        var currentCarArr = JSON.parse(localStorage.getItem("currentCart"));
+
+        for(var i in currentCarArr) {
+            console.info(i);
+            var productNum = parseInt(i) + 1;
+            var hiddenProduct = crateHiddenProduct(currentCarArr, productNum);
+
+            $('#formPaypal').append(hiddenProduct);
+        }
     }
 }); 
 // ready end

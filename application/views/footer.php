@@ -1,6 +1,44 @@
 <!--subscribe-->
 
+<div class="subscribe">
 
+	<div class="container">
+
+		<div class="subscribe1">
+
+			<h4>the latest from Perfumes Malta</h4>
+
+		</div>
+
+		<div class="subscribe2">
+
+			<form id="emailSubscription" action="javascript:void(0);" method="POST">
+
+				<input type="text" class="text" name="sign_email" value="Email" onfocus="this.value = '';" onblur="if (this.value == '') {this.value = 'Email';}">
+
+				<input type="submit" value="JOIN">
+
+			</form>
+
+		</div>
+
+		<div class="clearfix"></div>
+
+	</div>
+
+</div>
+
+<div id="dialog" title="Alert message" style="display: none">
+	<div class="ui-dialog-content ui-widget-content">
+		<p>
+			<span class="ui-icon ui-icon-alert" style="float: left; margin: 0 7px 20px 0"></span>
+			<label id="lblMessage">
+			</label>
+		</p>
+	</div>
+</div>
+
+<!--subscribe-->
 
 <!--footer-->
 

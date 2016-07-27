@@ -49,11 +49,28 @@ class Main extends MyController {
             }
 
             $smallestOptionId = '';
-            foreach ($product->options as $option) {
 
-                if($option->sale_price == $salePriceMin){
-                    $smallestOptionId = $option->id;
-                    $quantity = $option->quantity;
+            // bug fix
+            // if we have $salePriceMin == 9999 this is product with no sell price at all
+            // we should search for minimal price option according $regularPriceMin not $salePriceMin
+            if($salePriceMin != 9999) {
+
+                foreach ($product->options as $option) {
+
+                    if($option->sale_price == $salePriceMin){
+                        $smallestOptionId = $option->id;
+                        $quantity = $option->quantity;
+                    }
+                }
+            }
+            else{
+
+                foreach ($product->options as $option) {
+
+                    if($option->price == $regularPriceMin){
+                        $smallestOptionId = $option->id;
+                        $quantity = $option->quantity;
+                    }
                 }
             }
 
@@ -75,6 +92,9 @@ class Main extends MyController {
             $product->smallestOptionId = $smallestOptionId;
             $product->quantity = $quantity;
             $product->quantityString = implode(',', $quantityArr);
+            /*echo '<pre>';
+            print_r($product->quantityString);
+            echo '</pre>';*/
         }
 
         return $products;
@@ -195,9 +215,39 @@ class Main extends MyController {
                  $data['successMessage'] = '<div class="success">Successfully registered!</div>';
                  $this->currentPage('login', $data);
             }
-            $data['error'] = 'Database error occurred, resend!';
-            $this->currentPage('register', $data);
-           
+            else {
+
+                $data['error'] = 'Database error occurred, resend!';
+                $this->currentPage('register', $data);
+            }
+        }
+    }
+
+    public function signEmail() {
+
+        if($this->input->is_ajax_request()) {
+
+            $this->load->helper(array('form', 'url'));
+
+            $this->load->library('form_validation');
+
+            $this->form_validation->set_rules('sign_email', 'Email', 'trim|required|valid_email|is_unique[newsletter_signed.email]');
+
+            if ($this->form_validation->run() == FALSE) {
+
+                echo false;
+            }
+            else {
+
+                if($this->mainModel->signNewsEmail()) {
+
+                    echo true;
+                }
+                else {
+
+                    echo false;
+                }
+            }
         }
     }
     
@@ -281,10 +331,12 @@ class Main extends MyController {
     public function products() {
         $products = $this->mainModel->getFilteredProducts();
         
-        
-        
         if(is_array($products['sorted'])) {
               $products['sorted'] = $this->prepareOptionsToView($products['sorted']);
+            /*echo '<pre>';
+            print_r($products);
+            echo '</pre>';
+            die;*/
             }
         
         if(!isset($products['nextPageProductsCount'])) {
@@ -316,6 +368,7 @@ class Main extends MyController {
     }
 
     public function filteredProducts() {
+
         if($this->input->is_ajax_request()) {
 
             $products = $this->mainModel->getFilteredProducts();
@@ -323,7 +376,10 @@ class Main extends MyController {
             
             if(is_array($products['sorted'])) {
               $products['sorted'] = $this->prepareOptionsToView($products['sorted']);
-                
+                /*echo '<pre>';
+            print_r($products['sorted']);
+            echo '</pre>';*/
+
                echo json_encode($products);
             }
             else {
@@ -375,7 +431,10 @@ class Main extends MyController {
         $this->currentPage('checkout');
     }
     
-    
+    public function payment() {
+
+        $this->currentPage('payment');
+    }
     
     // PAYPAL METHODS
     
@@ -429,116 +488,116 @@ class Main extends MyController {
     
     public function payments() {
                 // PayPal settings
-    $paypal_email = 'novdomplovdiv@gmail.com';
-    $return_url = 'http://localhost/pay/payment-successful.html';
-    $cancel_url = 'http://domain.com/payment-cancelled.html';
-    $notify_url = 'http://domain.com/payments.php';
+        $paypal_email = 'novdomplovdiv@gmail.com';
+        $return_url = 'http://localhost/pay/payment-successful.html';
+        $cancel_url = 'http://domain.com/payment-cancelled.html';
+        $notify_url = 'http://domain.com/payments.php';
 
-    //$item_name = 'Test Item';
-    //$item_amount = 5.00;
+        //$item_name = 'Test Item';
+        //$item_amount = 5.00;
 
-    // Include Functions
-//    include("functions.php");
+        // Include Functions
+    //    include("functions.php");
 
-    // Check if paypal request or response
-    if (!isset($_POST["txn_id"]) && !isset($_POST["txn_type"])){
-            $querystring = '';
+        // Check if paypal request or response
+        if (!isset($_POST["txn_id"]) && !isset($_POST["txn_type"])){
+                $querystring = '';
 
-            // Firstly Append paypal account to querystring
-            $querystring .= "?business=".urlencode($paypal_email)."&";
+                // Firstly Append paypal account to querystring
+                $querystring .= "?business=".urlencode($paypal_email)."&";
 
-            // Append amount& currency (£) to quersytring so it cannot be edited in html
+                // Append amount& currency (£) to quersytring so it cannot be edited in html
 
-            //The item name and amount can be brought in dynamically by querying the $_POST['item_number'] variable.
-    //	$querystring .= "item_name=".urlencode($item_name)."&";
-    //	$querystring .= "amount=".urlencode($item_amount)."&";
+                //The item name and amount can be brought in dynamically by querying the $_POST['item_number'] variable.
+        //	$querystring .= "item_name=".urlencode($item_name)."&";
+        //	$querystring .= "amount=".urlencode($item_amount)."&";
 
-            //loop for posted values and append to querystring
-            foreach($_POST as $key => $value){
-                    $value = urlencode(stripslashes($value));
-                    $querystring .= "$key=$value&";
-            }
+                //loop for posted values and append to querystring
+                foreach($_POST as $key => $value){
+                        $value = urlencode(stripslashes($value));
+                        $querystring .= "$key=$value&";
+                }
 
 
-            // Redirect to paypal IPN
-            header('location:https://www.paypal.com/cgi-bin/webscr'.$querystring);
-            exit();
-    } else {
-            //Database Connection
-            $link = mysql_connect($host, $user, $pass);
-            mysql_select_db($db_name);
+                // Redirect to paypal IPN
+                header('location:https://www.paypal.com/cgi-bin/webscr'.$querystring);
+                exit();
+        } else {
+                //Database Connection
+                $link = mysql_connect($host, $user, $pass);
+                mysql_select_db($db_name);
 
-            // Response from Paypal
+                // Response from Paypal
 
-            // read the post from PayPal system and add 'cmd'
-            $req = 'cmd=_notify-validate';
-            foreach ($_POST as $key => $value) {
-                    $value = urlencode(stripslashes($value));
-                    $value = preg_replace('/(.*[^%^0^D])(%0A)(.*)/i','${1}%0D%0A${3}',$value);// IPN fix
-                    $req .= "&$key=$value";
-            }
+                // read the post from PayPal system and add 'cmd'
+                $req = 'cmd=_notify-validate';
+                foreach ($_POST as $key => $value) {
+                        $value = urlencode(stripslashes($value));
+                        $value = preg_replace('/(.*[^%^0^D])(%0A)(.*)/i','${1}%0D%0A${3}',$value);// IPN fix
+                        $req .= "&$key=$value";
+                }
 
-            // assign posted variables to local variables
-            $data['item_name']			= $_POST['item_name'];
-            $data['item_number'] 		= $_POST['item_number'];
-            $data['payment_status'] 	= $_POST['payment_status'];
-            $data['payment_amount'] 	= $_POST['mc_gross'];
-            $data['payment_currency']	= $_POST['mc_currency'];
-            $data['txn_id']				= $_POST['txn_id'];
-            $data['receiver_email'] 	= $_POST['receiver_email'];
-            $data['payer_email'] 		= $_POST['payer_email'];
-            $data['custom'] 			= $_POST['custom'];
+                // assign posted variables to local variables
+                $data['item_name']			= $_POST['item_name'];
+                $data['item_number'] 		= $_POST['item_number'];
+                $data['payment_status'] 	= $_POST['payment_status'];
+                $data['payment_amount'] 	= $_POST['mc_gross'];
+                $data['payment_currency']	= $_POST['mc_currency'];
+                $data['txn_id']				= $_POST['txn_id'];
+                $data['receiver_email'] 	= $_POST['receiver_email'];
+                $data['payer_email'] 		= $_POST['payer_email'];
+                $data['custom'] 			= $_POST['custom'];
 
-            // post back to PayPal system to validate
-            $header = "POST /cgi-bin/webscr HTTP/1.0\r\n";
-            $header .= "Content-Type: application/x-www-form-urlencoded\r\n";
-            $header .= "Content-Length: " . strlen($req) . "\r\n\r\n";
+                // post back to PayPal system to validate
+                $header = "POST /cgi-bin/webscr HTTP/1.0\r\n";
+                $header .= "Content-Type: application/x-www-form-urlencoded\r\n";
+                $header .= "Content-Length: " . strlen($req) . "\r\n\r\n";
 
-            $fp = fsockopen ('ssl://www.paypal.com', 443, $errno, $errstr, 30);
+                $fp = fsockopen ('ssl://www.paypal.com', 443, $errno, $errstr, 30);
 
-            if (!$fp) {
-                    // HTTP ERROR
+                if (!$fp) {
+                        // HTTP ERROR
 
-            } else {
-                    fputs($fp, $header . $req);
-                    while (!feof($fp)) {
-                            $res = fgets ($fp, 1024);
-                            if (strcmp($res, "VERIFIED") == 0) {
+                } else {
+                        fputs($fp, $header . $req);
+                        while (!feof($fp)) {
+                                $res = fgets ($fp, 1024);
+                                if (strcmp($res, "VERIFIED") == 0) {
 
-                                    // Used for debugging
-                                    // mail('user@domain.com', 'PAYPAL POST - VERIFIED RESPONSE', print_r($post, true));
+                                        // Used for debugging
+                                        // mail('user@domain.com', 'PAYPAL POST - VERIFIED RESPONSE', print_r($post, true));
 
-                                    // Validate payment (Check unique txnid & correct price)
-                                    $valid_txnid = $this->check_txnid($data['txn_id']);
-                                    $valid_price = $this->check_price($data['payment_amount'], $data['item_number']);
-                                    // PAYMENT VALIDATED & VERIFIED!
-                                    if ($valid_txnid && $valid_price) {
+                                        // Validate payment (Check unique txnid & correct price)
+                                        $valid_txnid = $this->check_txnid($data['txn_id']);
+                                        $valid_price = $this->check_price($data['payment_amount'], $data['item_number']);
+                                        // PAYMENT VALIDATED & VERIFIED!
+                                        if ($valid_txnid && $valid_price) {
 
-                                            $orderid = $this->updatePayments($data);
+                                                $orderid = $this->updatePayments($data);
 
-                                            if ($orderid) {
-                                                    // Payment has been made & successfully inserted into the Database
-                                            } else {
-                                                    // Error inserting into DB
-                                                    // E-mail admin or alert user
-                                                    // mail('user@domain.com', 'PAYPAL POST - INSERT INTO DB WENT WRONG', print_r($data, true));
-                                            }
-                                    } else {
-                                            // Payment made but data has been changed
-                                            // E-mail admin or alert user
-                                    }
+                                                if ($orderid) {
+                                                        // Payment has been made & successfully inserted into the Database
+                                                } else {
+                                                        // Error inserting into DB
+                                                        // E-mail admin or alert user
+                                                        // mail('user@domain.com', 'PAYPAL POST - INSERT INTO DB WENT WRONG', print_r($data, true));
+                                                }
+                                        } else {
+                                                // Payment made but data has been changed
+                                                // E-mail admin or alert user
+                                        }
 
-                            } else if (strcmp ($res, "INVALID") == 0) {
+                                } else if (strcmp ($res, "INVALID") == 0) {
 
-                                    // PAYMENT INVALID & INVESTIGATE MANUALY!
-                                    // E-mail admin or alert user
+                                        // PAYMENT INVALID & INVESTIGATE MANUALY!
+                                        // E-mail admin or alert user
 
-                                    // Used for debugging
-                                    //@mail("user@domain.com", "PAYPAL DEBUGGING", "Invalid Response<br />data = <pre>".print_r($post, true)."</pre>");
-                            }
-                    }
-            fclose ($fp);
-            }
-    }
+                                        // Used for debugging
+                                        //@mail("user@domain.com", "PAYPAL DEBUGGING", "Invalid Response<br />data = <pre>".print_r($post, true)."</pre>");
+                                }
+                        }
+                fclose ($fp);
+                }
+        }
     }
 }
