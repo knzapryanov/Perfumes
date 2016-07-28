@@ -1,0 +1,1 @@
+<h2>Return after canceled payment</h2>

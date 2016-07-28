@@ -3,6 +3,7 @@
 class Main extends MyController {
     
     public function index(){
+
         $data['manualNewest'] = $this->mainModel->indexRelation(12, '', 'is_newest');
         $data['promotions'] = $this->mainModel->indexRelation(12, '', 'is_sale');
 
@@ -450,6 +451,28 @@ class Main extends MyController {
          $this->currentPage('payment');
         }
     }
+
+    public function logMesssageToFile($filePath, $message) {
+
+        // Open the file to get existing content
+        $current = file_get_contents($filePath);
+
+        // Append the new message to the file
+        $current .= "\n" . $message;
+
+        // Write the contents back to the file
+        file_put_contents($filePath, $current);
+    }
+
+    public function successPayment() {
+
+        $this->currentPage('successPayment');
+    }
+
+    public function cancelPayment() {
+
+        $this->currentPage('cancelPayment');
+    }
     
     // PAYPAL METHODS
     
@@ -459,8 +482,8 @@ class Main extends MyController {
             return true;
             $valid_txnid = true;
             //get result set
-            $sql = mysql_query("SELECT * FROM `payments` WHERE txnid = '$tnxid'", $link);
-            if ($row = mysql_fetch_array($sql)) {
+            $sql = mysqli_query("SELECT * FROM `payments` WHERE txnid = '$tnxid'", $link);
+            if ($row = mysqli_fetch_array($sql)) {
                     $valid_txnid = false;
             }
             return $valid_txnid;
@@ -489,58 +512,72 @@ class Main extends MyController {
             global $link;
 
             if (is_array($data)) {
-                    $sql = mysql_query("INSERT INTO `payments` (txnid, payment_amount, payment_status, itemid, createdtime) VALUES (
+                    $sql = mysqli_query($link, "INSERT INTO `payments` (txnid, payment_amount, payment_status, itemid, createdtime) VALUES (
                                     '".$data['txn_id']."' ,
                                     '".$data['payment_amount']."' ,
                                     '".$data['payment_status']."' ,
                                     '".$data['item_number']."' ,
                                     '".date("Y-m-d H:i:s")."'
-                                    )", $link);
-                    return mysql_insert_id($link);
+                                    )");
+                    return mysqli_insert_id($link);
             }
     }
     
     
     public function payments() {
-                // PayPal settings
-        $paypal_email = 'novdomplovdiv@gmail.com';
-        $return_url = 'http://localhost/pay/payment-successful.html';
-        $cancel_url = 'http://domain.com/payment-cancelled.html';
-        $notify_url = 'http://domain.com/payments.php';
+
+        // PayPal settings
+        $paypal_email = 'novdomplovdiv-facilitator@gmail.com';
+        $return_url = 'http://localhost/Perfumes/successPayment';
+        $cancel_url = 'http://localhost/Perfumes/cancelPayment';
+        $notify_url = 'http://localhost/Perfumes/payments';
 
         //$item_name = 'Test Item';
         //$item_amount = 5.00;
 
         // Include Functions
-    //    include("functions.php");
+        //    include("functions.php");
+
 
         // Check if paypal request or response
+        $this->logMesssageToFile('logMessages.txt', 'txn_id = ' . $_POST["txn_id"]);
+        $this->logMesssageToFile('logMessages.txt', 'txn_type = ' . $_POST["txn_type"]);
+
         if (!isset($_POST["txn_id"]) && !isset($_POST["txn_type"])){
+            $this->logMesssageToFile('logMessages.txt', 'paypal request');
                 $querystring = '';
 
-                // Firstly Append paypal account to querystring
-                $querystring .= "?business=".urlencode($paypal_email)."&";
+            // Firstly Append paypal account to querystring
+            $querystring .= "?business=".urlencode($paypal_email)."&";
 
-                // Append amount& currency (£) to quersytring so it cannot be edited in html
+            // Append amount& currency (£) to quersytring so it cannot be edited in html
 
-                //The item name and amount can be brought in dynamically by querying the $_POST['item_number'] variable.
-        //	$querystring .= "item_name=".urlencode($item_name)."&";
-        //	$querystring .= "amount=".urlencode($item_amount)."&";
+            //The item name and amount can be brought in dynamically by querying the $_POST['item_number'] variable.
+            //	$querystring .= "item_name=".urlencode($item_name)."&";
+            //	$querystring .= "amount=".urlencode($item_amount)."&";
 
-                //loop for posted values and append to querystring
-                foreach($_POST as $key => $value){
-                        $value = urlencode(stripslashes($value));
-                        $querystring .= "$key=$value&";
-                }
+            //loop for posted values and append to querystring
+            foreach($_POST as $key => $value){
+                    $value = urlencode(stripslashes($value));
+                    $querystring .= "$key=$value&";
+            }
 
+            // Append paypal return addresses
 
-                // Redirect to paypal IPN
-                header('location:https://www.paypal.com/cgi-bin/webscr'.$querystring);
-                exit();
+            $querystring .= "return=".urlencode(stripslashes($return_url))."&amp;amp;amp;amp;amp;amp;";
+
+            $querystring .= "cancel_return=".urlencode(stripslashes($cancel_url))."&amp;amp;amp;amp;amp;amp;";
+
+            $querystring .= "notify_url=".urlencode($notify_url);
+
+            // Redirect to paypal IPN
+            header('location:https://www.sandbox.paypal.com/cgi-bin/webscr'.$querystring);
+            exit();
         } else {
+            $this->logMesssageToFile('logMessages.txt', 'paypal response');
                 //Database Connection
-                $link = mysql_connect($host, $user, $pass);
-                mysql_select_db($db_name);
+                $link = mysqli_connect('localhost', 'root', '', 'perfumes');
+                //mysql_select_db('Perfumes');
 
                 // Response from Paypal
 
@@ -568,7 +605,7 @@ class Main extends MyController {
                 $header .= "Content-Type: application/x-www-form-urlencoded\r\n";
                 $header .= "Content-Length: " . strlen($req) . "\r\n\r\n";
 
-                $fp = fsockopen ('ssl://www.paypal.com', 443, $errno, $errstr, 30);
+                $fp = fsockopen ('ssl://www.sandbox.paypal.com', 443, $errno, $errstr, 30);
 
                 if (!$fp) {
                         // HTTP ERROR
