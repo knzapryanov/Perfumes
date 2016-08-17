@@ -16,7 +16,7 @@
 
 				<td><i class="glyphicon glyphicon-user"></i></td>
 
-				<td><?php echo '<span class="tableInformation" name="first_name" id="firstName_table">'.$address['first_name']. '</span> <span name="last_name" class="tableInformation" id="lastName_table">' . $address['last_name'].'</span>' ?></td>
+				<td><?php echo '<span class="tableInformation" name="first_name"  id="firstName_table">'.$address['first_name']. '</span> <span name="last_name" class="tableInformation" id="lastName_table">' . $address['last_name'].'</span>' ?></td>
 
 			</tr>
 
@@ -28,7 +28,8 @@
 
 					<span name="street" class="addreess tableInformation"><?= $address['street'] ?></span><BR>
 
-					<span name="city" class="city tableInformation"><?= $address['city'] ?></span> <span class="postcode"><?= $address['zip'] ?></span><BR>
+					<span name="city" class="city tableInformation"><?= $address['city'] ?></span> 
+                                        <span name="postcode" class="postcode tableInformation"><?= $address['zip'] ?></span><BR>
 
 					<span name="country" class="country tableInformation"><?= $address['country'] ?></span>
 
@@ -96,9 +97,9 @@
 
 			<div class="shipping_info_names">
 
-				<input type="text" name="first_name" placeholder="First Name" class="float_left" />
+				<input type="text" name="first_name" form="goToPaymentsForm" placeholder="First Name" class="float_left" />
 
-				<input type="text" name="lasst_name" placeholder="Last Name" class="float_right" />
+				<input type="text" name="lasst_name" form="goToPaymentsForm" placeholder="Last Name" class="float_right" />
 
 				<div class="clearfix"></div>
 
@@ -106,7 +107,7 @@
 
 			<div class="shipping_info_street">
 
-				<input type="text" name="street_address" placeholder="Enter your street address" class="full_width"/>
+				<input type="text" name="street_address" form="goToPaymentsForm" placeholder="Enter your street address" class="full_width"/>
 
 				<div class="clearfix"></div>
 
@@ -114,9 +115,9 @@
 
 			<div class="shipping_info_city_and_postcode">
 
-				<input type="text" name="city" placeholder="City" class="float_left" />
+				<input type="text" name="city" form="goToPaymentsForm" placeholder="City" class="float_left" />
 
-				<input type="text" name="postcode" placeholder="Post code" class="float_right" />
+				<input type="text" name="postcode" form="goToPaymentsForm" placeholder="Post code" class="float_right" />
 
 				<div class="clearfix"></div>
 
@@ -124,9 +125,9 @@
 
 			<div class="shipping_info_email_and_mobile">
 
-				<input type="text" name="mobile_number" placeholder="+35699805637" class="float_left" />
+				<input type="text" name="mobile_number" form="goToPaymentsForm" placeholder="+35699805637" class="float_left" />
 
-				<input type="email" name="email" placeholder="E-mail" class="float_right"/>
+				<input type="email" name="email" form="goToPaymentsForm" placeholder="E-mail" class="float_right"/>
 
 				<div class="clearfix"></div>
 
@@ -146,7 +147,8 @@
            
         </div>
 
-        <form action="<?= base_url('payment')?>" id="goToPaymentsForm" method="POST">    
+        <form action="<?= base_url('payment')?>" id="goToPaymentsForm" method="POST">
+            <input type="hidden" value="" name="deliveryHiddenInput" />    
             <div class="confitm_order">
                 <input type="hidden" name="token" value="<?= $token; ?>" />        
                 <div>Products Price: <span id="checkoutProductsPrice"></span></div>

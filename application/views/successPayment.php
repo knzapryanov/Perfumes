@@ -1,1 +1,1 @@
-<h2>Success payment</h2>
+<h2 style="text-align: center;">Success payment</h2>

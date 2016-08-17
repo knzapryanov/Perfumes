@@ -1,8 +1,3 @@
-<?php
-//echo '<pre>';
-    //print_r($manualNewest);
-//echo '</pre>';
-?>
 <div class="banner-section" style="margin:0 0 20px 0;">
 
 	<div class="container">
@@ -69,7 +64,9 @@
 
 						<div class="tab_inside_main_small_text">SEE</div>
 
-						<div class="tab_inside_main_large_text"><span>PROMOTIONS</span></div>
+						<div class="tab_inside_main_large_text">
+                                                    <span>PROMOTIONS</span>
+                                                </div>
 
 						<div class="clearfix"></div>
 
@@ -95,8 +92,6 @@
 		<div class="gallery">
 
 			<div class="container">
-
-				<h3>NEWEST</h3>
 
 				<div class="gallery-grids">
                                     
@@ -142,10 +137,10 @@
                                         
 					</div>
                                 <!-- END GALLERY -->
-
-					<div style="text-align:center;"><a attr-method="loadManual" class="button loadProducts" target="1">See more newest products</a></div>
-
-				</div>
+                                      <?php if(!isset($emptymanualNewest) && count($manualNewest) === 12) :?>
+                            		<div style="text-align:center;"><a attr-method="loadManual" class="button loadProducts" target="1">See more newest products</a></div>
+                                      <?php endif; ?>
+                    		</div>
 
 			</div>
 
@@ -157,25 +152,24 @@
 
 			<div class="container">
 
-				<h3>PROMOTIONS</h3>
 
 				<div class="gallery-grids">
-                                        <?php foreach($promotions as $promo) : ?>   
-                                      	<div class="col-md-3 gallery-grid ">
-                                            <a href="<?= base_url('product').'/'.$promo->slug ?>">
-                                                        
-                                                    <?php if($promo->percentage < 30) : ?>
-                                                         <div class="b-wrapper_sale">
-                                                                 <div>SALE</div>
-                                                         </div>
+                        <?php foreach($promotions as $promo) : ?>
+                        <div class="col-md-3 gallery-grid ">
+                            <a href="<?= base_url('product').'/'.$promo->slug ?>">
 
-                                                    <?php else :?>     
-                                                          <div class="b-wrapper_percent_off">
-                                                                 <div><?= $promo->percentage ?>%<BR/>OFF</div>
-                                                         </div>
-                                                     <?php endif; ?>    
-                                         
-                                                <img src="<?= base_url('assets/uploads/thumbs').'/'.$promo->pictures[0]->source ?>" class="img-responsive" alt="<?= $promo->product_name ?>" />
+                                    <?php if($promo->percentage < 30) : ?>
+                                         <div class="b-wrapper_sale">
+                                                 <div>SALE</div>
+                                         </div>
+
+                                    <?php else :?>
+                                          <div class="b-wrapper_percent_off">
+                                                 <div><?= $promo->percentage ?>%<BR/>OFF</div>
+                                         </div>
+                                     <?php endif; ?>
+
+                                <img src="<?= base_url('assets/uploads/thumbs').'/'.$promo->pictures[0]->source ?>" class="img-responsive" alt="<?= $promo->product_name ?>" />
 							<div class="gallery-info">
 								<div class="quick">
 									<p><span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span> view</p>
@@ -185,23 +179,22 @@
 						<div class="galy-info">
 							<p><?= $promo->product_name ?></p>
 							<div class="galry">
-                                                                <div class="home_item_price"><?= $promo->price  ?></div>
-                                                                <div class="home_new_price"><?= $promo->salePrice  ?></div>
-                                                                
+									<div class="home_item_price"><?= $promo->price  ?></div>
+									<div class="home_new_price"><?= $promo->salePrice  ?></div>
 								<div class="clearfix"></div>
 							</div>
 						</div>
 					</div>
 			
-                                        <?php endforeach; ?>
-                                        
+                    <?php endforeach; ?>
+
 					<div class="clearfix"></div>
                                         
 					</div>
                                 <!-- END GALLERY -->
-
-					<div style="text-align:center;"><a attr-method="loadPromotions" class="button loadProducts" target="1">See more promotional products</a></div>
-
+                                        <?php if(!isset($emptypromotions) && count($promotions) === 12) :?>
+                                            <div style="text-align:center;"><a attr-method="loadPromotions" class="button loadProducts" target="1">See more promotional products</a></div>
+                                        <?php endif; ?>    
 				</div>
 
 			</div>

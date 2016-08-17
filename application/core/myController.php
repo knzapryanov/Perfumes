@@ -48,14 +48,24 @@ class MyController extends CI_Controller
                     'password' => $is_empty[0]->password,
                 );            
                 
-                // user found
-                $this->session->set_userdata($sessionData);
+                $isConfirmed = $is_empty[0]->is_confirmed;
 
-                if((int)$is_empty[0]->role === ADMIN){
-                     redirect('admin/productPage');
+                // user found
+                if($isConfirmed) {
+                    
+                    $this->session->set_userdata($sessionData);
+
+                    if((int)$is_empty[0]->role === ADMIN){
+                         redirect('admin/productPage');
+                    }
+                    if((int)$is_empty[0]->role === USER){
+                        redirect('index');
+                    }
                 }
-                if((int)$is_empty[0]->role === USER){
-                    redirect('index');
+                else {
+                    
+                    $this->session->set_flashdata('error','Please confirm your email first!');
+                    redirect(!$redirect ? 'login' : 'admin');                    
                 }
         }   
         else {
@@ -66,6 +76,7 @@ class MyController extends CI_Controller
     
     public function currentPage($page, $message = '') {
         $data['brands'] = $this->mainModel->getAllBrandIdName();
+        $data['topBrands'] = $this->mainModel->getTopBrandIdName();
 
         $this->load->view('header', $data);
         $this->load->view($page, $message);

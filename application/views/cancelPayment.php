@@ -1,1 +1,1 @@
-<h2>Return after canceled payment</h2>
+<h2 style="text-align: center;">Return after canceled payment</h2>

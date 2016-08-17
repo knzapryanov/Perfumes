@@ -100,8 +100,7 @@ $(window).load(function() {
 
 <script type="text/javascript" src="<?= base_url('assets/js/jquery.mousewheel.js') ?>"></script>
 
-
-	<script type="text/javascript" src="<?= base_url('assets/js/scripts.js') ?>"></script>
+<script type="text/javascript" src="<?= base_url('assets/js/scripts.js') ?>"></script>
 
 </head>
 
@@ -114,13 +113,7 @@ $(window).load(function() {
 <div class="header">
 
 <!--  SET GLOBAL VARIABLE  -->
-<?php 
 
-echo '<pre>';
- print_r($_SESSION);
-echo '</pre>';
-
-?>
 	<div class="header-top">
 
 		<div class="container">
@@ -305,69 +298,47 @@ echo '</pre>';
 
 
 
-							<li class="dropdown">
+							<li class="dropdown" attr-cat="top">
 
 								<a href="#" class="dropdown-toggle" data-toggle="dropdown">Top <b class="caret"></b></a>
 
 								<ul class="dropdown-menu multi-column columns-3">
 
 									<div class="row">
+										<div class="col-sm-4">
+											<ul class="multi-column-dropdown">
+                                                                                            <?php foreach($topBrands as $i => $brand) : ?>
+                                                                                                <?php if($i <= 4) : ?>
+                                                                                                      <li><a brandId="<?= $brand->id ?>" class="list1" href="<?= base_url('products').'?cat=woman&brand='.$brand->id ?>"><?= $brand->brand_name ?></a></li>
+                                                                                              <?php endif;?>  
+                                                                                            <?php endforeach; ?>        
+                                                                                        </ul>
+										</div>
+										<div class="col-sm-4">
+											<ul class="multi-column-dropdown">
+											   <?php foreach($brands as $i => $brand) : ?>
+                                                                                              <?php if($i >= 5 && $i <= 9) : ?>
+                                                                                                   <li><a brandId="<?= $brand->id ?>"  class="list1" href="<?= base_url('products').'?cat=woman&brand='.$brand->id ?>"><?= $brand->brand_name ?></a></li>
+                                                                                              <?php endif;?>  
+                                                                                            <?php endforeach; ?>
+                                                                                                   
+											</ul>
+                                                                                </div>
 
 										<div class="col-sm-4">
 
 											<ul class="multi-column-dropdown">
-
-												<li><a class="list" href="products.php">Category</a></li>
-
-												<li><a class="list1" href="products.php">Sub Category</a></li>
-
-												<li><a class="list1" href="products.php">Sub Category</a></li>
-
-												<li><a class="list1" href="products.php">Sub Category</a></li>
-
-												<li><a class="list1" href="products.php">Sub Category</a></li>
-
+											    <?php foreach($brands as $i => $brand) : ?>
+                                                                                              <?php if($i >= 10 && $i <= 14) : ?>
+                                                                                                   <li><a brandId="<?= $brand->id ?>"  class="list1" href="<?= base_url('products').'?cat=woman&brand='.$brand->id ?>"><?= $brand->brand_name ?></a></li>
+                                                                                              <?php endif;?>  
+                                                                                            <?php endforeach; ?>
 											</ul>
-
-										</div>
-
-										<div class="col-sm-4">
-
-											<ul class="multi-column-dropdown">
-
-												<li><a class="list" href="products.php">Category</a></li>
-
-												<li><a class="list1" href="products.php">Sub Category</a></li>
-
-												<li><a class="list1" href="products.php">Sub Category</a></li>
-
-												<li><a class="list1" href="products.php">Sub Category</a></li>
-
-												<li><a class="list1" href="products.php">Sub Category</a></li>
-
-											</ul>
-
-										</div>
-
-										<div class="col-sm-4">
-
-											<ul class="multi-column-dropdown">
-
-												<li><a class="list" href="products.php">Category</a></li>
-
-												<li><a class="list1" href="products.php">Sub Category</a></li>
-
-												<li><a class="list1" href="products.php">Sub Category</a></li>
-
-												<li><a class="list1" href="products.php">Sub Category</a></li>
-
-												<li><a class="list1" href="products.php">Sub Category</a></li>
-
-											</ul>
-
-										</div>
-
+										</div>										
 									</div>
+                                                                          <a  href = "javascript:void(0)" onclick = "document.getElementById('light').style.display='block';document.getElementById('fade').style.display='block'">
+                                                                            <div class="menu_see_all_brands" attr-cat="top">SEE ALL BRANDS</div>
+                                                                        </a>
 
 								</ul>
 

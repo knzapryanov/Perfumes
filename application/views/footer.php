@@ -14,16 +14,16 @@
 
 			<form id="emailSubscription" action="javascript:void(0);" method="POST">
 
-                            <input
-                                id="subscriptionInput"
-                                type="text" 
-                                required 
-                                type="email" 
-                                class="text" 
-                                name="sign_email" 
-                                placeholder="Email..."
-                                autocomplete="off"
-                                >
+				<input
+					id="subscriptionInput"
+					type="text"
+					required
+					type="email"
+					class="text"
+					name="sign_email"
+					placeholder="Email..."
+					autocomplete="off"
+				>
 
 				<input id="submitEmail" type="submit" value="JOIN">
 

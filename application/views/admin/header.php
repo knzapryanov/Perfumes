@@ -20,6 +20,7 @@
     <script src="<?= base_url('assets/js/jquery-2.2.4.min.js') ?>"></script>
     <script type="text/javascript" src="<?= base_url('assets/js/bootstrap-3.1.1.min.js') ?>"></script>
     <script type="text/javascript" src="<?= base_url('assets/js/scripts.js') ?>"></script>
+    <script type="text/javascript" src="<?= base_url('assets/js/admin.js') ?>"></script>
     <script>
         function myFunction() {
             document.getElementsByClassName("topnav")[0].classList.toggle("responsive");
@@ -34,24 +35,19 @@
 <div class="header">
 
 <!--  SET GLOBAL VARIABLE  -->
-<?php 
 
-echo '<pre>';
- print_r($_SESSION);
-echo '</pre>';
-
-?>
+       <?php if(isset($_SESSION['id']) && $_SESSION['role'] == 1) : ?>
 	<div class="header-top">
 
 		<ul class="topnav">
                     <!--<li><span class="responsive_size responsive_menu_a
                     ctive"><?php echo $page_title; ?></span></li>-->
 
-                    <li><a href="<?= base_url('admin/productPage') ?>"><span class="responsive_size">Add product</span></a></li>
+                    <li><a href="<?= base_url('admin/productPage') ?>" class="productPage"><span class="responsive_size">Add product</span></a></li>
 
-                    <li><a href="<?= base_url('admin/addBrand') ?>"><span class="responsive_size">Add Brand</a></span></li>
-                    <li><a href="<?= base_url('admin/allProducts') ?>"><span class="responsive_size">All Products</a></span></li>
-                    <li><a href="<?= base_url('admin/newsletter') ?>"><span class="responsive_size">Newsletter</a></span></li>
+                    <li><a href="<?= base_url('admin/addBrand') ?>" class="addBrand"><span class="responsive_size">Add Brand</a></span></li>
+                    <li><a href="<?= base_url('admin/allProducts') ?>" class="allProducts"><span class="responsive_size">All Products</a></span></li>
+                    <li><a href="<?= base_url('admin/newsletter') ?>" class="newsletter"><span class="responsive_size">Newsletter</a></span></li>
                     
                     
                     <li class="toRight"><a target="_blank" href="<?= base_url() ?>"><span class="responsive_size">To Site</a></span></li>
@@ -66,6 +62,7 @@ echo '</pre>';
             </ul>
 
 	</div>
+     <?php endif; ?>   
 </div>
 
 <!--header-->

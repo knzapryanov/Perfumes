@@ -28,9 +28,9 @@
 
 			<div class="shipping_info_names">
 
-                            <input type="text" name="first_name" value="<?= $address['first_name'] ?>" placeholder="First Name" class="float_left" />
+                            <input type="text" name="first_name" value="<?= $address['first_name'] ?>" title="You can't name" disabled='disabled' class="float_left" />
 
-				<input type="text" name="last_name" value="<?= $address['last_name'] ?>" placeholder="Last Name" class="float_right" />
+				<input type="text" name="last_name" value="<?= $address['last_name'] ?>" title="You can't name " disabled='disabled' class="float_right" />
 
 				<div class="clearfix"></div>
 
@@ -66,7 +66,7 @@
 
 				<input type="text" name="mobile_number" value="<?= $address['phone'] ?>" placeholder="+35699805637" class="float_left" />
 
-				<input type="email" name="email" value="<?= $address['email'] ?>" placeholder="E-mail" class="float_right"/>
+				<input type="email" name="email" disabled='disabled' value="<?= $address['email'] ?>" title=" You can't change E-mail" class="float_right"/>
 
 				<div class="clearfix"></div>
 
@@ -89,7 +89,7 @@
 
 		<?php
 		if(count($orders) > 0) {
-			foreach ($orders as $orderIndex => $order) :
+			foreach (array_reverse($orders) as $orderIndex => $order) :
 				$orderNum = $orderIndex + 1;
 				$orderDate = gmdate("Y-m-d", $order[0]->order_date);
 		?>
@@ -98,13 +98,28 @@
 				Order &#35: <span class="orderNumDate"><?= $orderNum .' Date: '. $orderDate ?></span>
 
 				<?php
+				if($order[0]->isProcessed == 0) {
+					?>
+					<div class="orderNotProcessed">
+						Not proccessed order !
+					</div>
+					<?php
+				}else {
+					?>
+					<div class="orderProcessed">
+						Processed order !
+					</div>
+					<?php
+				}
+				?>
+
+				<?php
 					$totalOrderPrice = 0;
 					foreach ($order as $productIndex => $product) :
 						$productNum = $productIndex + 1;
 						$totalOrderPrice += (int)$product->total_price_ml;
 				?>
 					<div class="confirm_products_single">
-
 						<div class="confirm_order_single_pr_number float_left">#: <b><?= $productNum ?></b><span class="devider_vertical_line">|</span></div>
 
 						<div class="confirm_order_single_pr_image float_left"><img src="<?= base_url('assets/uploads/thumbs').'/'.$product->image_src ?>"><span class="devider_vertical_line">|</span></div>
