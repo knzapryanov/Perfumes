@@ -3,9 +3,41 @@ Credentials:
 email > admin@gmail.com
 pass > admin
 
+Admin panel functionality:
+
 - Add perfume with custom milliliters and price(sale price if it is on sale) for each ML type
-- Add to newest products
-- Remove newest products
+- Add/Remove perfume to/from newest products
 - Add/Remove brands
-- Search products
-- Edit/Delete products
+- Search/Edit/Delete available products
+
+Website functionality:
+
+- User registration/login with confirmation email and forgotten password feature
+	> registered users can:
+		# add delivery address in their profile
+		# see order history with information which order is proccessed and send by the site management
+		
+- Index page with lazy loading showing:
+	> all newest products which can be added/removed manualy by the site administration	
+	> all products which are currently in promotion
+	
+- Shopping page with 5 categories (Woman/Man/Top/Newest/Promo perfumes) and lazy loading:
+	> Ajax filter products by category, brand and price
+	> Quick selecting/add to shopping cart functionality for each product on the shopping page
+
+- Product page showing:
+	> Product description and available options with prices
+	> Add to cart
+	> Related products
+	
+- Shopping cart:
+	> Add/Remove products
+	> Empty cart
+	
+- Order confirmation page:
+	> Review order info / Add delivery address for guest users
+	
+- Paypal payment system (Website Payments Standard) :
+	> on confirmed payment saves the payment and order info into the database 
+	
+- Newsletter update for signed users/guests
