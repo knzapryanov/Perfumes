@@ -127,152 +127,10 @@ $(document).ready(function() {
         });
         
      }); 
-
-    $('body').on('click', '#createProduct', function() {
-       var productName = $('#product_name').val();
-       var isSale = 0;
-       var description = $('textarea#description').val();
-       var productBrandId = $('#brand_id').val();
-       var productCatId = $('#cat_id').val();
-       var isUpdate = $('#updateMethod').length > 0 ? 1 : 0;
-       var method = 'createProduct';
-       var productId = [];
-       
-       if(isUpdate === 1) {
-           method = 'updateProduct';
-           productId = $('#updateMethod').val();
-       }
-       
-       if(!checkEmptyVal()) {
-         alert('Some of the required fields is empty!');  
-         return false;
-       }
-
-       if(isProductOnSale()) {
-
-           if(!isSalePriceFilled()) {
-               alert('Please fill sale price!');
-               return false;
-           }
-
-           isSale = 1;
-       }
-
-       if($('.holderPrices').length === 0 ) {
-           alert('Please add atleast one ML for the product!');
-           return false;
-       } 
-       
-       var mlArray = getAllMl();
-       var images = getImages();     
-       
-       var addToNewest = $('#addToNewest').is(':checked') === true ? 1 : 0; 
-
-       showWaitMessage('Product is being uploaded...');
-       $.ajax({
-          url: adminPath+"/" + method,
-          type: 'POST',
-          data: {
-             product_name: productName,
-             is_sale: isSale,
-             brand_id: productBrandId,
-             cat_id: productCatId,
-             mlArray: mlArray,
-             images: images,
-             addToNewest: addToNewest,
-             product_id: productId,
-             description: description
-          },
-          success: function(response) {
-              if(response !== false) {
-                  
-                  var jsonData = JSON.parse(response);
-                  
-                  $('#counterNew').text(jsonData.data.length);
-                  
-                  
-                  if(productId.length > 0) {
-                      $('ol li').remove();
-                  }
-                  else {
-                      clearForm();
-                  }
-                  
-                  for(var i in jsonData.data) {
-                      var li = '<li>'
-                               +'<input type="checkbox" checked="checked" value="'+ jsonData.data[i].id +'">'
-                               +'<label>'+ jsonData.data[i].product_name +'</label>'
-                            +'</li>';
-                      $('ol').append(li);
-                  }
-                  $.event.trigger({
-                      type: 'hideMessage',
-                      bool: true
-                  });
-              }
-              else {
-                  $.event.trigger({
-                      type: 'hideMessage',
-                      bool: false
-                  });
-              }
-          }
-       });
-    });
- 
-    function getAllMl() {
-        var mlArrayHolder = [];
-        
-        for(var i = 0; i < $('.holderPrices').length; i++ ) {
-           var currentArray = [];
-           var holder = $('.holderPrices').eq(i);
-           
-           var mlVal =  holder.find('.editMl').val();
-           var priceVal =  holder.find('.price').val();
-           
-           if(holder.find('.is_sale').prop('checked') === true) {
-            var salePrice =  holder.find('.sale_price').val();
-            var offPercentage =  holder.find('.off_percentage').val();
-           }
-           
-           else {
-               salePrice = '';
-               offPercentage = '';
-           }
-           
-           var quantity = holder.find('.quantity').val();
-           
-           
-           currentArray.push(mlVal, priceVal, salePrice, offPercentage, quantity);
-          
-           mlArrayHolder.push(currentArray);
-        }
-        
-        return mlArrayHolder;
-    }
-    
-    function getImages() {
-       var images = [];
-       
-       for(var i = 0; i < $('.contImage').length; i++) {
-          var src = $('.contImage').eq(i).attr('image-src');
-          images.push(src);
-       }
-       
-       return images;
-    }
-    
     
     $('body').on('click', '.removeImage', function() {
        $(this).parent().remove(); 
     });
-    
-    
-    function clearForm() {
-        $('input, textarea').not('input[type=submit]').val('');
-        $('input#addToNewest').attr('checked', false);
-        $('.contImage, .holderPrices, ol li').remove();
-    }
     
      $(document).on('hideMessage', function(e) {
          var element =  $('.waitMessage');
@@ -292,70 +150,7 @@ $(document).ready(function() {
                            $(this).removeClass('errorEvent');
                      });
      });
-    
-    function checkEmptyVal() {
-         if($('#product_name').val() === '' || $('.price').val() === '' || $('.contImage').length === 0) {
-             return false;
-         }
-         
-         
-         return true;
-    }
-
-    function isProductOnSale() {
-
-        for(var i = 0; i < $('.holderPrices').length; i++ ) {
-            var holder = $('.holderPrices').eq(i);
-
-            if(holder.find('.is_sale').prop('checked') === true) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    function isSalePriceFilled() {
-
-        for(var i = 0; i < $('.holderPrices').length; i++ ) {
-            var holder = $('.holderPrices').eq(i);
-
-            if(holder.find('.sale_price').val() != '') {
-                return true;
-            }
-        }
-
-        return false;
-    }
-    
-    function showWaitMessage(message) {
-     if($('.waitMessage').length === 0) {
-        $('body').prepend('<div class="waitMessage">'+ message +'</div>');
-               $('.waitMessage').animate({
-                  opacity: 1,
-                  top: '-1px'
-               },
-               {
-                 duration:500,
-                 complete: function(){
-//                    var that = $(this);
-//                    $(document).on('hideMessage', function() {
-//                        console.info('hide');
-//                        setTimeout(function(){
-//                         $(that).animate({
-//                         opacity: 0,
-//                         top: '-37px'
-//                        },function(){
-//                            $(this).remove();
-//                        });
-//                       }, 400);
-//                       
-//                    });
-                 }
-       });
-    }
-}
-
+   
     $('body').on('click', '.is_sale', function() {
         $(this).parent().find('.sale_price_div')[this.checked ? "show" : "hide"]();
     });
@@ -435,8 +230,8 @@ $(document).ready(function() {
                              +'<span>OFF Percentage<label>*</label></span>'
                              +'<input type="text" name="off_percentage" class="off_percentage" autocomplete="off">'                                                          
                          +'</div>'
-                         +'<span class="qnty">Quantity<label>*</label></span>'
-                         +'<input type="text" name="quantity" class="quantity" autocomplete="off">'
+//                         +'<span class="qnty">Quantity<label>*</label></span>'
+//                         +'<input type="text" name="quantity" class="quantity" autocomplete="off">'
                      +'</div>'
                 +'</div>';
         
@@ -491,37 +286,6 @@ $(document).ready(function() {
        });
     });
     
-    
-    $('#formBrand').on('submit', function () {
-        var nameBrand = $('#brand_name').val();
-        if(nameBrand === '') {
-            return false;
-        }
-
-        $.ajax({
-         url: adminPath+"/createBrand",
-         type: 'POST',
-         data: {
-           brand_name: nameBrand
-         },
-         success: function(response) {
-              
-            if(!response) {
-                alert('create FAIL!');
-            }
-            else {
-                var data = JSON.parse(response);
-                var li = '<li>'
-                            +'<a href="javascript:void(0)" class="brandId" attr-id="'+ data.brand_id +'">X</a>'
-                            +'<label>'+ nameBrand +'</label>'
-                        +'</li>';
-                                            
-                $('#brandPageOl').prepend(li);
-            }
-         }
-       });
-    });
-
    function appendMessage(that, element , message) {
        var selector = '#' + element;
        
@@ -569,49 +333,9 @@ $(document).ready(function() {
         });
     });
     
-    $('body').on('click', '.showSingle', function() {
-        var productName = $.urlParam('product_name');
-        var pathToController  = typeof adminPath === 'undefined' ? publicPath : adminPath;
-        
-      $('body').prepend('<div id="loader"></div>');  
-      
-      $.ajax({
-         url: pathToController + "/loadProducts",
-         type: 'POST',
-         data: {
-           product_name: productName,
-           page: pageProducts
-         },
-         success: function(response) {
-                var data = JSON.parse(response);
-
-                for(var i in data.products) {
-                    var li = '<li>'
-                                +'<a href="javascript:void(0)" class="brandId" attr-id="'+ data.products[i].id +'">X</a>'
-                                +'<label>'+ data.products[i].product_name +'</label>'
-                                +'<a href="' + pathToController +'/editProduct/' + data.products[i].id + '" class="editProduct" attr-id="'+ data.products[i].id +'">edit</a>'
-                            +'</li>';
-
-                    $('#productPageOl').append(li);
-                }
-                
-            pageProducts++;
-            
-            $('#loader').remove();
-            
-            if(data.nextPage === 0) {
-                $('.showSingle').remove();
-            }
-        }
-       });
-        
-        
-    });
-    
-    
     var pageManuals = 1;
     var pagePromo = 1;
-    var pageProducts = 1;
+    
     
     $('body').on('click', '.loadProducts', function() {
         var element = $(this).parents('.container');
@@ -792,19 +516,19 @@ $(document).ready(function() {
     $('.qty_add_to_cart').on('focus', '#quantity', function() {
         $(this).on('keyup', function() {
             
-            if($(this).val().indexOf('.') > -1) {
+            if(!isInt($(this).val())) {
                 $(this).val(1);
                 alert('This is not allowed number!');
+                
                 return false;
             }
             
-            
-            if(parseInt($(this).val()) > parseInt($(this).attr('max'))) {
-                $(this).val($(this).attr('max'));
-                alert('Max quantity on this item is ' + $(this).attr('max'));
-            }
         });
     });
+
+    function isInt(value) {
+      return !isNaN(value) && (function(x) { return (x | 0) === x; })(parseFloat(value))
+    }
 
     //$('select[name="perfum_available_ml"]').on('change',function(){
     $('.col-md-9, .product-model-sec').on('change', 'select[name="perfum_available_ml"]', function(){
@@ -937,11 +661,11 @@ $(document).ready(function() {
         var itemQuantity = $(this).find('.item_quantity');
         
         itemQuantity.on('keyup', function() {
-            console.info($(this).val(), $(this).attr('max'));
-            
-            if(parseInt($(this).val()) > parseInt($(this).attr('max'))) {
-                $(this).val($(this).attr('max'));
-                alert('Max quantity on this item is ' + $(this).attr('max'));
+           if(!isInt($(this).val())) {
+                $(this).val(1);
+                alert('This is not allowed number!');
+                
+                return false;
             }
         });
     });
@@ -960,6 +684,9 @@ $(document).ready(function() {
          // check page for optimize ajax request than php 
      });
 
+    function setDisabledFilter() {
+         $('.product_right .sky-form:first').prepend('<div id="disabledFilter"><div/>');
+     }
 
     $('body').on('click', '.menu_see_all_brands', function() {
         var thisCatAttr = $(this).attr('attr-cat');
@@ -967,12 +694,31 @@ $(document).ready(function() {
         $('.searchOverlyBrands').attr('attr-cat', thisCatAttr);
         
         getUrlBrands('', document.URL);
+        
+        setDisabledFilter();
        
     });
+    
+    // detect on load if page is top filtred
+    function checkPageForTop() {
+        var selector = $('#disabledFilter');
+        var isExist = selector.length === 0;
+        if(document.URL.indexOf('cat=top') > -1) {
+             if(isExist) {
+                 setDisabledFilter();
+             }
+        }
+        else {
+            selector.remove();
+        }
+    }
+    
+    checkPageForTop();
+    
+    
 
     // reset filter options to default!
     $('body').on('click', '#cleanFilter', function() {
-
        var currentCat = $.urlParam('cat');
 
        counterPage = 0;
@@ -1070,6 +816,7 @@ $(document).ready(function() {
         if(document.URL.indexOf('products') > -1) {
             var closeElement = $(this).parents('.dropdown');
             
+            counterPage = 0;
             loadFilteredProducts(
                     closeElement.attr('attr-cat'),
                     $(this).attr('brandId'),  
@@ -1162,7 +909,8 @@ $(document).ready(function() {
                 page: counterPage
             },
             success: function(response) {
-
+                checkPageForTop();
+                
                 if(response != false) {
                     setRangeFilterVal(min, max);
                     // set globaly min and max value on range filter
@@ -1238,7 +986,7 @@ $(document).ready(function() {
                                                      
                                                      : jsonData.sorted[i].options[j].price, 
                                                      
-                                            text: jsonData.sorted[i].options[j].ml})
+                                            text: jsonData.sorted[i].options[j].ml + ' ml'})
                                                 .appendTo(select);
 
                             if(jsonData.sorted[i].options[j].sale_price != 0) {
@@ -1450,6 +1198,7 @@ $(document).ready(function() {
         
         var cartItemsString = JSON.stringify( cartItems );
 
+        console.info(cartItems);
         localStorage.setItem( "currentCart", cartItemsString );
     }
     
@@ -1481,15 +1230,14 @@ $(document).ready(function() {
     
     $('body').on('click', '.simpleCart_empty', function() {
         itemCountity = 0;
-        localStorage.removeItem("currentCart");
-        localStorage.removeItem("currentShoppingCarTotal");
-        localStorage.removeItem("itemQuantity");
+        localStorage.clear();
+        cartItems = [];
         
         $('.cart-header').fadeOut('slow', function(){
             $('.cart-header').remove();
         });
         
-        updateChekoutInfo(0, 0, 10);
+        updateChekoutInfo(0, 0, 'No delivery cost!');
         
     });
     
@@ -1509,7 +1257,16 @@ $(document).ready(function() {
                     
                     
             console.info(cartItemQty, currentShoppingCarTotal);
-            updateChekoutInfo(cartItemQty, currentShoppingCarTotal, 10);
+            var delivery = '';
+            if(currentShoppingCarTotal > 30) {
+
+              delivery = 'No delivery cost!';
+            }
+            else
+            {
+              delivery = '€10';
+            }
+            updateChekoutInfo(cartItemQty, currentShoppingCarTotal, delivery);
 
             localStorage.setItem('currentCart', JSON.stringify( localStorageCart ));
             localStorage.setItem('itemQuantity', cartItemQty);
@@ -1527,10 +1284,8 @@ $(document).ready(function() {
         var currentShoppingCarTotal = parseFloat(localStorage.getItem("currentShoppingCarTotal"));
         var currentCarArr = JSON.parse(localStorage.getItem("currentCart"));
         
-        //console.log('checkout' + carItemQty, currentShoppingCarTotal, currentCarArr);
-        
         for(var i in currentCarArr) {
-            
+            console.info(i);
             var productDiv =                
                     '<div class="cart-header">' +
                     '<div class="removeCartProduct" cart-position="' + i + '"> </div>' +
@@ -1572,7 +1327,18 @@ $(document).ready(function() {
         carItemQty = isNaN(carItemQty) ? 0 : carItemQty;
         currentShoppingCarTotal = isNaN(currentShoppingCarTotal) ? 0 : currentShoppingCarTotal;
         
-        updateChekoutInfo(carItemQty, currentShoppingCarTotal, 10);
+console.log(currentShoppingCarTotal > 30);
+        var delivery = '';
+        if(currentShoppingCarTotal > 30) {
+
+          delivery = 'No delivery cost!';
+        }
+        else
+        {
+          delivery = '€10';
+        }
+console.log(delivery);
+        updateChekoutInfo(carItemQty, currentShoppingCarTotal, delivery);
 
         if(currentShoppingCarTotal > 0 == false) {
 
@@ -1583,7 +1349,6 @@ $(document).ready(function() {
     }
     
     function updateChekoutInfo(carItemQty, currentShoppingCarTotal, delivery) {
-        
         currentShoppingCarTotal = currentShoppingCarTotal === 0 ? currentShoppingCarTotal + '.00' : currentShoppingCarTotal;
         $('.simpleCart_total').text('€' + currentShoppingCarTotal);
         currentShoppingCarTotal = parseFloat(currentShoppingCarTotal);
@@ -1596,8 +1361,13 @@ $(document).ready(function() {
         
         $('#checkoutCarQty').text(carItemQty);
         $('#checkoutProductsPrice').text('€' + currentShoppingCarTotal);
-        $('#checkoutDeliveryPrice').text('hardcoded €' + delivery);
-        $('#checkoutTotalPrice').text('€' + (currentShoppingCarTotal + 10));
+        $('#checkoutDeliveryPrice').text(delivery);
+        if(delivery == '€10'){
+            $('#checkoutTotalPrice').text('€' + (currentShoppingCarTotal + 10));
+        }
+        else {
+            $('#checkoutTotalPrice').text('€' + currentShoppingCarTotal);
+        }
         // update info order
     }
     
@@ -1627,7 +1397,18 @@ $(document).ready(function() {
         carItemQty = isNaN(carItemQty) ? 0 : carItemQty;
         currentShoppingCarTotal = isNaN(currentShoppingCarTotal) ? 0 : currentShoppingCarTotal;
 
-        updateChekoutInfo(carItemQty, currentShoppingCarTotal, 10);
+        var delivery = '';
+        if(currentShoppingCarTotal > 30) {
+
+          delivery = 'No delivery cost!';
+          $('input[name="deliveryHiddenInput"]').val(0);
+        }
+        else
+        {
+          delivery = '€10';
+          $('input[name="deliveryHiddenInput"]').val(10);
+        }
+        updateChekoutInfo(carItemQty , currentShoppingCarTotal, delivery);        
 
         $('.registerBtn').on('click', function(){
 
@@ -1639,10 +1420,14 @@ $(document).ready(function() {
     
     function crateHiddenProduct(currentCarArr, productNum) {
         var child = 
-        '<input type="hidden" name="item_number_' + productNum + '" value="' + productNum + '">' +
+        '<input type="hidden" name="item_number_' + productNum + '" value="' + currentCarArr[i].product_id + '">' +
         '<input type="hidden" name="item_name_' + productNum + '" value="' + currentCarArr[i].product_name + '">' +
         '<input type="hidden" name="amount_' + productNum + '" value="' + currentCarArr[i].option_price + '">' +
-        '<input type="hidden" name="quantity_' + productNum + '" value="' + currentCarArr[i].qty + '">';
+        '<input type="hidden" name="quantity_' + productNum + '" value="' + currentCarArr[i].qty + '">' +
+        '<input type="hidden" name="on0_' + productNum + '" value="Ml">' +
+        '<input type="hidden" name="os0_' + productNum + '" value="' + currentCarArr[i].order_ml + '">' +
+        '<input type="hidden" name="on1_' + productNum + '" value="Image">' +
+        '<input type="hidden" name="os1_' + productNum + '" value="' + currentCarArr[i].image_src + '">';
 
         return child;
     }
@@ -1679,22 +1464,15 @@ $(document).ready(function() {
         
         var errors = [];
         
-        $('.shipping_information_table tr').each(function() {
-            
-            var isExists = $(this).find('.tableInformation').length > 0;
-            
-            if($(this).find('.tableInformation').text() === '' && isExists) {
+        $('.tableInformation').each(function() {
+            if($.trim($(this).text()) === '') {
                 errors.push(1);
             }
         });
         
         if(errors.length > 0) {
                 if($('.overMessage').length === 0) {
-                    $('.shipping_information_table table').addClass('inputError');
-                    $('body').prepend('<div class="overMessage">Please fill all address data!</div>');
-                    setTimeout(function() {
-                       $('.overMessage').remove(); 
-                    }, 4000);
+                    checkIsCorrect('.shipping_information_table table');
                 }
                 
                return false;
@@ -1708,6 +1486,14 @@ $(document).ready(function() {
         
     }
     
+    function checkIsCorrect(selector) {
+        $(selector).addClass('inputError');
+                    $('body').prepend('<div class="overMessage">Please fill all address data!</div>');
+                    setTimeout(function() {
+                       $('.overMessage').remove(); 
+                    }, 4000);
+    }
+    
     function loopCheck(selector) {
         var errors = [];
         
@@ -1718,8 +1504,8 @@ $(document).ready(function() {
             
         if(errors.length > 0) {
             $('input').removeClass('inputError');
-            $('input[name="' + errors[0] + '"]').addClass('inputError');
-
+            checkIsCorrect('input[name="' + errors[0] + '"]'); // send 
+            
             return false;
         }
 
@@ -1784,7 +1570,16 @@ $(document).ready(function() {
         var currentShoppingCarTotal = parseFloat(localStorage.getItem("currentShoppingCarTotal"));
         currentShoppingCarTotal = isNaN(currentShoppingCarTotal) ? 0 : currentShoppingCarTotal;
 
-        $('#paymentTotal').text(currentShoppingCarTotal);
+        if(currentShoppingCarTotal > 30) {
+
+          $('#paymentTotal').text(currentShoppingCarTotal);
+        }
+        else
+        {
+          var totalPayment = currentShoppingCarTotal + 10;
+          $('#paymentTotal').text(totalPayment);
+        }
+        
 
         var currentCarArr = JSON.parse(localStorage.getItem("currentCart"));
 
@@ -1793,10 +1588,18 @@ $(document).ready(function() {
             var hiddenProduct = crateHiddenProduct(currentCarArr, productNum);
 
             $('#formPaypal').append(hiddenProduct);
+            $('#formPaypalCard').append(hiddenProduct);
         }
     }
     
-    
+    if(document.URL.indexOf('successPayment') > - 1) {
+
+        localStorage.removeItem("currentCart");
+        localStorage.removeItem("currentShoppingCarTotal");
+        localStorage.removeItem("itemQuantity");
+
+        updateChekoutInfo(0, 0, 'No delivery cost!');        
+    }    
     
     // subscription email
 }); 
